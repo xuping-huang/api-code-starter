@@ -1,0 +1,45 @@
+# Overview
+
+{{project.description}}
+
+# Install & Run
+
+$ npm install
+$ npm run start
+
+# Configuration
+
+Configuration saved in .env file.
+
+|Environment Variables|Description|
+|--|--|
+|HOST|Server host address.|
+|PORT|Server running port.|
+|NODE_ENV|Server running context. `development` in developing.|
+
+# Scripts
+
+| Script | Summary |
+|---|---|
+{{#projectStyle.language.isJavaScript}}
+|npm run start|Start server.|
+|npm run debug|Print debug info in server running.|
+|npm run lint|Check code style with eslint rules.|
+|npm run test|Running api test code.|
+{{/projectStyle.language.isJavaScript}}
+{{#projectStyle.language.isTypeScript}}
+|npm run start|Start server.|
+|npm run debug|Print debug info in server running.|
+|npm run build|Build ts code to js|
+|npm run watch|Watch code change and rebuild|
+|npm run tslint|Check code style with tslint rules.|
+|npm run test|Running api test code.|
+{{/projectStyle.language.isTypeScript}}
+
+# Docker Demployment
+
+ - Configuration: `Dockfile`, `docker-compose.yml`
+ {{#projectStyle.db.isMongoDB}}
+ - DB Data Import: `db/user.json`, `db/import.sh`
+ {{/projectStyle.db.isMongoDB}}
+ - Running: `docker-compose up`

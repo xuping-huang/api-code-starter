@@ -1,0 +1,46 @@
+{
+  "name": "code-api-starter",
+  "version": "1.0.0",
+  "description": "a starter",
+  "main": "build/main/main.js",
+  "typings": "build/main/main.d.ts",
+  "repository": "https://github.com/xuping-huang/code-api-starter",
+  "license": "MIT",
+  "keywords": [],
+  "scripts": {
+    "start": "set DEBUG=code:generator&&set CODE_ENV=development&&ts-node src/main.ts",
+    "describe": "npm-scripts-info",
+    "build:main": "tsc -p tsconfig.json",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "clean": "trash build test"
+  },
+  "engines": {
+    "node": ">=8.9"
+  },
+  "dependencies": {
+    "@types/js-yaml": "^3.11.4",
+    "debug": "^4.1.0",
+    "dotenv": "^6.0.0",
+    "joi": "^14.3.0",
+    "js-yaml": "^3.12.1",
+    "merge-deep": "^3.0.2",
+    "mustache": "^3.0.1",
+    "node-yaml-config": "^0.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^9.4.6",
+    "@types/mustache": "^0.8.32",
+    "@types/dotenv": "^6.0.0",
+    "@types/joi": "^14.0.1",
+    "@types/debug": "^0.0.31",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-immutable": "^5.0.0",
+    "typescript": "^3.1.6"
+  },
+  "prettier": {
+    "singleQuote": true
+  }
+}

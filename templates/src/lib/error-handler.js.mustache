@@ -1,0 +1,27 @@
+const { promisify } = require('util');
+const config = require('./config');
+
+const isCriticalError = error => error.isCritical;
+
+const sendMailIfCritical = (error) => {
+  if (isCriticalError(error)) {
+    // TODO: send mail
+  }
+};
+
+const saveQueueIfCritical = (error) => {
+  if (isCriticalError(error)) {
+    // TODO: save error log to queue
+  }
+};
+
+const sendMailToAdminIfCritical = promisify(sendMailIfCritical);
+const saveInOpsQueueIfCritical = promisify(saveQueueIfCritical);
+
+exports.handleError = async (error) => {
+  if (config.env === 'development') {
+    console.error(error);
+  }
+  await sendMailToAdminIfCritical;
+  await saveInOpsQueueIfCritical;
+};

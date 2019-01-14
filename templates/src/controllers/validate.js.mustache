@@ -1,0 +1,48 @@
+{{#dependencies.validate.need_joi}}
+const Joi = require('joi');
+
+const { JoiValidationError } = require('../../lib/app-error');
+
+const validPageSchema = (options) => {
+  const schema = Joi.object({
+    page: Joi.number().integer().min(1).optional().default(1),
+    perPage: Joi.number().integer().min(1).max(config.page.max).optional().default(config.page.perPage)
+  });
+
+  const {
+    error,
+    value: validOptions
+  } = Joi.validate(options, schema, {
+    abortEarly: false,
+    stripUnknown: true
+  });
+
+  if (error) {
+    return { pageError: error };
+  }
+
+  validOptions.skipTotal = (validOptions.page -1) * validOptions.perPage;
+  return { pageOption: validOptions };
+};
+
+module.exports.validForSampleRoute = async (options) => {
+  const schema = Joi.object({
+    groupId: Joi.string().guid().required()
+  }).unknown().required();
+  const {
+    error,
+    value: validOptions
+  } = Joi.validate(options, schema, {
+    abortEarly: false
+  });
+
+  const {pageError, pageOption} = validPageSchema(options);
+
+
+  if (error || pageError) {
+    return Promise.reject(new JoiValidationError([error, pageError]));
+  }
+  validOptions.pagination = pageOption;
+  return Promise.resolve(validOptions);
+};
+{{/dependencies.validate.need_joi}}

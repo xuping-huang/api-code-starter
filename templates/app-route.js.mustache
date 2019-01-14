@@ -1,0 +1,55 @@
+const express = require('express');
+{{#dependencies.other.need_swagger_jsdoc}}
+const swaggerJSDoc = require('swagger-jsdoc');
+{{/dependencies.other.need_swagger_jsdoc}}
+const apiRoute = require('.src/controller/api.route');
+const config = require('./src/config/env-config');
+
+const router = express.Router(); // eslint-disable-line new-cap
+{{#dependencies.other.need_swagger_jsdoc}}
+
+/**
+ * Swagger-jsdoc
+ */
+const swaggerDefinition = {
+  info: {
+    // API informations (required)
+    title: '{{proejct.name}}', // Title (required)
+    version: '{{project.version}}', // Version (required)
+    description: '{{project.description}}', // Description (optional)
+  },
+  host: `${config.host}:${config.port}`, // Host (optional)
+  basePath: '/', // Base path (optional)
+};
+
+// Options for the swagger docs
+const options = {
+  // Import swaggerDefinitions
+  swaggerDefinition,
+  // Path to the API docs
+  // Note that this path is relative to the current directory from which the Node.js is ran,
+  // not the application itself.
+  apis: ['./src/controller/*.js','./src/models/*.js'],
+};
+
+// Initialize swagger-jsdoc -> returns validated swagger spec in json format
+const swaggerSpec = swaggerJSDoc(options);
+
+// Serve swagger docs the way you like (Recommendation: swagger-tools)
+router.get('/swagger', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+{{/dependencies.other.need_swagger_jsdoc}}
+{{#apiStyle.other.needHealthCheck}}
+
+/** GET /health-check - Check service health */
+router.get('/health-check', (req, res) => {
+  res.send('OK');
+});
+{{/apiStyle.other.needHealthCheck}}
+
+// mount routes
+router.use('', apiRoute);
+
+module.exports = router;

@@ -1,0 +1,157 @@
+{
+  "name": "{{project.name}}",
+  "version": "{{project.version}}",
+  "description": "{{project.description}}",
+  "author": {
+    "name": "Xuping Huang",
+    "email": "it@huangxuping.com"
+  },
+  "license": "",
+  "scripts": {
+    {{#projectStyle.language.isJavaScript}}
+    {{#devDependencies.other.need_nodemon}}
+    "debug": "set DEBUG=*&&set NODE_ENV=development&&nodemon app.js",
+    "start": "node app.js",
+    {{/devDependencies.other.need_nodemon}}
+    {{^devDependencies.other.need_nodemon}}
+    "debug": "set DEBUG=*&&set NODE_ENV=development&&node app.js",
+    "start": "node app.js",
+    {{/devDependencies.other.need_nodemon}}
+    {{#devDependencies.codeStyle.need_eslint}}
+    "lint": "eslint \"**/*.js\"",
+    {{/devDependencies.codeStyle.need_eslint}}
+    {{#devDependencies.test.need_mocha}}
+    {{#devDependencies.coverage.need_nyc}}
+    "test": "nyc mocha --timeout=10000 --exit"
+    {{/devDependencies.coverage.need_nyc}}
+    {{/devDependencies.test.need_mocha}}
+    {{/projectStyle.language.isJavaScript}}
+    {{#projectStyle.language.isTypeScript}}
+    "start": "ts-node app.ts“,
+    "debug": "set DEBUG=*&&set CODE_ENV=development&&ts-node app.ts",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    {{#devDependencies.test.need_jest}}
+    "test": "jest --forceExit --coverage --verbose",
+    {{/devDependencies.test.need_jest}}
+    {{/projectStyle.language.isTypeScript}}
+  },
+  "dependencies": {
+    {{#dependencies.secure.need_bcrypt_nodejs}}
+    "bcrypt-nodejs": "^0.0.3",
+    {{/dependencies.secure.need_bcrypt_nodejs}}
+    {{#projectStyle.server.isExpress}}
+    "express": "^4.16.3",
+    {{#dependencies.express.need_multer}}
+    "multer": "^1.3.0",
+    {{/dependencies.express.need_multer}}
+    {{#dependencies.express.need_bodyParser}}
+    "body-parser": "^1.18.3",
+    {{/dependencies.express.need_bodyParser}}
+    {{#dependencies.express.need_compression}}
+    "compression": "^1.7.3",
+    {{/dependencies.express.need_compression}}
+    {{#dependencies.express.need_cors}}
+    "cors": "^2.8.5",
+    {{/dependencies.express.need_cors}}
+    {{#dependencies.express.need_express_status_monitor}}
+    "express-status-monitor": "^1.1.5",
+    {{/dependencies.express.need_express_status_monitor}}
+    {{#dependencies.express.need_expressValidator}}
+    "express-validator": "^5.3.0",
+    {{/dependencies.express.need_expressValidator}}
+    {{#dependencies.express.need_helmet}}
+    "helmet": "^3.15.0",
+    {{/dependencies.express.need_helmet}}
+    {{/projectStyle.server.isExpress}}
+    {{#dependencies.config.need_dotenv}}
+    "dotenv": "^6.0.0",
+    {{/dependencies.config.need_dotenv}}
+    {{#dependencies.other.need_error_handle}}
+    "errorhandler": "^1.5.0",
+    {{/dependencies.other.need_error_handle}}
+    {{#dependencies.other.need_http_status}}
+    "http-status": "^1.3.1",
+    {{/dependencies.other.need_http_status}}
+    {{#dependencies.validate.need_joi}}
+    "joi": "^14.3.0",
+    {{/dependencies.validate.need_joi}}
+    {{#dependencies.logger.need_morgan}}
+    "morgan": "^1.9.1",
+    {{/dependencies.logger.need_morgan}}
+    {{#dependencies.validate.need_validator}}
+    "validator": "^10.7.1",
+    {{/dependencies.validate.need_validator}}
+    {{#projectStyle.db.isJsonDB}}
+    {{#dependencies.db.need_json_file_db}}
+    "json-file-db": "^0.0.2",
+    {{/dependencies.db.need_json_file_db}}
+    {{/projectStyle.db.isJsonDB}}
+    {{#dependencies.express.need_lusca}}
+    "lusca": "^1.6.1",
+    {{/dependencies.express.need_lusca}}
+    {{#dependencies.other.need_uuid}}
+    "uuid": "^3.3.2",
+    {{/dependencies.other.need_uuid}}
+    {{#dependencies.other.need_debug}}
+    "debug": "^4.1.0",
+    {{/dependencies.other.need_debug}}
+    {{#apiStyle.other.needJwt}}
+    {{#projectStyle.server.isExpress}}
+    {{#dependencies.express.need_express_jwt}}
+    "express-jwt": "^5.3.1",
+    "jsonwebtoken": "^8.4.0",
+    {{/dependencies.express.need_express_jwt}}
+    {{/projectStyle.server.isExpress}}
+    {{/apiStyle.other.needJwt}}
+    {{#projectStyle.db.isMongoDB}}
+    {{#dependencies.db.need_mongoose}}
+    "mongoose": "^5.2.15",
+    {{/dependencies.db.need_mongoose}}
+    {{/projectStyle.db.isMongoDB}}
+  },
+  "devDependencies": {
+    {{#devDependencies.test.need_chai}}
+    "chai": "^4.1.2",
+    {{/devDependencies.test.need_chai}}
+    {{#devDependencies.test.need_mocha}}
+    "mocha": "^5.2.0",
+    {{/devDependencies.test.need_mocha}}
+    {{#devDependencies.test.need_sinon}}
+    "sinon": "^6.3.3",
+    {{/devDependencies.test.need_sinon}}
+    {{#devDependencies.test.need_supertest}}
+    "supertest": "^3.3.0",
+    {{/devDependencies.test.need_supertest}}
+    {{#devDependencies.test.need_sinon_mongoose}}
+    {{#projectStyle.db.isMongoDB}}
+    "sinon-mongoose": "^2.2.1",
+    {{/projectStyle.db.isMongoDB}}
+    {{/devDependencies.test.need_sinon_mongoose}}
+    {{#projectStyle.language.isJavaScript}}
+    {{#devDependencies.codeStyle.need_eslint}}
+    "eslint": "^5.6.0",
+    {{/devDependencies.codeStyle.need_eslint}}
+    {{#devDependencies.codeStyle.need_eslint_airbnb_base}}
+    "eslint-config-airbnb-base": "^13.1.0",
+    {{/devDependencies.codeStyle.need_eslint_airbnb_base}}
+    {{#devDependencies.codeStyle.need_eslint_chai_friendly}}
+    "eslint-plugin-chai-friendly": "^0.4.1",
+    {{/devDependencies.codeStyle.need_eslint_chai_friendly}}
+    {{#devDependencies.codeStyle.need_eslint_plugin_import}}
+    "eslint-plugin-import": "^2.14.0",
+    {{/devDependencies.codeStyle.need_eslint_plugin_import}}
+    {{/projectStyle.language.isJavaScript}}
+    {{#devDependencies.other.need_nodemon}}
+    "nodemon": "^1.18.9",
+    {{/devDependencies.other.need_nodemon}}
+    {{#devDependencies.coverage.need_nyc}}
+    "nyc": "^13.0.1"
+    {{/devDependencies.coverage.need_nyc}}
+  },
+  "engines": {
+    "node": ">=10.14.0",
+    "npm": ">=5.6.0"
+  }
+}

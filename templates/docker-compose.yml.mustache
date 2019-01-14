@@ -1,0 +1,37 @@
+version: '3'
+services:
+  {{#projectStyle.db.isMongoDB}}
+  mongo:
+    image: mongo:4.0
+    ports:
+    - "27017:27017"
+    environment:
+    - MONGO_INITDB_DATABASE=apiKitDb
+  mongo_seed:
+    image: mongo:4.0
+    links:
+      - mongo
+    volumes:
+    - ./db:/mongo-seed
+    # use to import init data for mongo db
+    command:
+      /mongo-seed/import.sh
+  {{/projectStyle.db.isMongoDB}}
+  web:
+    build: .
+    ports:
+    - "80:80"
+    environment:
+    # web connect to the db in the mongo service
+    {{#projectStyle.db.isMongoDB}}
+    - MONGODB_URI=mongodb://mongo:27017/apiKitDb
+    depends_on:
+    - mongo
+    links:
+    - mongo
+    {{/projectStyle.db.isMongoDB}}
+    volumes:
+    # map current dir to docker machine dir: /starter
+    - .:/starter
+    # create a volumes /starter/node_modules in docker machine only
+    - /starter/node_modules

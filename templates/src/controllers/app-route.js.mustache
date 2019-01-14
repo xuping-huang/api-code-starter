@@ -1,0 +1,133 @@
+{{#projectStyle.server.isExpress}}
+const server = require('express');
+{{/projectStyle.server.isExpress}}
+{{#apiStyle.other.needJwt}}
+{{#dependencies.express.need_express_jwt}}
+const jwt = require('jsonwebtoken');
+const expressJwt = require('express-jwt');
+{{/dependencies.express.need_express_jwt}}
+{{/apiStyle.other.needJwt}}
+{{#dependencies.other.need_http_status}}
+const httpStatus = require('http-status');
+{{/dependencies.other.need_http_status}}
+{{#dependencies.validate.need_joi}}
+const Joi = require('joi');
+{{/dependencies.validate.need_joi}}
+
+const config = require('../lib/config');
+{{#apiStyle.log.needLog}}
+const logger = require('../lib/logger');
+const log = logger(config.logger);
+{{/apiStyle.log.needLog}}
+
+const {{project.module}} = require('../services/api-service');
+const validates = require('./validate');
+const router = new server.Router();
+const { AuthenticateError } = require('../lib/app-error');
+{{#apiStyle.other.needJwt}}
+
+/**
+ * Return member info packaged at jwt sign
+ * @param {request} req request object from client
+ * @returns member info with userId
+ */
+const getUserInfoFromToken = async (req) => {
+  const auth = req.get(config.jwt.headerName);
+  if (!auth) return Promise.reject(new AuthenticateError());
+
+  const jwtObj = jwt.verify(auth.substr(7), config.jwt.secretKey);
+  return Promise.resolve({ userId: jwtObj.userId });
+};
+{{/apiStyle.other.needJwt}}
+
+/**
+ * Format returned error info
+ * @param {*} err caught error
+ * @param {*} res http response
+ * @returns Error object with status & error info
+ */
+const formatError = (err, res) => {
+  // log.error(err);
+
+  if (!err || !err.status) {
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+      status: httpStatus.INTERNAL_SERVER_ERROR,
+      message: config.response.err.internalServerError
+    });
+  }
+  return res.status(err.status).send({
+    status: err.status,
+    message: err.error || err.message
+  });
+};
+{{#apiStyle.other.needJwt}}
+
+/**
+ * **just for validation in test phase.**
+ * Auth api not include in demand, but we need jwt token for api security.
+ * So this api will return a valid JWT token for particular memberId
+ * without check username and password.
+ */
+router.get('/auth/login/:userId', async (req, res, next) => {
+  /** ignore validate because this api not in demand */
+  const userId = req.params.userId;
+
+  /** find user info by userId */
+  const user = { firstName: 'demo' };
+
+  const token = jwt.sign({
+    userId
+  }, config.jwt.secretKey, {
+    expiresIn: config.jwt.expireDay
+  });
+  return res.json({
+    token,
+    username: user.firstName
+  });
+});
+
+/**
+ * Validate token, removed after dev complete
+ */
+router.route('/auth/token')
+  .get(expressJwt({
+    secret: config.jwt.secretKey
+  }), async (req, res, next) => {
+    try {
+      const user = await getUserInfoFromToken(req);
+      if(!user) {
+        return formatError(null, res);
+      }
+      res.status(result.status || 200).json(user);
+    } catch (err) {
+      return formatError(err, res);
+    }
+  });
+{{/apiStyle.other.needJwt}}
+
+/**
+ * Sample route
+ */
+router.route('{{project.module}}/:groupId/members')
+  .get({{#apiStyle.other.needJwt}}expressJwt({
+    secret: config.jwt.secretKey
+  }), {{/apiStyle.other.needJwt}}async (req, res, next) => {
+    try {
+      const user = await getUserInfoFromToken(req);
+      const options = {
+        groupId: req.params.groupId,
+        page: req.query.page,
+        perPage: req.query.perPage,
+        userId: user.userId
+      };
+
+      const validOptions = await validates.validForSampleRoute(options);
+      const result = await {{project.module}}.getMembersByGroupId(validOptions);
+      res.status(result.status || 200).json(result);
+    } catch (err) {
+      return formatError(err, res);
+    }
+  });
+
+
+module.exports = router;

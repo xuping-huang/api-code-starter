@@ -1,0 +1,115 @@
+{{#projectStyle.server.isExpress}}
+const express = require('express');
+{{#dependencies.express.need_express_status_monitor}}
+const expressStatusMonitor = require('express-status-monitor');
+{{/dependencies.express.need_express_status_monitor}}
+{{#dependencies.express.need_compression}}
+const compression = require('compression');
+{{/dependencies.express.need_compression}}
+{{#dependencies.express.need_bodyParser}}
+const bodyParser = require('body-parser');
+{{/dependencies.express.need_bodyParser}}
+{{#dependencies.express.need_cors}}
+const cors = require('cors');
+{{/dependencies.express.need_cors}}
+{{#dependencies.express.need_expressValidator}}
+const expressValidator = require('express-validator');
+{{/dependencies.express.need_expressValidator}}
+{{#dependencies.other.need_http_status}}
+const httpStatus = require('http-status');
+{{/dependencies.other.need_http_status}}
+{{#dependencies.express.need_helmet}}
+const helmet = require('helmet');
+{{/dependencies.express.need_helmet}}
+
+const config = require('./src/config/config');
+{{#apiStyle.log.needLog}}
+const logger = require('./src/lib/logger');
+{{/apiStyle.log.needLog}}
+const { NotFoundError } = require('./src/lib/app-error');
+const errorHandler = require('./src/lilb/error-handler');
+const router = require('./app-route');
+
+const app = express();
+app.set('host', config.host);
+app.set('port', config.port);
+{{#dependencies.express.need_express_status_monitor}}
+// Monitor express running at http://host:port/status
+app.use(expressStatusMonitor());
+{{/dependencies.express.need_express_status_monitor}}
+{{#dependencies.express.need_compression}}
+
+// Comment it if choose ngnix to compress response.
+app.use(compression());
+{{/dependencies.express.need_compression}}
+{{#dependencies.express.need_bodyParser}}
+
+// Create req.body in request object.
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+{{/dependencies.express.need_bodyParser}}
+{{#dependencies.express.need_helmet}}
+
+// secure apps by setting various HTTP headers
+app.use(helmet());
+{{/dependencies.express.need_helmet}}
+{{#dependencies.express.need_expressValidator}}
+
+/**
+ * When validate fail, error response will like below:
+  {
+    "errors": [{
+      "location": "body",
+      "msg": "Invalid value",
+      "param": "username"
+    }]
+  }
+ */
+app.use(expressValidator());
+{{/dependencies.express.need_expressValidator}}
+{{#dependencies.express.need_cors}}
+
+// enable CORS - Cross Origin Resource Sharing
+app.use(cors());
+{{/dependencies.express.need_cors}}
+
+// Hide the technical details of the site implementation.
+app.disable('x-powered-by');
+{{#apiStyle.log.needLog}}
+
+{{#dependencies.logger.need_morgan}}
+app.use(logger);
+{{/dependencies.logger.need_morgan}}
+{{/apiStyle.log.needLog}}
+
+// Mount all routes on a root path
+app.use('', router);
+
+// catch 404 and forward to error handler
+app.use((req, res, next) => {
+  const err = new NotFoundError('API not found', httpStatus.NOT_FOUND);
+  return next(err);
+});
+
+{{#dependencies.other.need_error_handle}}
+// Error Handler.
+if (config.isDebug) {
+  app.use(devErrorHandler());
+} else {
+  app.use(async (err, req, res, next) => {
+    await errorHandler.handleError(err);
+    res.status(500).send(err);
+  });
+}
+{{/dependencies.other.need_error_handle}}
+{{^dependencies.other.need_error_handle}}
+app.use(async (err, req, res, next) => {
+  await errorHandler.handleError(err);
+  res.status(500).send(err);
+});
+{{/dependencies.other.need_error_handle}}
+
+exports.app = app;
+{{/projectStyle.server.isExpress}}

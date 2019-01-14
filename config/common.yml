@@ -1,0 +1,98 @@
+defaults: &defaults
+  project:
+    name: code-api-generator
+    version: 0.0.1
+    description: Generate api code start kit.
+    port: 3000
+    module: groups
+  projectStyle:
+    language:
+      name: JavaScript
+      isJavaScript: true
+      isTypeScript: false
+    server:
+      name: Express
+      isExpress: true
+      isKoa: false
+    db:
+      name: JSON-DB
+      isJsonDB: true
+      isMongoDB: true
+      isNeo4j: false
+      isMysql: false
+  apiStyle:
+    log:
+      needLog: true
+    other:
+      needHealthCheck: true
+      needJwt: true
+      needPasswordBcrypt: true
+    lint:
+      isAribnbBase: true
+      isESlingStandard: false
+      isESlintRecommended: false
+  devDependencies:
+    codeStyle:
+      need_tslint: false
+      need_eslint: true
+      need_eslint_airbnb_base: true
+      need_eslint_chai_friendly: true
+      need_eslint_plugin_import: true
+    test:
+      need_chai: true
+      need_mocha: true
+      need_sinon: true
+      need_supertest: true
+      need_sinon_mongoose: true
+      need_jest: true
+    coverage:
+      need_nyc: true # Istanbul's state of the art command line interface
+    other:
+      need_nodemon: true # monitor file change and rerun server
+  dependencies:
+    config:
+      need_dotenv: true # load .env
+    logger:
+      need_morgan: true # logger
+      need_bunyan: false
+    validate:
+      need_joi: true
+      need_validator: true
+    secure:
+      need_bcrypt_nodejs: true
+    db:
+      need_json_file_db: true
+      need_mongoose: true
+    express:
+      need_express_status_monitor: true # monitor express status
+      need_compression: true # compress http response & request
+      need_bodyParser: true
+      need_expressValidator: true
+      need_cors: true # enable CORS with various options.
+      need_helmet: true # secure Express/Connect apps with various HTTP headers
+      need_lusca: true # Web application security middleware.
+      need_express_jwt: true
+      need_multer: true # Middleware for handling `multipart/form-data
+    other:
+      need_http_status: true
+      need_error_handle: true
+      need_uuid: true
+      need_swagger_jsdoc: true
+      need_debug: true
+development:
+  <<: *defaults
+
+ts:
+  <<: *defaults
+  projectStyle:
+    language:
+      name: TypeScript
+      isJavaScript: false
+      isTypeScript: true
+mongo:
+  <<: *defaults
+  projectStyle:
+    db:
+      name: MONGO
+      isJsonDB: false
+      isMongoDB: true

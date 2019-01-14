@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+  - "8"
+  - "10"
+services: {{#projectStyle.db.isMongoDB}}mongodb{{/projectStyle.db.isMongoDB}}
+cache:
+  directories:
+    - "node_modules"
+sudo: false
+install:
+  - npm install
+script:
+  - npm run lint
+  - npm test
