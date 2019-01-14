@@ -1,0 +1,71 @@
+{{#dependencies.validate.need_joi}}
+const Joi = require('joi');
+/**
+ * common Joi boolean validate
+ */
+const JoiBoolean = Joi.boolean().insensitive()
+  .truthy('yes')
+  .truthy('y')
+  .truthy('t')
+  .falsy('no')
+  .falsy('n')
+  .falsy('f');
+
+const JoiUpperEnum = Joi.string().trim().uppercase();
+const JoiLowerEnum = Joi.string().trim().lowercase();
+
+const JoiInt = Joi.number().integer();
+{{/dependencies.validate.need_joi}}
+
+/**
+ * Some regex used in validate quote
+ */
+const RegexDef = {
+  /** no number and special char */
+  CheckName: /^((?![0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]).)*$/,
+  /** mobile length */
+  CheckMobile: /^\d{10,14}$/,
+  /** not more than 8, and 4 number at the end */
+  CheckSerialNumber: /^.{0,4}\d{4}/,
+};
+
+/**
+ * Validate the enum value
+ * @param {*} value Which step is in the quote updating
+ */
+const checkEnumValue = (value, enums) => {
+  if (!value) return false;
+  value = value.toString().toLowerCase().trim();
+  if (value.length === 0) return false;
+  if (enums.indexOf(value) === -1) return false;
+  return true;
+};
+
+/**
+ * Validate Id property
+ * @param {*} obj validate target object
+ */
+const checkId = (obj, idProp) => {
+  {{#dependencies.validate.need_joi}}
+  const job = {};
+  job[idProp] = Joi.string().min(3).max(40).required();
+  const schema = Joi.object(job).unknown().required();
+  const { error } = Joi.validate(obj, schema);
+  if (error) {
+    return false;
+  }
+  return true;
+  {{/dependencies.validate.need_joi}}
+};
+
+module.exports = {
+  {{#dependencies.validate.need_joi}}
+  JoiBoolean,
+  JoiUpperEnum,
+  JoiLowerEnum,
+  JoiInt,
+  checkId,
+  {{/dependencies.validate.need_joi}}
+  RegexDef,
+  checkEnumValue
+};

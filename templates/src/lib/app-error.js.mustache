@@ -1,7 +1,11 @@
 {{#dependencies.other.need_http_status}}
 const httpStatus = require('http-status');
 {{/dependencies.other.need_http_status}}
-const config = require('./config');
+
+const config = require('../config/config');
+{{#apiStyle.log.needLog}}
+const logger = require('./logger');
+{{/apiStyle.log.needLog}}
 
 /**
  * @extends Error
@@ -13,6 +17,28 @@ class ExtendableError extends Error {
     this.name = this.constructor.name;
     this.status = status;
     Error.captureStackTrace(this, this.constructor.name);
+  }
+}
+
+/**
+ * Class representing an Internal Server error.
+ * @extends ExtendableError
+ */
+class DBError extends ExtendableError {
+  /**
+   * Creates an Internal Server error.
+   */
+  constructor (err, httpCode = httpStatus.INTERNAL_SERVER_ERROR) {
+    if (err.message) {
+      super(err.message, httpCode, false);
+    } else {
+      super('an error happened in db', httpCode, false);
+    }
+    {{#apiStyle.log.needLog}}
+    {{#dependencies.logger.need_bunyan}}
+    logger.error(err)
+    {{/dependencies.logger.need_bunyan}}
+    {{/apiStyle.log.needLog}}
   }
 }
 

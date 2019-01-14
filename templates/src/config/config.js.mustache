@@ -51,6 +51,18 @@ const envVarsSchema = Joi.object({
   LOGGER_LEVELS_FATAL: Joi.string().optional().allow(''),
   {{/dependencies.logger.need_bunyan}}
   {{/apiStyle.log.needLog}}
+  {{#projectStyle.db.isNeo4j}}
+  {{#projectStyle.deploy.useDocker}}
+  NEO4J_BOLT_URL: Joi.string().require(),
+  NEO4J_BOLT_USER: Joi.string().require(),
+  NEO4J_BOLT_PASSWORD: Joi.string().require(),
+  {{/projectStyle.deploy.useDocker}}
+  {{#projectStyle.deploy.useHeroku}}
+  GRAPHENEDB_BOLT_URL: Joi.string().require(),
+  GRAPHENEDB_BOLT_USER: Joi.string().require(),
+  GRAPHENEDB_BOLT_PASSWORD: Joi.string().require(),
+  {{/projectStyle.deploy.useHeroku}}
+  {{/projectStyle.db.isNeo4j}}
   RESPONSE_INTERNAL_SERVER_ERROR: Joi.string().optional().default('Something went wrong while processing your request. We’re sorry for the trouble. We’ve been notified of the error and will correct it as soon as possible. Please try your request again in a moment.'),
   RESPONSE_FORBIDDEN: Joi.string().optional().default('You are not allowed to access the request.'),
   RESPONSE_UNAUTHENTICATED: Joi.string().optional().default('Unable to authenticate the user.'),
@@ -100,6 +112,20 @@ const config = {
   },
   {{/dependencies.logger.need_bunyan}}
   {{/apiStyle.log.needLog}}
+  db: {
+    {{#projectStyle.db.isNeo4j}}
+    {{#projectStyle.deploy.useDocker}}
+    url: envVars.NEO4J_BOLT_URL,
+    username: envVars.NEO4J_BOLT_USER,
+    password: envVars.NEO4J_BOLT_PASSWORD,
+    {{/projectStyle.deploy.useDocker}}
+    {{#projectStyle.deploy.useHeroku}}
+    url: envVars.GRAPHENEDB_BOLT_URL,
+    username: envVars.GRAPHENEDB_BOLT_USER,
+    password: envVars.GRAPHENEDB_BOLT_PASSWORD,
+    {{/projectStyle.deploy.useHeroku}}
+    {{/projectStyle.db.isNeo4j}}
+  }
   response: {
     err: {
       internalServerError: envVars.RESPONSE_INTERNAL_SERVER_ERROR,

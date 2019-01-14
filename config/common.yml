@@ -18,8 +18,11 @@ defaults: &defaults
       name: JSON-DB
       isJsonDB: true
       isMongoDB: true
-      isNeo4j: false
+      isNeo4j: true
       isMysql: false
+    deploy:
+      useDocker: false
+      useHeroku: true
   apiStyle:
     log:
       needLog: true
@@ -60,9 +63,11 @@ defaults: &defaults
       need_validator: true
     secure:
       need_bcrypt_nodejs: true
+      need_crypto: true
     db:
       need_json_file_db: true
       need_mongoose: true
+      need_neo4j_driver: true
     express:
       need_express_status_monitor: true # monitor express status
       need_compression: true # compress http response & request

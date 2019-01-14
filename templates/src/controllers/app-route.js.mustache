@@ -122,7 +122,7 @@ router.route('{{project.module}}/:groupId/members')
       };
 
       const validOptions = await validates.validForSampleRoute(options);
-      const result = await {{project.module}}.getMembersByGroupId(validOptions);
+      const result = await {{project.module}}.sampleService(validOptions);
       res.status(result.status || 200).json(result);
     } catch (err) {
       return formatError(err, res);

@@ -1,0 +1,105 @@
+{{#projectStyle.db.isJsonDB}}
+{{#dependencies.db.need_json_file_db}}
+const openDB = require('json-file-db');
+{{/dependencies.db.need_json_file_db}}
+const BaseModel = require('./base-model');
+
+const JSON_FILE_PATH = path.join(__dirname, '../../db/SampleModel.json');
+const ID_PROP = 'userId';
+
+class SampleModel extends BaseModel {
+  /**
+   * constructor
+   * @param values Can be used to set a webapi response
+   */
+  constructor(values) {
+    super();
+    this.userId = undefined;
+    this.username = undefined;
+
+    if (values) {
+      this.setValues(values);
+    }
+  }
+
+  /**
+   * set the values.
+   * @param values Can be used to set a webapi response to this newly constructed model
+   */
+  setValues(values) {
+    if (values) {
+      this.userId = values.userId;
+      this.username = values.username;
+    }
+  }
+
+  /**
+   * find policy by ID
+   * @param {string} userId
+   */
+  static async findById(userId) {
+    const db = openDB(JSON_FILE_PATH, ID_PROP);
+    db.get({ userId }, (err, records) => {
+      if (err) return Promise.reject(err);
+      return Promise.resolve(records);
+    });
+  }
+}
+{{/projectStyle.db.isJsonDB}}
+{{#projectStyle.db.isMongoDB}}
+{{#dependencies.secure.need_bcrypt_nodejs}}
+const bcrypt = require('bcrypt-nodejs');
+{{/dependencies.secure.need_bcrypt_nodejs}}
+{{#dependencies.secure.need_crypto}}
+const crypto = require('crypto');
+{{/dependencies.secure.need_crypto}}
+const mongoose = require('mongoose');
+
+const config = require('../config/config');
+
+const userSchema = new mongoose.Schema({
+  userId: {type: Integer, unique: true },
+  username: { type: String },
+  password: String
+}, { timestamps: true });
+
+/**
+ * Password hash middleware.
+ */
+userSchema.pre('save', function save(next) {
+  const user = this;
+  if (!user.isModified('password')) { return next(); }
+  bcrypt.genSalt(10, (err, salt) => {
+    if (err) { return next(err); }
+    bcrypt.hash(user.password, salt, null, (err, hash) => {
+      if (err) { return next(err); }
+      user.password = hash;
+      next();
+    });
+  });
+});
+
+/**
+ * Helper method for validating user's password.
+ *
+ * The password send by request client should be encoded like below:
+   const encodeData = crypto.publicEncrypt(publicKey, Buffer.from(password)).toString('base64');
+ */
+userSchema.methods.comparePassword = function comparePassword(candidatePassword, cb) {
+  debug('candidatePassword is %s', candidatePassword);
+  try {
+    const password = crypto.privateDecrypt(config.privateKey,
+      Buffer.from(candidatePassword.toString('base64'), 'base64'));
+
+    bcrypt.compare(password.toString(), this.password, (err, isMatch) => {
+      cb(err, isMatch);
+    });
+  } catch (err) {
+    cb(err, false);
+  }
+};
+
+const SampleModel = mongoose.model('SampleModel', modelSchema);
+{{/projectStyle.db.isMongoDB}}
+
+module.exports = SampleModel;
