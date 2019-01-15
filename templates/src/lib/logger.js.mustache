@@ -11,12 +11,12 @@ const config = require('../config/config');
 /**
  * create logger direcotory
  */
-const logDirectory = path.join(__dirname, config.logger.dirname);
+const logDirectory = path.join(__dirname, '../../', config.logger.dirname);
 if (!fs.existsSync(logDirectory)) fs.mkdirSync(logDirectory);
 {{#dependencies.logger.need_morgan}}
 
 module.exports = morgan('combined', {
-  stream: fs.createWriteStream(path.join(logDirectory, '../../', config.logger.filename), {
+  stream: fs.createWriteStream(path.join(logDirectory, config.logger.filename), {
     flags: 'a'
   })
 })

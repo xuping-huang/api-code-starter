@@ -1,8 +1,8 @@
 defaults: &defaults # default use json-db,express,javascript
   project:
-    name: test-json-db
+    name: test-mongo-db
     version: 0.0.1
-    description: Generate api code start kit for json db.
+    description: Generate api code start kit for mongo db.
     port: 3000
     module: users
   projectStyle:
@@ -81,7 +81,7 @@ defaults: &defaults # default use json-db,express,javascript
       need_express_jwt: true
       need_multer: true # Middleware for handling `multipart/form-data
     other:
-      need_http_status: true # if false, becareful package.json devpendencies has a extend comma
+      need_http_status: true
       need_error_handle: true
       need_uuid: true
       need_swagger_jsdoc: true
@@ -92,6 +92,18 @@ no-test-cov:
     log:
       needTest: false
       needCoverage: false
+jsondb:
+  <<: *defaults
+  projectStyle:
+    db:
+      name: JSON-DB
+      isJsonDB: true
+  devDependencies:
+    test:
+      need_sinon_mongoose: false
+  dependencies:
+    db:
+      need_json_file_db: true
 neo4j:
   <<: *defaults
   projectStyle:
@@ -109,6 +121,20 @@ neo4j:
     db:
       need_json_file_db: false
       need_neo4j_driver: true
+mongo:
+  <<: *defaults
+  projectStyle:
+    db:
+      name: MongoDB
+      isJsonDB: false
+      isMongoDB: true
+  dependencies:
+    secure:
+      need_bcrypt_nodejs: true
+      need_crypto: true
+    db:
+      need_json_file_db: false
+      need_mongoose: true
 ts:
   <<: *defaults
   projectStyle:
@@ -116,10 +142,3 @@ ts:
       name: TypeScript
       isJavaScript: false
       isTypeScript: true
-mongo:
-  <<: *defaults
-  projectStyle:
-    db:
-      name: MONGO
-      isJsonDB: false
-      isMongoDB: true

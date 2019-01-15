@@ -1,3 +1,4 @@
+const debug = require('debug')('api:app');
 {{#projectStyle.db.isMongoDB}}
 {{#dependencies.db.need_mongoose}}
 const mongoose = require('mongoose');
@@ -8,8 +9,13 @@ const { inspect } = require('util');
 const { app } = require('./app-middleware');
 const config = require('./src/config/config');
 {{#apiStyle.log.needLog}}
+{{#dependencies.logger.need_morgan}}
+const logger = require('./src/lib/logger');
+{{/dependencies.logger.need_morgan}}
+{{#dependencies.logger.need_bunyan}}
 const log = require('./src/lib/logger');
 const logger = log(config.logger);
+{{/dependencies.logger.need_bunyan}}
 {{/apiStyle.log.needLog}}
 {{#projectStyle.db.isMongoDB}}
 {{#dependencies.db.need_mongoose}}
@@ -20,7 +26,7 @@ const logger = log(config.logger);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true);
-mongoose.connect(config.mongo.dblink, {
+mongoose.connect(config.db.url, {
   keepAlive: 120
 });
 mongoose.connection.on('error', (err) => {

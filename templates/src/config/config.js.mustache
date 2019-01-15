@@ -65,6 +65,9 @@ const envVarsSchema = Joi.object({
   GRAPHENEDB_BOLT_PASSWORD: Joi.string().required(),
   {{/projectStyle.deploy.useHeroku}}
   {{/projectStyle.db.isNeo4j}}
+  {{#projectStyle.db.isMongoDB}}
+  MONGODB_URI: Joi.string().required(),
+  {{/projectStyle.db.isMongoDB}}
   PAGE_PERPAGE_MAX: Joi.string().default(100),
   PAGE_PERPAGE_DEFAULT: Joi.string().default(20),
   RESPONSE_INTERNAL_SERVER_ERROR: Joi.string().optional().default('Something went wrong while processing your request. We’re sorry for the trouble. We’ve been notified of the error and will correct it as soon as possible. Please try your request again in a moment.'),
@@ -121,6 +124,9 @@ const config = {
   {{/dependencies.logger.need_bunyan}}
   {{/apiStyle.log.needLog}}
   db: {
+    {{#projectStyle.db.isMongoDB}}
+    url: envVars.MONGODB_URI
+    {{/projectStyle.db.isMongoDB}}
     {{#projectStyle.db.isNeo4j}}
     {{#projectStyle.deploy.useDocker}}
     url: envVars.NEO4J_BOLT_URL,
