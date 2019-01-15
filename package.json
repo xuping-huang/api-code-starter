@@ -8,7 +8,7 @@
   "license": "MIT",
   "keywords": [],
   "scripts": {
-    "start": "set DEBUG=code:generator&&set CODE_ENV=development&&ts-node src/main.ts",
+    "start": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=no-test-cov&&ts-node src/main.ts",
     "describe": "npm-scripts-info",
     "build:main": "tsc -p tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json",

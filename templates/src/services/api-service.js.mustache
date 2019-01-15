@@ -3,8 +3,9 @@
 const neo4j = require('neo4j-driver').v1;
 {{/dependencies.db.need_neo4j_driver}}
 {{/projectStyle.db.isNeo4j}}
+const debug = require('debug')('api:api-service');
 const config = require('../config/config');
-const { NotFoundError, BadRequestError, DBError } = require('../lib/app-error');
+const { NotFoundError, InternalServerError, DBError } = require('../lib/app-error');
 {{#projectStyle.db.isJsonDB}}
 const SampleModel = require('../models/sample-model');
 {{/projectStyle.db.isJsonDB}}
@@ -48,7 +49,7 @@ module.exports.sampleService = async (options) => {
     if (!records || records.length === 0) {
       return Promise.reject(new NotFoundError('Model not found by the ID'));
     }
-    return Promise.resolve(model);
+    return Promise.resolve(records);
   } catch (err) {
     return Promise.reject(new DBError(err));
   }

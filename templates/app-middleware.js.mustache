@@ -21,13 +21,16 @@ const httpStatus = require('http-status');
 {{#dependencies.express.need_helmet}}
 const helmet = require('helmet');
 {{/dependencies.express.need_helmet}}
+{{#dependencies.other.need_error_handle}}
+const devErrorHandler = require('errorhandler');
+{{/dependencies.other.need_error_handle}}
 
 const config = require('./src/config/config');
 {{#apiStyle.log.needLog}}
 const logger = require('./src/lib/logger');
 {{/apiStyle.log.needLog}}
 const { NotFoundError } = require('./src/lib/app-error');
-const errorHandler = require('./src/lilb/error-handler');
+const errorHandler = require('./src/lib/error-handler');
 const router = require('./app-route');
 
 const app = express();

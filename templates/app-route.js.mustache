@@ -2,8 +2,8 @@ const express = require('express');
 {{#dependencies.other.need_swagger_jsdoc}}
 const swaggerJSDoc = require('swagger-jsdoc');
 {{/dependencies.other.need_swagger_jsdoc}}
-const apiRoute = require('.src/controller/api.route');
-const config = require('./src/config/env-config');
+const apiRoute = require('./src/controllers/api-route');
+const config = require('./src/config/config');
 
 const router = express.Router(); // eslint-disable-line new-cap
 {{#dependencies.other.need_swagger_jsdoc}}
@@ -29,7 +29,7 @@ const options = {
   // Path to the API docs
   // Note that this path is relative to the current directory from which the Node.js is ran,
   // not the application itself.
-  apis: ['./src/controller/*.js','./src/models/*.js'],
+  apis: ['./src/controller/*.js', './src/models/*.js'],
 };
 
 // Initialize swagger-jsdoc -> returns validated swagger spec in json format

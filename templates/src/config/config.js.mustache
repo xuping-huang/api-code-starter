@@ -31,6 +31,7 @@ const envVarsSchema = Joi.object({
   {{#apiStyle.other.needJwt}}
   JWT_SECRET_KEY: Joi.string().required(),
   JWT_HEADER_NAME: Joi.string().optional().default('Authorization'),
+  JWT_EXPIRED: Joi.string().optional().default('10d'),
   {{/apiStyle.other.needJwt}}
   {{#apiStyle.log.needLog}}
   {{#dependencies.logger.need_morgan}}
@@ -63,6 +64,8 @@ const envVarsSchema = Joi.object({
   GRAPHENEDB_BOLT_PASSWORD: Joi.string().require(),
   {{/projectStyle.deploy.useHeroku}}
   {{/projectStyle.db.isNeo4j}}
+  PAGE_PERPAGE_MAX: Joi.string().default(100),
+  PAGE_PERPAGE_DEFAULT: Joi.string().default(20),
   RESPONSE_INTERNAL_SERVER_ERROR: Joi.string().optional().default('Something went wrong while processing your request. We’re sorry for the trouble. We’ve been notified of the error and will correct it as soon as possible. Please try your request again in a moment.'),
   RESPONSE_FORBIDDEN: Joi.string().optional().default('You are not allowed to access the request.'),
   RESPONSE_UNAUTHENTICATED: Joi.string().optional().default('Unable to authenticate the user.'),
@@ -86,7 +89,8 @@ const config = {
   {{#apiStyle.other.needJwt}}
   jwt: {
     secretKey: envVars.JWT_SECRET_KEY,
-    headerName: envVars.JWT_HEADER_NAME
+    headerName: envVars.JWT_HEADER_NAME,
+    expired: envVars.JWT_EXPIRED
   },
   {{/apiStyle.other.needJwt}}
   {{#apiStyle.log.needLog}}
@@ -125,7 +129,11 @@ const config = {
     password: envVars.GRAPHENEDB_BOLT_PASSWORD,
     {{/projectStyle.deploy.useHeroku}}
     {{/projectStyle.db.isNeo4j}}
-  }
+  },
+  page: {
+    perPage: envVars.PAGE_PERPAGE_DEFAULT,
+    perPageMax: envVars.PAGE_PERPAGE_MAX
+  },
   response: {
     err: {
       internalServerError: envVars.RESPONSE_INTERNAL_SERVER_ERROR,

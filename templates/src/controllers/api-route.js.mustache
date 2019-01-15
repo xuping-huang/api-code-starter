@@ -10,14 +10,13 @@ const expressJwt = require('express-jwt');
 {{#dependencies.other.need_http_status}}
 const httpStatus = require('http-status');
 {{/dependencies.other.need_http_status}}
-{{#dependencies.validate.need_joi}}
-const Joi = require('joi');
-{{/dependencies.validate.need_joi}}
 
-const config = require('../lib/config');
+const config = require('../config/config');
 {{#apiStyle.log.needLog}}
+{{#dependencies.logger.need_bunyan}}
 const logger = require('../lib/logger');
 const log = logger(config.logger);
+{{/dependencies.logger.need_bunyan}}
 {{/apiStyle.log.needLog}}
 
 const {{project.module}} = require('../services/api-service');
@@ -70,19 +69,18 @@ const formatError = (err, res) => {
  */
 router.get('/auth/login/:userId', async (req, res, next) => {
   /** ignore validate because this api not in demand */
-  const userId = req.params.userId;
+  const { userId } = req.params;
 
-  /** find user info by userId */
-  const user = { firstName: 'demo' };
+  /** TODO: find user info by userId */
 
   const token = jwt.sign({
     userId
   }, config.jwt.secretKey, {
-    expiresIn: config.jwt.expireDay
+    expiresIn: config.jwt.expired
   });
   return res.json({
     token,
-    username: user.firstName
+    userId
   });
 });
 
@@ -94,12 +92,13 @@ router.route('/auth/token')
     secret: config.jwt.secretKey
   }), async (req, res, next) => {
     try {
-      const user = await getUserInfoFromToken(req);
-      if(!user) {
+      const result = await getUserInfoFromToken(req);
+      if (!result) {
         return formatError(null, res);
       }
-      res.status(result.status || 200).json(user);
+      return res.status(result.status || 200).json(result);
     } catch (err) {
+      debug('err: %s', JSON.stringify(err));
       return formatError(err, res);
     }
   });
@@ -108,17 +107,15 @@ router.route('/auth/token')
 /**
  * Sample route
  */
-router.route('{{project.module}}/:groupId/members')
+router.route('/{{project.module}}/userId/:userId')
   .get({{#apiStyle.other.needJwt}}expressJwt({
     secret: config.jwt.secretKey
   }), {{/apiStyle.other.needJwt}}async (req, res, next) => {
     try {
-      const user = await getUserInfoFromToken(req);
       const options = {
-        groupId: req.params.groupId,
+        userId: req.params.userId,
         page: req.query.page,
-        perPage: req.query.perPage,
-        userId: user.userId
+        perPage: req.query.perPage
       };
 
       const validOptions = await validates.validForSampleRoute(options);

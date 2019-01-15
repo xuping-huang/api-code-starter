@@ -1,7 +1,10 @@
+const debug = require('debug')('api:sample-model');
 {{#projectStyle.db.isJsonDB}}
+const path = require('path');
 {{#dependencies.db.need_json_file_db}}
 const openDB = require('json-file-db');
 {{/dependencies.db.need_json_file_db}}
+
 const BaseModel = require('./base-model');
 
 const JSON_FILE_PATH = path.join(__dirname, '../../db/SampleModel.json');
@@ -39,9 +42,12 @@ class SampleModel extends BaseModel {
    */
   static async findById(userId) {
     const db = openDB(JSON_FILE_PATH, ID_PROP);
-    db.get({ userId }, (err, records) => {
-      if (err) return Promise.reject(err);
-      return Promise.resolve(records);
+    // Note: never change to Promise.resolve/Promise.reject mode
+    return new Promise((resolve, reject) => {
+      db.get({ userId }, (err, records) => {
+        if (err) return reject(err);
+        return resolve(records);
+      });
     });
   }
 }

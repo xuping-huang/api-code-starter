@@ -1,0 +1,31 @@
+class BaseModel {
+  /**
+   * fill array property in model.
+   * for complex types, type must be defined.
+   * not support for complex types with subtypes
+   */
+  static fillModelArray(object, key, values, TypeClass = undefined) {
+    if (values) {
+      object[key] = [];
+      values.forEach((value) => {
+        if (TypeClass) {
+          object[key].push(new TypeClass(value));
+        } else {
+          object[key].push(value);
+        }
+      });
+    }
+  }
+
+  /**
+   * isInclude
+   * @param target
+   * @param search
+   * @returns
+   */
+  static isInclude(target, search) {
+    return target && target.toString().toLowerCase().includes(search);
+  }
+}
+
+module.exports = BaseModel;

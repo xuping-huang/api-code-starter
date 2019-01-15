@@ -1,10 +1,10 @@
-defaults: &defaults
+defaults: &defaults # default use json-db,express,javascript
   project:
-    name: code-api-generator
+    name: test-json-db
     version: 0.0.1
-    description: Generate api code start kit.
+    description: Generate api code start kit for json db.
     port: 3000
-    module: groups
+    module: users
   projectStyle:
     language:
       name: JavaScript
@@ -17,15 +17,17 @@ defaults: &defaults
     db:
       name: JSON-DB
       isJsonDB: true
-      isMongoDB: true
-      isNeo4j: true
+      isMongoDB: false
+      isNeo4j: false
       isMysql: false
     deploy:
-      useDocker: false
-      useHeroku: true
+      useDocker: true
+      useHeroku: false
   apiStyle:
     log:
       needLog: true
+      needTest: true
+      needCoverage: true
     other:
       needHealthCheck: true
       needJwt: true
@@ -51,7 +53,7 @@ defaults: &defaults
     coverage:
       need_nyc: true # Istanbul's state of the art command line interface
     other:
-      need_nodemon: true # monitor file change and rerun server
+      need_nodemon: true # if false, becareful devDependencies has a extend comma
   dependencies:
     config:
       need_dotenv: true # load .env
@@ -60,14 +62,14 @@ defaults: &defaults
       need_bunyan: false
     validate:
       need_joi: true
-      need_validator: true
+      need_validator: false
     secure:
       need_bcrypt_nodejs: true
       need_crypto: true
     db:
       need_json_file_db: true
-      need_mongoose: true
-      need_neo4j_driver: true
+      need_mongoose: false
+      need_neo4j_driver: false
     express:
       need_express_status_monitor: true # monitor express status
       need_compression: true # compress http response & request
@@ -79,14 +81,19 @@ defaults: &defaults
       need_express_jwt: true
       need_multer: true # Middleware for handling `multipart/form-data
     other:
-      need_http_status: true
+      need_http_status: true # if false, becareful package.json devpendencies has a extend comma
       need_error_handle: true
       need_uuid: true
       need_swagger_jsdoc: true
       need_debug: true
 development:
   <<: *defaults
-
+no-test-cov:
+  <<: *defaults
+  apiStyle:
+    log:
+      needTest: false
+      needCoverage: false
 ts:
   <<: *defaults
   projectStyle:

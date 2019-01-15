@@ -1,14 +1,18 @@
 {{#dependencies.validate.need_joi}}
 const Joi = require('joi');
+const debug = require('debug')('api:validate');
+const config = require('../config/config');
+const { JoiValidationError } = require('../lib/app-error');
 
-const { JoiValidationError } = require('../../lib/app-error');
-
-const validPageSchema = (options) => {
+const validPageSchema = async (options) => {
   const schema = Joi.object({
-    page: Joi.number().integer().min(1).optional().default(1),
-    perPage: Joi.number().integer().min(1).max(config.page.max).optional().default(config.page.perPage)
+    page: Joi.number().integer().min(1)
+      .optional()
+      .default(1),
+    perPage: Joi.number().integer().min(1).max(config.page.perPageMax)
+      .optional()
+      .default(config.page.perPage)
   });
-
   const {
     error,
     value: validOptions
@@ -16,18 +20,17 @@ const validPageSchema = (options) => {
     abortEarly: false,
     stripUnknown: true
   });
-
   if (error) {
-    return { pageError: error };
+    return Promise.reject(new JoiValidationError(error));
   }
 
-  validOptions.skipTotal = (validOptions.page -1) * validOptions.perPage;
-  return { pageOption: validOptions };
+  validOptions.skipTotal = (validOptions.page - 1) * validOptions.perPage;
+  return Promise.resolve({ pageOption: validOptions });
 };
 
 module.exports.validForSampleRoute = async (options) => {
   const schema = Joi.object({
-    groupId: Joi.string().guid().required()
+    userId: Joi.string().required()
   }).unknown().required();
   const {
     error,
@@ -35,9 +38,7 @@ module.exports.validForSampleRoute = async (options) => {
   } = Joi.validate(options, schema, {
     abortEarly: false
   });
-
-  const {pageError, pageOption} = validPageSchema(options);
-
+  const { pageError, pageOption } = await validPageSchema(options);
 
   if (error || pageError) {
     return Promise.reject(new JoiValidationError([error, pageError]));
