@@ -8,7 +8,8 @@ const { inspect } = require('util');
 const { app } = require('./app-middleware');
 const config = require('./src/config/config');
 {{#apiStyle.log.needLog}}
-const logger = require('./src/lib/logger');
+const log = require('./src/lib/logger');
+const logger = log(config.logger);
 {{/apiStyle.log.needLog}}
 {{#projectStyle.db.isMongoDB}}
 {{#dependencies.db.need_mongoose}}

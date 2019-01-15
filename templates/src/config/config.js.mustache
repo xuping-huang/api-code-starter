@@ -42,6 +42,7 @@ const envVarsSchema = Joi.object({
   LOGGER_COMPRESS_FORMAT: Joi.string().default('gzip'),
   {{/dependencies.logger.need_morgan}}
   {{#dependencies.logger.need_bunyan}}
+  LOGGER_DIR: Joi.string().optional().default('log'),
   LOGGER_NAME: Joi.string().default('{{project.name}}'),
   LOGGER_LEVEL: Joi.string().default('debug'),
   LOGGER_LEVELS_TRACE: Joi.string().optional().allow(''),
@@ -54,14 +55,14 @@ const envVarsSchema = Joi.object({
   {{/apiStyle.log.needLog}}
   {{#projectStyle.db.isNeo4j}}
   {{#projectStyle.deploy.useDocker}}
-  NEO4J_BOLT_URL: Joi.string().require(),
-  NEO4J_BOLT_USER: Joi.string().require(),
-  NEO4J_BOLT_PASSWORD: Joi.string().require(),
+  NEO4J_BOLT_URL: Joi.string().required(),
+  NEO4J_BOLT_USER: Joi.string().required(),
+  NEO4J_BOLT_PASSWORD: Joi.string().required(),
   {{/projectStyle.deploy.useDocker}}
   {{#projectStyle.deploy.useHeroku}}
-  GRAPHENEDB_BOLT_URL: Joi.string().require(),
-  GRAPHENEDB_BOLT_USER: Joi.string().require(),
-  GRAPHENEDB_BOLT_PASSWORD: Joi.string().require(),
+  GRAPHENEDB_BOLT_URL: Joi.string().required(),
+  GRAPHENEDB_BOLT_USER: Joi.string().required(),
+  GRAPHENEDB_BOLT_PASSWORD: Joi.string().required(),
   {{/projectStyle.deploy.useHeroku}}
   {{/projectStyle.db.isNeo4j}}
   PAGE_PERPAGE_MAX: Joi.string().default(100),
@@ -94,6 +95,7 @@ const config = {
   },
   {{/apiStyle.other.needJwt}}
   {{#apiStyle.log.needLog}}
+  {{#dependencies.logger.need_morgan}}
   logger: {
     dirname: envVars.LOGGER_DIR,
     interval: envVars.LOGGER_INTERVAL,
@@ -101,8 +103,10 @@ const config = {
     compressFormat: envVars.LOGGER_COMPRESS_FORMAT,
     filename: envVars.LOGGER_FILE
   },
+  {{/dependencies.logger.need_morgan}}
   {{#dependencies.logger.need_bunyan}}
   logger: {
+    dirname: envVars.LOGGER_DIR,
     name: envVars.LOGGER_NAME,
     level: envVars.LOGGER_LEVEL,
     levels: {

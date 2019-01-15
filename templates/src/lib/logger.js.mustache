@@ -51,6 +51,6 @@ module.exports = config => {
     bunyanConfig.push(logger);
   });
 
-  return bunyan.createLogger({ name: config.name, streams: bunyanConfig })(config.logger);
+  return bunyan.createLogger({ name: config.name, streams: bunyanConfig });
 };
 {{/dependencies.logger.need_bunyan}}

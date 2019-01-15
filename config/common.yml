@@ -86,14 +86,29 @@ defaults: &defaults # default use json-db,express,javascript
       need_uuid: true
       need_swagger_jsdoc: true
       need_debug: true
-development:
-  <<: *defaults
 no-test-cov:
   <<: *defaults
   apiStyle:
     log:
       needTest: false
       needCoverage: false
+neo4j:
+  <<: *defaults
+  projectStyle:
+    db:
+      name: Neo4j
+      isJsonDB: false
+      isNeo4j: true
+  devDependencies:
+    test:
+      need_sinon_mongoose: false
+  dependencies:
+    logger:
+      need_morgan: false # logger
+      need_bunyan: true
+    db:
+      need_json_file_db: false
+      need_neo4j_driver: true
 ts:
   <<: *defaults
   projectStyle:
