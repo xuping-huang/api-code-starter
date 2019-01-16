@@ -20,9 +20,9 @@ const config = require('../config/config');
 const logger = require('../lib/logger');
 {{/dependencies.logger.need_bunyan}}
 {{/apiStyle.log.needLog}}
-
 const {{project.module}} = require('../services/api-service');
 const validates = require('./validate');
+
 const router = new server.Router();
 const { AuthenticateError } = require('../lib/app-error');
 {{#apiStyle.other.needJwt}}
@@ -48,7 +48,11 @@ const getUserInfoFromToken = async (req) => {
  * @returns Error object with status & error info
  */
 const formatError = (err, res) => {
-  // logger.error(err);
+  {{#apiStyle.log.needLog}}
+  {{#dependencies.logger.need_bunyan}}
+  logger.error(err);
+  {{/dependencies.logger.need_bunyan}}
+  {{/apiStyle.log.needLog}}
 
   if (!err || !err.status) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({

@@ -1,4 +1,3 @@
-const debug = require('debug')('api:sample-model');
 {{#projectStyle.db.isJsonDB}}
 const path = require('path');
 {{#dependencies.db.need_json_file_db}}
@@ -64,7 +63,7 @@ const mongoose = require('mongoose');
 const config = require('../config/config');
 
 const userSchema = new mongoose.Schema({
-  userId: {type: String, unique: true },
+  userId: { type: String, unique: true },
   username: { type: String },
   password: String
 }, { timestamps: true });
@@ -92,7 +91,6 @@ userSchema.pre('save', function save(next) {
    const encodeData = crypto.publicEncrypt(publicKey, Buffer.from(password)).toString('base64');
  */
 userSchema.methods.comparePassword = function comparePassword(candidatePassword, cb) {
-  debug('candidatePassword is %s', candidatePassword);
   try {
     const password = crypto.privateDecrypt(config.privateKey,
       Buffer.from(candidatePassword.toString('base64'), 'base64'));
@@ -107,5 +105,35 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword,
 
 const SampleModel = mongoose.model('User', userSchema);
 {{/projectStyle.db.isMongoDB}}
+{{#projectStyle.db.isNeo4j}}
+  {{#dependencies.db.need_neo4j_driver}}
+const neo4j = require('neo4j-driver').v1;
+const config = require('../config/config');
+  {{/dependencies.db.need_neo4j_driver}}
+const BaseModel = require('./base-model');
+
+  {{#dependencies.db.need_neo4j_driver}}
+const driver = neo4j.driver(config.db.url,
+  neo4j.auth.basic(config.db.username, config.db.password));
+const session = driver.session();
+  {{/dependencies.db.need_neo4j_driver}}
+
+class SampleModel extends BaseModel {
+  /**
+   * find policy by ID
+   * @param {string} userId
+   */
+  static async findById(userId) {
+    const cql = 'MATCH (n:User) WHERE n.userId={userId} RETURN n';
+    const results = await session.run(cql, { userId });
+    session.close();
+
+    if (this.isNotFound(results)) {
+      return Promise.resolve([]);
+    }
+    return Promise.resolve(results.records);
+  }
+}
+{{/projectStyle.db.isNeo4j}}
 
 module.exports = SampleModel;

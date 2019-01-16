@@ -27,7 +27,9 @@ const devErrorHandler = require('errorhandler');
 
 const config = require('./src/config/config');
 {{#apiStyle.log.needLog}}
+{{#dependencies.logger.need_morgan}}
 const logger = require('./src/lib/logger');
+{{/dependencies.logger.need_morgan}}
 {{/apiStyle.log.needLog}}
 const { NotFoundError } = require('./src/lib/app-error');
 const errorHandler = require('./src/lib/error-handler');

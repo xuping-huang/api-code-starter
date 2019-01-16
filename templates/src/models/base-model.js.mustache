@@ -1,4 +1,5 @@
 class BaseModel {
+  {{#projectStyle.db.isJsonDB}}
   /**
    * fill array property in model.
    * for complex types, type must be defined.
@@ -26,6 +27,16 @@ class BaseModel {
   static isInclude(target, search) {
     return target && target.toString().toLowerCase().includes(search);
   }
+  {{/projectStyle.db.isJsonDB}}
+  {{#projectStyle.db.isNeo4j}}
+  /**
+   * isNotFound
+   */
+  static isNotFound(neoResult) {
+    const notFound = neoResult.records.length === 0;
+    return notFound;
+  }
+  {{/projectStyle.db.isNeo4j}}
 }
 
 module.exports = BaseModel;

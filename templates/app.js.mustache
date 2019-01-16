@@ -1,19 +1,19 @@
-const debug = require('debug')('api:app');
 {{#projectStyle.db.isMongoDB}}
+const debug = require('debug')('api:app');
 {{#dependencies.db.need_mongoose}}
 const mongoose = require('mongoose');
 const { inspect } = require('util');
 {{/dependencies.db.need_mongoose}}
-{{/projectStyle.db.isMongoDB}}
-
-const { app } = require('./app-middleware');
+{{^dependencies.logger.need_bunyan}}
 const config = require('./src/config/config');
+{{/dependencies.logger.need_bunyan}}
+{{/projectStyle.db.isMongoDB}}
+const { app } = require('./app-middleware');
 {{#apiStyle.log.needLog}}
-{{#dependencies.logger.need_morgan}}
-const logger = require('./src/lib/logger');
-{{/dependencies.logger.need_morgan}}
 {{#dependencies.logger.need_bunyan}}
+const config = require('./src/config/config');
 const log = require('./src/lib/logger');
+
 const logger = log(config.logger);
 {{/dependencies.logger.need_bunyan}}
 {{/apiStyle.log.needLog}}

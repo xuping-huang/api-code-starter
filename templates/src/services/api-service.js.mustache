@@ -1,67 +1,18 @@
-{{#projectStyle.db.isNeo4j}}
-  {{#dependencies.db.need_neo4j_driver}}
-const neo4j = require('neo4j-driver').v1;
-  {{/dependencies.db.need_neo4j_driver}}
-{{/projectStyle.db.isNeo4j}}
 const debug = require('debug')('api:api-service');
-const config = require('../config/config');
 const { NotFoundError, InternalServerError, DBError } = require('../lib/app-error');
-{{#projectStyle.db.isMongoDB}}
 const SampleModel = require('../models/sample-model');
-{{/projectStyle.db.isMongoDB}}
-{{#projectStyle.db.isJsonDB}}
-const SampleModel = require('../models/sample-model');
-{{/projectStyle.db.isJsonDB}}
-{{#projectStyle.db.isNeo4j}}
-  {{#dependencies.db.need_neo4j_driver}}
 
-const driver = neo4j.driver(config.db.url, neo4j.auth.basic(config.db.username, config.db.password));
-const session = driver.session();
-
-const isNotFound = (neoResult) => {
-  return neoResult.records.length === 0;
-};
-
-/**
- * @param {Object} options
- * @param {Uuid} options.groupId The group id.
- * @param {Integer} options.page The page number.
- * @param {Integer} options.perPage The number of entities shown in one page.
- * @param {Uuid} options.userId The operator id.
- * @throws {Error}
- * @return {Promise}
- */
 module.exports.sampleService = async (options) => {
-  const cql = `MATCH (n:User) WHERE n.userId={userId} RETURN n`;
-  const results = await session.run(cql, {userId: options.userId});
-  session.close();
-  if (isNotFound(results)) {
-    return Promise.reject(new NotFoundError());
-  }
-  return Promise.resolve(results.records);
-};
-  {{/dependencies.db.need_neo4j_driver}}
+  try {
+{{#projectStyle.db.isNeo4j}}
+    const records = await SampleModel.findById(options.userId);
 {{/projectStyle.db.isNeo4j}}
 {{#projectStyle.db.isJsonDB}}
-module.exports.sampleService = async (options) => {
-  try {
     const records = await SampleModel.findById(options.userId);
-    if (records && records.length > 1) {
-      return Promise.reject(new InternalServerError('Too many records be found'));
-    }
-    if (!records || records.length === 0) {
-      return Promise.reject(new NotFoundError('Model not found by the ID'));
-    }
-    return Promise.resolve(records);
-  } catch (err) {
-    return Promise.reject(new DBError(err));
-  }
-};
 {{/projectStyle.db.isJsonDB}}
 {{#projectStyle.db.isMongoDB}}
-module.exports.sampleService = async (options) => {
-  try {
     const records = await SampleModel.findOne({ userId: options.userId });
+{{/projectStyle.db.isMongoDB}}
     if (records && records.length > 1) {
       return Promise.reject(new InternalServerError('Too many records be found'));
     }
@@ -74,4 +25,3 @@ module.exports.sampleService = async (options) => {
     return Promise.reject(new DBError(err));
   }
 };
-{{/projectStyle.db.isMongoDB}}
