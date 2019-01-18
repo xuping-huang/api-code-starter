@@ -5,6 +5,7 @@ defaults: &defaults # default use json-db,express,javascript
     description: Generate api code start kit for mongo db.
     port: 3000
     module: users
+    basePath: ''
   projectStyle:
     language:
       name: JavaScript

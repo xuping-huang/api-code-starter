@@ -7,6 +7,7 @@ const config = require('./src/config/config');
 
 const router = express.Router(); // eslint-disable-line new-cap
 {{#dependencies.other.need_swagger_jsdoc}}
+const basePath = '';
 
 /**
  * Swagger-jsdoc
@@ -14,12 +15,12 @@ const router = express.Router(); // eslint-disable-line new-cap
 const swaggerDefinition = {
   info: {
     // API informations (required)
-    title: '{{proejct.name}}', // Title (required)
+    title: '{{project.name}}', // Title (required)
     version: '{{project.version}}', // Version (required)
     description: '{{project.description}}', // Description (optional)
   },
   host: `${config.host}:${config.port}`, // Host (optional)
-  basePath: '/', // Base path (optional)
+  basePath: `${basePath}`, // Base path (optional)
 };
 
 // Options for the swagger docs
@@ -29,8 +30,17 @@ const options = {
   // Path to the API docs
   // Note that this path is relative to the current directory from which the Node.js is ran,
   // not the application itself.
-  apis: ['./src/controller/*.js', './src/models/*.js'],
+  apis: ['./app-route.js', './src/controllers/*.js', './src/models/*.js'],
 };
+
+/**
+  * @swagger
+  * tags:
+  *   - name: auth
+  *     description: 'Certification for request user'
+  *   - name: user
+  *     description: 'Request with user resource'
+  */
 
 // Initialize swagger-jsdoc -> returns validated swagger spec in json format
 const swaggerSpec = swaggerJSDoc(options);
@@ -50,6 +60,6 @@ router.get('/health-check', (req, res) => {
 {{/apiStyle.other.needHealthCheck}}
 
 // mount routes
-router.use('', apiRoute);
+router.use(basePath, apiRoute);
 
 module.exports = router;

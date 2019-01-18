@@ -39,9 +39,22 @@ const codeGenerate = (templatePath: any, config: any) => {
   return renderContent;
 }
 
+const prepareOutputDir = (outputDir: string) => {
+  const srcDir = path.resolve(outputDir, 'src');
+  if (!fs.existsSync(outputDir)){
+    fs.mkdirSync(outputDir);
+    fs.mkdirSync(srcDir);
+  } else {
+    if (!fs.existsSync(srcDir)) {
+      fs.mkdirSync(srcDir);
+    }
+  }
+}
+
 export const run = (config: any): any => {
   const templateDir = path.resolve(__dirname, '../../templates');
   const outputDir = path.resolve(__dirname, '../../output');
+  prepareOutputDir(outputDir);
 
   const templates = findTemplates(templateDir, []);
   templates.forEach((template) =>{

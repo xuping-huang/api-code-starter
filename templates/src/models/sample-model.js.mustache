@@ -8,7 +8,55 @@ const BaseModel = require('./base-model');
 
 const JSON_FILE_PATH = path.join(__dirname, '../../db/SampleModel.json');
 const ID_PROP = 'userId';
+{{/projectStyle.db.isJsonDB}}
+{{#projectStyle.db.isMongoDB}}
+{{#dependencies.secure.need_bcrypt_nodejs}}
+const bcrypt = require('bcrypt-nodejs');
+{{/dependencies.secure.need_bcrypt_nodejs}}
+{{#dependencies.secure.need_crypto}}
+const crypto = require('crypto');
+{{/dependencies.secure.need_crypto}}
+const mongoose = require('mongoose');
 
+const config = require('../config/config');
+{{/projectStyle.db.isMongoDB}}
+{{#projectStyle.db.isNeo4j}}
+  {{#dependencies.db.need_neo4j_driver}}
+const neo4j = require('neo4j-driver').v1;
+const config = require('../config/config');
+  {{/dependencies.db.need_neo4j_driver}}
+const BaseModel = require('./base-model');
+
+  {{#dependencies.db.need_neo4j_driver}}
+const driver = neo4j.driver(config.db.url,
+  neo4j.auth.basic(config.db.username, config.db.password));
+const session = driver.session();
+  {{/dependencies.db.need_neo4j_driver}}
+{{/projectStyle.db.isNeo4j}}
+{{#dependencies.other.need_swagger_jsdoc}}
+
+/**
+ * @swagger
+ * definitions:
+ *   User:
+ *     required:
+ *       - userId
+ *       - username
+ *     properties:
+ *       userId:
+ *         type: string
+ *         description: "user id"
+ *       username:
+ *         type: string
+ *         description: user name
+ */
+{{/dependencies.other.need_swagger_jsdoc}}
+{{^dependencies.other.need_swagger_jsdoc}}
+/**
+ * User info
+ */
+{{/dependencies.other.need_swagger_jsdoc}}
+{{#projectStyle.db.isJsonDB}}
 class SampleModel extends BaseModel {
   /**
    * constructor
@@ -52,16 +100,6 @@ class SampleModel extends BaseModel {
 }
 {{/projectStyle.db.isJsonDB}}
 {{#projectStyle.db.isMongoDB}}
-{{#dependencies.secure.need_bcrypt_nodejs}}
-const bcrypt = require('bcrypt-nodejs');
-{{/dependencies.secure.need_bcrypt_nodejs}}
-{{#dependencies.secure.need_crypto}}
-const crypto = require('crypto');
-{{/dependencies.secure.need_crypto}}
-const mongoose = require('mongoose');
-
-const config = require('../config/config');
-
 const userSchema = new mongoose.Schema({
   userId: { type: String, unique: true },
   username: { type: String },
@@ -106,18 +144,6 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword,
 const SampleModel = mongoose.model('User', userSchema);
 {{/projectStyle.db.isMongoDB}}
 {{#projectStyle.db.isNeo4j}}
-  {{#dependencies.db.need_neo4j_driver}}
-const neo4j = require('neo4j-driver').v1;
-const config = require('../config/config');
-  {{/dependencies.db.need_neo4j_driver}}
-const BaseModel = require('./base-model');
-
-  {{#dependencies.db.need_neo4j_driver}}
-const driver = neo4j.driver(config.db.url,
-  neo4j.auth.basic(config.db.username, config.db.password));
-const session = driver.session();
-  {{/dependencies.db.need_neo4j_driver}}
-
 class SampleModel extends BaseModel {
   /**
    * find policy by ID

@@ -53,7 +53,6 @@ const formatError = (err, res) => {
   logger.error(err);
   {{/dependencies.logger.need_bunyan}}
   {{/apiStyle.log.needLog}}
-
   if (!err || !err.status) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       status: httpStatus.INTERNAL_SERVER_ERROR,
@@ -67,12 +66,35 @@ const formatError = (err, res) => {
 };
 {{#apiStyle.other.needJwt}}
 
+
+{{#dependencies.other.need_swagger_jsdoc}}
 /**
- * **just for validation in test phase.**
- * Auth api not include in demand, but we need jwt token for api security.
- * So this api will return a valid JWT token for particular memberId
- * without check username and password.
+ * @swagger
+ * /auth/login/{userId}:
+ *   get:
+ *     description: Return token for userid
+ *     tags:
+ *       - auth
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: userId
+ *         description: user id
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: "successful operation"
+ *       400:
+ *         description: "Invalid ID supplied"
  */
+{{/dependencies.other.need_swagger_jsdoc}}
+{{^dependencies.other.need_swagger_jsdoc}}
+/**
+ * Return token for userid
+ */
+{{/dependencies.other.need_swagger_jsdoc}}
 router.get('/auth/login/:userId', async (req, res, next) => {
   /** ignore validate because this api not in demand */
   const { userId } = req.params;
@@ -90,9 +112,29 @@ router.get('/auth/login/:userId', async (req, res, next) => {
   });
 });
 
+{{#dependencies.other.need_swagger_jsdoc}}
+/**
+ * @swagger
+ * /auth/token:
+ *   get:
+ *     description: Validate token, removed after dev complete
+ *     tags:
+ *       - auth
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *     responses:
+ *       200:
+ *         description: "successful operation"
+ *       400:
+ *         description: "Invalid token"
+ */
+{{/dependencies.other.need_swagger_jsdoc}}
+{{^dependencies.other.need_swagger_jsdoc}}
 /**
  * Validate token, removed after dev complete
  */
+{{/dependencies.other.need_swagger_jsdoc}}
 router.route('/auth/token')
   .get(expressJwt({
     secret: config.jwt.secretKey
@@ -110,9 +152,38 @@ router.route('/auth/token')
   });
 {{/apiStyle.other.needJwt}}
 
+{{#dependencies.other.need_swagger_jsdoc}}
 /**
- * Sample route
+ * @swagger
+ * /{{project.module}}/userId/{userId}:
+ *   get:
+ *     description: Find user by id
+ *     tags:
+ *       - auth
+ *     produces:
+ *       - "application/json"
+ *     parameters:
+ *       - name: userId
+ *         description: user id
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: "successful operation"
+ *         schema:
+ *           $ref: "#/definitions/User"
+ *       400:
+ *         description: "Invalid ID supplied"
+ *       404:
+ *         description: "User not found"
  */
+{{/dependencies.other.need_swagger_jsdoc}}
+{{^dependencies.other.need_swagger_jsdoc}}
+/**
+ * Find user by id
+ */
+{{/dependencies.other.need_swagger_jsdoc}}
 router.route('/{{project.module}}/userId/:userId')
   .get({{#apiStyle.other.needJwt}}expressJwt({
     secret: config.jwt.secretKey
