@@ -1,16 +1,18 @@
 defaults: &defaults # default use json-db,express,javascript
   project:
-    name: test-mongo-db
+    name: autocognita-api
     version: 0.0.1
     description: Generate api code start kit for mongo db.
     port: 3000
     module: users
     basePath: ''
+    templateSwitch: nodejs
   projectStyle:
     language:
       name: JavaScript
       isJavaScript: true
       isTypeScript: false
+      isJava: false
     server:
       name: Express
       isExpress: true
@@ -28,15 +30,24 @@ defaults: &defaults # default use json-db,express,javascript
     log:
       needLog: true
       needTest: true
-      needCoverage: true
+      needCoverage: false
     other:
-      needHealthCheck: true
-      needJwt: true
-      needPasswordBcrypt: true
+      needHealthCheck: false
+      needJwt: false
+      needPasswordBcrypt: false
+      needTwilio: true
+      needAws: true
+      needGootleText2Speech: true
     lint:
       isAribnbBase: true
       isESlingStandard: false
       isESlintRecommended: false
+    doc:
+      isSwaggerDoc: true
+    date:
+      isThreeTenbp: true
+      isJava8: false
+      isJoda: false
   devDependencies:
     codeStyle:
       need_tslint: false
@@ -45,14 +56,14 @@ defaults: &defaults # default use json-db,express,javascript
       need_eslint_chai_friendly: true
       need_eslint_plugin_import: true
     test:
-      need_chai: true
-      need_mocha: true
-      need_sinon: true
-      need_supertest: true
-      need_sinon_mongoose: true
-      need_jest: true
+      need_chai: false
+      need_mocha: false
+      need_sinon: false
+      need_supertest: false
+      need_sinon_mongoose: false
+      need_jest: false
     coverage:
-      need_nyc: true # Istanbul's state of the art command line interface
+      need_nyc: false # Istanbul's state of the art command line interface
     other:
       need_nodemon: true # if false, becareful devDependencies has a extend comma
   dependencies:
@@ -87,14 +98,15 @@ defaults: &defaults # default use json-db,express,javascript
       need_uuid: true
       need_swagger_jsdoc: true
       need_debug: true
+    spring:
+      need_spring_fox: true
+      need_otp_aerogera: true
 no-test-cov:
-  <<: *defaults
   apiStyle:
     log:
       needTest: false
       needCoverage: false
 jsondb:
-  <<: *defaults
   projectStyle:
     db:
       name: JSON-DB
@@ -106,7 +118,6 @@ jsondb:
     db:
       need_json_file_db: true
 neo4j:
-  <<: *defaults
   projectStyle:
     db:
       name: Neo4j
@@ -117,13 +128,12 @@ neo4j:
       need_sinon_mongoose: false
   dependencies:
     logger:
-      need_morgan: false # logger
-      need_bunyan: true
+      need_morgan: true # logger
+      need_bunyan: false
     db:
       need_json_file_db: false
       need_neo4j_driver: true
 mongo:
-  <<: *defaults
   projectStyle:
     db:
       name: MongoDB
@@ -137,9 +147,26 @@ mongo:
       need_json_file_db: false
       need_mongoose: true
 ts:
-  <<: *defaults
   projectStyle:
     language:
       name: TypeScript
       isJavaScript: false
       isTypeScript: true
+spring:
+  project:
+    port: 3000
+    templateSwitch: spring
+  projectStyle:
+    language:
+      name: Java
+      isJavaScript: false
+      isTypeScript: false
+      isJava: true
+    maven:
+      groupId: com.autocognita
+  apiStyle:
+    log:
+      needLog: true
+    other:
+      needJwt: true
+      needPasswordBcrypt: true

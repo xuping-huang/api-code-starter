@@ -52,7 +52,8 @@ const prepareOutputDir = (outputDir: string) => {
 }
 
 export const run = (config: any): any => {
-  const templateDir = path.resolve(__dirname, '../../templates');
+  const templateDir = path.resolve(__dirname, '../../templates', config.project.templateSwitch);
+  debug("template dir:"+templateDir);
   const outputDir = path.resolve(__dirname, '../../output');
   prepareOutputDir(outputDir);
 

@@ -1,0 +1,342 @@
+From 4ef7eaf188c41c52ec85dc9030812afa294709ad Mon Sep 17 00:00:00 2001
+From: Xuping Huang <xuping.huang.jason@gmail.com>
+Date: Fri, 18 Jan 2019 21:58:45 +0800
+Subject: [PATCH] fix swagger doc
+
+---
+ config/common.yml                               |  1 +
+ package.json                                    |  2 +-
+ src/lib/generator.ts                            | 13 ++++
+ templates/app-route.js.mustache                 | 18 ++++--
+ templates/src/controllers/api-route.js.mustache | 83 +++++++++++++++++++++++--
+ templates/src/models/sample-model.js.mustache   | 70 ++++++++++++++-------
+ 6 files changed, 154 insertions(+), 33 deletions(-)
+
+diff --git a/config/common.yml b/config/common.yml
+index 8487304..5071145 100644
+--- a/config/common.yml
++++ b/config/common.yml
+@@ -5,6 +5,7 @@ defaults: &defaults # default use json-db,express,javascript
+     description: Generate api code start kit for mongo db.
+     port: 3000
+     module: users
++    basePath: ''
+   projectStyle:
+     language:
+       name: JavaScript
+diff --git a/package.json b/package.json
+index a4d0cd3..9b35f77 100644
+--- a/package.json
++++ b/package.json
+@@ -8,7 +8,7 @@
+   "license": "MIT",
+   "keywords": [],
+   "scripts": {
+-    "start": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=no-test-cov,neo4j&&ts-node src/main.ts",
++    "start": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=no-test-cov,jsondb&&ts-node src/main.ts",
+     "describe": "npm-scripts-info",
+     "build:main": "tsc -p tsconfig.json",
+     "tslint": "tslint -c tslint.json -p tsconfig.json",
+diff --git a/src/lib/generator.ts b/src/lib/generator.ts
+index 2122968..3599477 100644
+--- a/src/lib/generator.ts
++++ b/src/lib/generator.ts
+@@ -39,9 +39,22 @@ const codeGenerate = (templatePath: any, config: any) => {
+   return renderContent;
+ }
+ 
++const prepareOutputDir = (outputDir: string) => {
++  const srcDir = path.resolve(outputDir, 'src');
++  if (!fs.existsSync(outputDir)){
++    fs.mkdirSync(outputDir);
++    fs.mkdirSync(srcDir);
++  } else {
++    if (!fs.existsSync(srcDir)) {
++      fs.mkdirSync(srcDir);
++    }
++  }
++}
++
+ export const run = (config: any): any => {
+   const templateDir = path.resolve(__dirname, '../../templates');
+   const outputDir = path.resolve(__dirname, '../../output');
++  prepareOutputDir(outputDir);
+ 
+   const templates = findTemplates(templateDir, []);
+   templates.forEach((template) =>{
+diff --git a/templates/app-route.js.mustache b/templates/app-route.js.mustache
+index 3df63c0..a508ebb 100644
+--- a/templates/app-route.js.mustache
++++ b/templates/app-route.js.mustache
+@@ -7,6 +7,7 @@ const config = require('./src/config/config');
+ 
+ const router = express.Router(); // eslint-disable-line new-cap
+ {{#dependencies.other.need_swagger_jsdoc}}
++const basePath = '';
+ 
+ /**
+  * Swagger-jsdoc
+@@ -14,12 +15,12 @@ const router = express.Router(); // eslint-disable-line new-cap
+ const swaggerDefinition = {
+   info: {
+     // API informations (required)
+-    title: '{{proejct.name}}', // Title (required)
++    title: '{{project.name}}', // Title (required)
+     version: '{{project.version}}', // Version (required)
+     description: '{{project.description}}', // Description (optional)
+   },
+   host: `${config.host}:${config.port}`, // Host (optional)
+-  basePath: '/', // Base path (optional)
++  basePath: `${basePath}`, // Base path (optional)
+ };
+ 
+ // Options for the swagger docs
+@@ -29,9 +30,18 @@ const options = {
+   // Path to the API docs
+   // Note that this path is relative to the current directory from which the Node.js is ran,
+   // not the application itself.
+-  apis: ['./src/controller/*.js', './src/models/*.js'],
++  apis: ['./app-route.js', './src/controllers/*.js', './src/models/*.js'],
+ };
+ 
++/**
++  * @swagger
++  * tags:
++  *   - name: auth
++  *     description: 'Certification for request user'
++  *   - name: user
++  *     description: 'Request with user resource'
++  */
++
+ // Initialize swagger-jsdoc -> returns validated swagger spec in json format
+ const swaggerSpec = swaggerJSDoc(options);
+ 
+@@ -50,6 +60,6 @@ router.get('/health-check', (req, res) => {
+ {{/apiStyle.other.needHealthCheck}}
+ 
+ // mount routes
+-router.use('', apiRoute);
++router.use(basePath, apiRoute);
+ 
+ module.exports = router;
+diff --git a/templates/src/controllers/api-route.js.mustache b/templates/src/controllers/api-route.js.mustache
+index 5fb6fd1..3259208 100644
+--- a/templates/src/controllers/api-route.js.mustache
++++ b/templates/src/controllers/api-route.js.mustache
+@@ -53,7 +53,6 @@ const formatError = (err, res) => {
+   logger.error(err);
+   {{/dependencies.logger.need_bunyan}}
+   {{/apiStyle.log.needLog}}
+-
+   if (!err || !err.status) {
+     return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+       status: httpStatus.INTERNAL_SERVER_ERROR,
+@@ -67,12 +66,35 @@ const formatError = (err, res) => {
+ };
+ {{#apiStyle.other.needJwt}}
+ 
++
++{{#dependencies.other.need_swagger_jsdoc}}
++/**
++ * @swagger
++ * /auth/login/{userId}:
++ *   get:
++ *     description: Return token for userid
++ *     tags:
++ *       - auth
++ *     produces:
++ *       - "application/json"
++ *     parameters:
++ *       - name: userId
++ *         description: user id
++ *         in: path
++ *         required: true
++ *         type: string
++ *     responses:
++ *       200:
++ *         description: "successful operation"
++ *       400:
++ *         description: "Invalid ID supplied"
++ */
++{{/dependencies.other.need_swagger_jsdoc}}
++{{^dependencies.other.need_swagger_jsdoc}}
+ /**
+- * **just for validation in test phase.**
+- * Auth api not include in demand, but we need jwt token for api security.
+- * So this api will return a valid JWT token for particular memberId
+- * without check username and password.
++ * Return token for userid
+  */
++{{/dependencies.other.need_swagger_jsdoc}}
+ router.get('/auth/login/:userId', async (req, res, next) => {
+   /** ignore validate because this api not in demand */
+   const { userId } = req.params;
+@@ -90,9 +112,29 @@ router.get('/auth/login/:userId', async (req, res, next) => {
+   });
+ });
+ 
++{{#dependencies.other.need_swagger_jsdoc}}
++/**
++ * @swagger
++ * /auth/token:
++ *   get:
++ *     description: Validate token, removed after dev complete
++ *     tags:
++ *       - auth
++ *     produces:
++ *       - "application/json"
++ *     parameters:
++ *     responses:
++ *       200:
++ *         description: "successful operation"
++ *       400:
++ *         description: "Invalid token"
++ */
++{{/dependencies.other.need_swagger_jsdoc}}
++{{^dependencies.other.need_swagger_jsdoc}}
+ /**
+  * Validate token, removed after dev complete
+  */
++{{/dependencies.other.need_swagger_jsdoc}}
+ router.route('/auth/token')
+   .get(expressJwt({
+     secret: config.jwt.secretKey
+@@ -110,9 +152,38 @@ router.route('/auth/token')
+   });
+ {{/apiStyle.other.needJwt}}
+ 
++{{#dependencies.other.need_swagger_jsdoc}}
++/**
++ * @swagger
++ * /{{project.module}}/userId/{userId}:
++ *   get:
++ *     description: Find user by id
++ *     tags:
++ *       - auth
++ *     produces:
++ *       - "application/json"
++ *     parameters:
++ *       - name: userId
++ *         description: user id
++ *         in: path
++ *         required: true
++ *         type: string
++ *     responses:
++ *       200:
++ *         description: "successful operation"
++ *         schema:
++ *           $ref: "#/definitions/User"
++ *       400:
++ *         description: "Invalid ID supplied"
++ *       404:
++ *         description: "User not found"
++ */
++{{/dependencies.other.need_swagger_jsdoc}}
++{{^dependencies.other.need_swagger_jsdoc}}
+ /**
+- * Sample route
++ * Find user by id
+  */
++{{/dependencies.other.need_swagger_jsdoc}}
+ router.route('/{{project.module}}/userId/:userId')
+   .get({{#apiStyle.other.needJwt}}expressJwt({
+     secret: config.jwt.secretKey
+diff --git a/templates/src/models/sample-model.js.mustache b/templates/src/models/sample-model.js.mustache
+index b237e47..da114da 100644
+--- a/templates/src/models/sample-model.js.mustache
++++ b/templates/src/models/sample-model.js.mustache
+@@ -8,7 +8,55 @@ const BaseModel = require('./base-model');
+ 
+ const JSON_FILE_PATH = path.join(__dirname, '../../db/SampleModel.json');
+ const ID_PROP = 'userId';
++{{/projectStyle.db.isJsonDB}}
++{{#projectStyle.db.isMongoDB}}
++{{#dependencies.secure.need_bcrypt_nodejs}}
++const bcrypt = require('bcrypt-nodejs');
++{{/dependencies.secure.need_bcrypt_nodejs}}
++{{#dependencies.secure.need_crypto}}
++const crypto = require('crypto');
++{{/dependencies.secure.need_crypto}}
++const mongoose = require('mongoose');
++
++const config = require('../config/config');
++{{/projectStyle.db.isMongoDB}}
++{{#projectStyle.db.isNeo4j}}
++  {{#dependencies.db.need_neo4j_driver}}
++const neo4j = require('neo4j-driver').v1;
++const config = require('../config/config');
++  {{/dependencies.db.need_neo4j_driver}}
++const BaseModel = require('./base-model');
+ 
++  {{#dependencies.db.need_neo4j_driver}}
++const driver = neo4j.driver(config.db.url,
++  neo4j.auth.basic(config.db.username, config.db.password));
++const session = driver.session();
++  {{/dependencies.db.need_neo4j_driver}}
++{{/projectStyle.db.isNeo4j}}
++{{#dependencies.other.need_swagger_jsdoc}}
++
++/**
++ * @swagger
++ * definitions:
++ *   User:
++ *     required:
++ *       - userId
++ *       - username
++ *     properties:
++ *       userId:
++ *         type: string
++ *         description: "user id"
++ *       username:
++ *         type: string
++ *         description: user name
++ */
++{{/dependencies.other.need_swagger_jsdoc}}
++{{^dependencies.other.need_swagger_jsdoc}}
++/**
++ * User info
++ */
++{{/dependencies.other.need_swagger_jsdoc}}
++{{#projectStyle.db.isJsonDB}}
+ class SampleModel extends BaseModel {
+   /**
+    * constructor
+@@ -52,16 +100,6 @@ class SampleModel extends BaseModel {
+ }
+ {{/projectStyle.db.isJsonDB}}
+ {{#projectStyle.db.isMongoDB}}
+-{{#dependencies.secure.need_bcrypt_nodejs}}
+-const bcrypt = require('bcrypt-nodejs');
+-{{/dependencies.secure.need_bcrypt_nodejs}}
+-{{#dependencies.secure.need_crypto}}
+-const crypto = require('crypto');
+-{{/dependencies.secure.need_crypto}}
+-const mongoose = require('mongoose');
+-
+-const config = require('../config/config');
+-
+ const userSchema = new mongoose.Schema({
+   userId: { type: String, unique: true },
+   username: { type: String },
+@@ -106,18 +144,6 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword,
+ const SampleModel = mongoose.model('User', userSchema);
+ {{/projectStyle.db.isMongoDB}}
+ {{#projectStyle.db.isNeo4j}}
+-  {{#dependencies.db.need_neo4j_driver}}
+-const neo4j = require('neo4j-driver').v1;
+-const config = require('../config/config');
+-  {{/dependencies.db.need_neo4j_driver}}
+-const BaseModel = require('./base-model');
+-
+-  {{#dependencies.db.need_neo4j_driver}}
+-const driver = neo4j.driver(config.db.url,
+-  neo4j.auth.basic(config.db.username, config.db.password));
+-const session = driver.session();
+-  {{/dependencies.db.need_neo4j_driver}}
+-
+ class SampleModel extends BaseModel {
+   /**
+    * find policy by ID
+-- 
+2.16.2.windows.1
+
