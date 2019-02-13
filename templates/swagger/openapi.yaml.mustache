@@ -1,0 +1,340 @@
+openapi: "3.0.0"
+info:
+  title: {{project.name}} backend rest API
+  description: |
+    <b>Note</b>: please note.
+  version: "1.0"
+servers:
+- url: {{{project.basePath}}}
+  variables:
+    apiVersion:
+      default: '{{project.version}}'
+      description: The REST API version
+security:
+{{#api.security.isJwt}}
+- bearerAuth: []
+{{/api.security.isJwt}}
+
+paths:
+  {{#paths}}
+  {{path}}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    {{#ops}}
+    {{method}}:
+      summary: {{operationId}} {{method}}
+      description: |
+        {{operationId}} {{method}}
+      tags:
+        - {{tag}}
+      {{#noSecurity}}
+      security: []
+      {{/noSecurity}}
+      {{#needReqBody}}
+      
+      requestBody
+        {{#needReqBodyRef}}
+        $ref: {{#refReqEntity}}'#/components/schemas/{{refReqEntity}}'{{/refReqEntity}}{{^refReqEntity}}'#/components/requestBodies/{{opreationName}}Body'{{/refReqEntity}}
+        {{/needReqBodyRef}}
+        {{^needReqBodyRef}}
+        description: {{operationId}} request
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                -
+              properties:
+                name:
+                  type: string
+                  description:
+                  example:
+        {{/needReqBodyRef}}
+      {{/needReqBody}}
+      responses:
+        {{#noResponseContent}}
+        204:
+          description: Successfully {{opreationName}}.
+        {{/noResponseContent}}
+        {{^noResponseContent}}
+        200:
+          {{#needResponseRef}}
+          $ref: {{#refResponseEntity}}'#/components/schemas/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/components/responses/{{opreationName}}Response'{{/refResponseEntity}}
+          {{/needResponseRef}}
+          {{^needResponseRef}}
+          description: The operation succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description:
+                    example:
+          {{#needResponsePageHeader}}
+          headers:
+            X-Next-Page:
+              schema:
+                type: integer
+              description: The index of the next page
+            X-Page:
+              schema:
+                type: integer
+              description: The index of the current page (starting at 1)
+            X-Per-Page:
+              schema:
+                type: integer
+              description: The number of items to list per page
+            X-Total:
+              schema:
+                type: integer
+              description: The total number of items
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: The total number of pages
+            Link:
+              schema:
+                type: string
+              description: Pagination link header
+          {{/needResponsePageHeader}}
+          {{/needResponseRef}}
+        {{/noResponseContent}}
+        400:
+          $ref: '#/components/responses/BadRequest'
+        {{#needAuth}}
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        {{/needAuth}}
+        {{#needPermission}}
+        403:
+          $ref: '#/components/responses/Forbidden'
+        {{/needPermission}}
+        {{#needFound}}
+        404:
+          $ref: '#/components/responses/NotFound'
+        {{/needFound}}
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    {{/ops}}
+  {{/paths}}
+
+components:
+  {{#api.security.isJwt}}
+  #-------------------------------
+  # JWT Security schemes
+  #-------------------------------
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  {{/api.security.isJwt}}
+
+  #-------------------------------
+  # Parameters
+  #-------------------------------
+  parameters:
+    page:
+      name: {{api.navigation.page}}
+      in: query
+      description: The page number.
+      required: false
+      schema:
+        type: integer
+        default: 1
+      example: 1
+
+    perPage:
+      name: {{api.navigation.perPage}}
+      in: query
+      description: The number of items to list per page.
+      required: false
+      schema:
+        type: integer
+        default: 20
+        maximum: 100
+      example: 20
+
+    sortOrder:
+      name: {{api.navigation.sortOrder}}
+      in: query
+      description: The sort order.
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+      example: asc
+
+    id:
+      name: id
+      in: path
+      description: The entity id.
+      required: true
+      schema:
+        type: string
+      example: 564935d6-16d5-4410-b415-55d369b90327
+
+  #-------------------------------
+  # Responses
+  #-------------------------------
+  responses:
+    BadRequest:
+      description: BAD REQUEST - if there was problem with the request (e.g. malformed or some parameters are missing).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthenticated:
+      description: UNAUTHENTICATED - if the request didn't bear authentication information or the authentication information is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: FORBIDDEN - if the requesting user didn't have permission to perform the requested operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: NOT FOUND - if the resource in request did not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: INTERNAL SERVER ERROR - if the request was properly formatted, but the operation failed on the server side
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    {{#paths}}
+    {{#ops}}
+    {{#needResponseRef}}
+    {{^refResponseEntity}}
+    {{opreationName}}Response:
+      description: {{opreationName}} response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              -
+            properties:
+              name:
+                type: string
+                description:
+                example:
+      {{#needResponsePageHeader}}
+      headers:
+        X-Next-Page:
+          schema:
+            type: integer
+          description: The index of the next page
+        X-Page:
+          schema:
+            type: integer
+          description: The index of the current page (starting at 1)
+        X-Per-Page:
+          schema:
+            type: integer
+          description: The number of items to list per page
+        X-Total:
+          schema:
+            type: integer
+          description: The total number of items
+        X-Total-Pages:
+          schema:
+            type: integer
+          description: The total number of pages
+        Link:
+          schema:
+            type: string
+          description: Pagination link header
+      {{/needResponsePageHeader}}
+    {{/refResponseEntity}}
+    {{/needResponseRef}}
+    {{/ops}}
+    {{/paths}}
+  #-------------------------------
+  # Request Bodies
+  #-------------------------------
+  requestBodies:
+    {{#paths}}
+    {{#ops}}
+    {{#needReqBodyRef}}
+    {{^refReqEntity}}
+    {{opreationName}}Body:
+      description: {{opreationName}} request
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              -
+            properties:
+              name:
+                type: string
+                description:
+                example:
+    {{/refReqEntity}}
+    {{/needReqBodyRef}}
+    {{/ops}}
+    {{/paths}}
+  #-------------------------------
+  # Entities
+  #-------------------------------
+  schemas:
+    Id:
+      type: string
+      description: The id.
+      example: 564935d6-16d5-4410-b415-55d369b90327
+
+    Error:
+      description: |
+        An error entity.
+      properties:
+        message:
+          type: string
+          description: The error message.
+
+    {{#paths}}
+    {{#ops}}
+    {{#needReqBodyRef}}
+    {{#refReqEntity}}
+    {{refReqEntity}}:
+      description: |
+        The {{refReqEntity}} entity.
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+          description:
+          example:
+    {{/refReqEntity}}
+    {{/needReqBodyRef}}
+    {{/ops}}
+    {{/paths}}
+    {{#paths}}
+    {{#ops}}
+    {{#needResponseRef}}
+    {{#refResponseEntity}}
+    {{refResponseEntity}}:
+      description: |
+        The {{refResponseEntity}} entity.
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+          description:
+          example:
+    {{/refResponseEntity}}
+    {{/needResponseRef}}
+    {{/ops}}
+    {{/paths}}

@@ -1,0 +1,22 @@
+package com.{{project.name}}.app.model.view;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.validation.annotation.Validated;
+
+@Validated
+public class ErrorResponse {
+
+    public ErrorResponse(String message){
+        this.message = message;
+    }
+    @JsonProperty("message")
+    protected String message = null;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}

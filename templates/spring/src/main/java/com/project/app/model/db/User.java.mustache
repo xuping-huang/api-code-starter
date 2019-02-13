@@ -1,0 +1,297 @@
+package com.{{project.name}}.app.model.db;
+
+import java.util.Date;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+import org.springframework.data.annotation.Id;
+
+/**
+ * The User entity.
+ */
+@ApiModel(description = "The User entity. ")
+@Validated
+public class User   {
+  @Id
+  @JsonProperty("id")
+  private String id = null;
+
+  @Indexed(unique = true)
+  @JsonProperty("phone")
+  private String phone = null;
+
+  @Indexed(unique = true)
+  @JsonProperty("email")
+  private String email = null;
+
+  @JsonIgnore()
+  private String password = null;
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public boolean isAdmin() {
+    List<String> roles = this.getRole();
+    if ( roles == null || roles.isEmpty() )
+      return false;
+    for (String re: roles) {
+      String adminName = RoleEnum.ADMIN .name();
+      if ( re.equalsIgnoreCase( adminName ))
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * the user role
+   */
+  public enum RoleEnum {
+    NORMAL("normal"),
+
+    ADMIN("admin");
+
+    private String value;
+
+    RoleEnum(String value) {
+      this.value = value;
+    }
+
+    @Override
+    @JsonValue
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static RoleEnum fromValue(String text) {
+      for (RoleEnum b : RoleEnum.values()) {
+        if (String.valueOf(b.value).equals(text)) {
+          return b;
+        }
+      }
+      return null;
+    }
+  }
+  @JsonProperty("role")
+  private List<String> role = null;
+
+  @JsonProperty("createdOn")
+  private Date createdOn = null;
+
+  @JsonProperty("updatedOn")
+  private Date updatedOn = null;
+
+  @JsonProperty("lastLoginOn")
+  private Date lastLoginOn = null;
+
+  public User id(String id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * Get id
+   * @return id
+  **/
+  @ApiModelProperty(value = "")
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public User phone(String phone) {
+    this.phone = phone;
+    return this;
+  }
+
+  /**
+   * The phone number, must be unique
+   * @return phone
+  **/
+  @ApiModelProperty(required = true, value = "The phone number, must be unique")
+  @NotNull
+
+  public String getPhone() {
+    return phone;
+  }
+
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
+
+  public User email(String email) {
+    this.email = email;
+    return this;
+  }
+
+  /**
+   * the email address, not required, must be unique
+   * @return email
+  **/
+  @ApiModelProperty(example = "user@email.com", value = "the email address, not required, must be unique")
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public User role(List<String> role) {
+    this.role = role;
+    return this;
+  }
+
+  public User addRoleItem(String roleItem) {
+    if (this.role == null) {
+      this.role = new ArrayList<String>();
+    }
+    this.role.add(roleItem);
+    return this;
+  }
+
+  /**
+   * Get role
+   * @return role
+  **/
+  @ApiModelProperty(example = "[\"normal\"]", value = "")
+
+  public List<String> getRole() {
+    return role;
+  }
+
+  public void setRole(List<String> role) {
+    this.role = role;
+  }
+
+  public User createdOn(Date createdOn) {
+    this.createdOn = createdOn;
+    return this;
+  }
+
+  /**
+   * The created on date.
+   * @return createdOn
+  **/
+  @ApiModelProperty(value = "The created on date.")
+
+  public Date getCreatedOn() {
+    return createdOn;
+  }
+
+  public void setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
+  }
+
+  public User updatedOn(Date updatedOn) {
+    this.updatedOn = updatedOn;
+    return this;
+  }
+
+  /**
+   * The updated on date.
+   * @return updatedOn
+  **/
+  @ApiModelProperty(value = "The updated on date.")
+
+  public Date getUpdatedOn() {
+    return updatedOn;
+  }
+
+  public void setUpdatedOn(Date updatedOn) {
+    this.updatedOn = updatedOn;
+  }
+
+  public User lastLoginOn(Date lastLoginOn) {
+    this.lastLoginOn = lastLoginOn;
+    return this;
+  }
+
+
+  /**
+   * The last login date.
+   * @return lastLoginOn
+  **/
+  @ApiModelProperty(value = "The last login date.")
+
+  public Date getLastLoginOn() {
+    return lastLoginOn;
+  }
+
+  public void setLastLoginOn(Date lastLoginOn) {
+    this.lastLoginOn = lastLoginOn;
+  }
+
+
+  @Override
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    User user = (User) o;
+    return Objects.equals(this.id, user.id) &&
+        Objects.equals(this.phone, user.phone) &&
+        Objects.equals(this.email, user.email) &&
+        Objects.equals(this.role, user.role) &&
+        Objects.equals(this.createdOn, user.createdOn) &&
+        Objects.equals(this.updatedOn, user.updatedOn) &&
+        Objects.equals(this.lastLoginOn, user.lastLoginOn);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, phone, email, role, createdOn, updatedOn, lastLoginOn);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class User {\n");
+
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    phone: ").append(toIndentedString(phone)).append("\n");
+    sb.append("    email: ").append(toIndentedString(email)).append("\n");
+    sb.append("    role: ").append(toIndentedString(role)).append("\n");
+    sb.append("    createdOn: ").append(toIndentedString(createdOn)).append("\n");
+    sb.append("    updatedOn: ").append(toIndentedString(updatedOn)).append("\n");
+    sb.append("    lastLoginOn: ").append(toIndentedString(lastLoginOn)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
+}

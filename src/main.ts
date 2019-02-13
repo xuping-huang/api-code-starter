@@ -9,7 +9,8 @@ const debug = Debug('code:main');
 
 const main = () => {
   const codeEnv = process.env.CODE_ENV || 'development';
-  const configFile = path.resolve(__dirname, '../config/common.yml');
+  const configEnv = process.env.CONFIG_ENV || 'common.yml'
+  const configFile = path.resolve(__dirname, `../config/${configEnv}`);
   const config = nodeConfig.load(configFile, codeEnv);
   debug(config);
 

@@ -1,0 +1,9 @@
+package com.{{project.name}}.app.lib.error;
+
+import org.springframework.http.HttpStatus;
+
+public class NotFoundException extends ExtensibleException {
+    public NotFoundException (String msg) {
+        super(msg, HttpStatus.NOT_FOUND);
+    }
+}

@@ -1,0 +1,17 @@
+package com.{{project.name}}.app.lib.error;
+import org.springframework.http.HttpStatus;
+public class ExtensibleException extends Exception {
+    private HttpStatus code;
+    public ExtensibleException (String msg, HttpStatus code ) {
+        super(msg);
+        this.code = code;
+    }
+
+    public HttpStatus getCode() {
+        return code;
+    }
+
+    public void setCode(HttpStatus code) {
+        this.code = code;
+    }
+}

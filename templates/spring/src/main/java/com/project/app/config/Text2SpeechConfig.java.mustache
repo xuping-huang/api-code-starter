@@ -1,0 +1,19 @@
+{{#apiStyle.other.needGootleText2Speech}}
+package com.{{project.name}}.app.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = "text2speech")
+public class Text2SpeechConfig {
+    private String language;
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+}
+
+{{/apiStyle.other.needGootleText2Speech}}

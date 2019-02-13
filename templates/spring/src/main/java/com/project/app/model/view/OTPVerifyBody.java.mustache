@@ -1,0 +1,103 @@
+package com.{{project.name}}.app.model.view;
+
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.*;
+
+/**
+ * OTPVerifyBody
+ */
+@Validated
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-01-24T14:59:02.249+08:00[GMT+08:00]")
+public class OTPVerifyBody {
+  @JsonProperty("otpCode")
+  private String otpCode = null;
+
+  @JsonProperty("otpToken")
+  private String otpToken = null;
+
+  public OTPVerifyBody otpCode(String otpCode) {
+    this.otpCode = otpCode;
+    return this;
+  }
+
+  /**
+   * The OTP code
+   * @return otpCode
+  **/
+  @ApiModelProperty(example = "1234", required = true, value = "The OTP code")
+  @NotEmpty(message = "OTP code required and not empty")
+  @NotBlank(message = "OTP code required and not empty")
+  public String getOtpCode() {
+    return otpCode;
+  }
+
+  public void setOtpCode(String otpCode) {
+    this.otpCode = otpCode;
+  }
+
+  public OTPVerifyBody otpToken(String otpToken) {
+    this.otpToken = otpToken;
+    return this;
+  }
+
+  /**
+   * The OTP token
+   * @return otpToken
+  **/
+  @ApiModelProperty(example = "4563879a-1490-4472-915e-4ab9c7034a74", required = true, value = "The OTP token")
+
+  @NotEmpty(message = "OTP token required and not empty.")
+  @NotBlank(message = "OTP token required and not empty.")
+  public String getOtpToken() {
+    return otpToken;
+  }
+
+  public void setOtpToken(String otpToken) {
+    this.otpToken = otpToken;
+  }
+
+
+  @Override
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    OTPVerifyBody body2 = (OTPVerifyBody) o;
+    return Objects.equals(this.otpCode, body2.otpCode) &&
+        Objects.equals(this.otpToken, body2.otpToken);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(otpCode, otpToken);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class OTPVerifyBody {\n");
+
+    sb.append("    otpCode: ").append(toIndentedString(otpCode)).append("\n");
+    sb.append("    otpToken: ").append(toIndentedString(otpToken)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
+}

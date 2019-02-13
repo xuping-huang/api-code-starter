@@ -1,0 +1,16 @@
+package com.{{project.name}}.app.lib.utils;
+
+import com.{{project.name}}.app.model.view.ErrorResponse;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+
+public class ResponseErrorHelper {
+    static public ErrorResponse error(BindingResult bindingResult){
+        StringBuilder sb = new StringBuilder();
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            sb.append( fieldError.getDefaultMessage() );
+            sb.append("\r\n");
+        }
+        return new ErrorResponse(sb.toString());
+    }
+}

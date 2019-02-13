@@ -1,0 +1,59 @@
+{{^apiStyle.other.needGootleText2Speech}}
+// not implement, remove need
+{{/apiStyle.other.needGootleText2Speech}}
+{{#apiStyle.other.needGootleText2Speech}}
+package com.{{project.name}}.app.lib.google;
+
+import com.{{project.name}}.app.config.Text2SpeechConfig;
+import com.google.cloud.texttospeech.v1.AudioConfig;
+import com.google.cloud.texttospeech.v1.AudioEncoding;
+import com.google.cloud.texttospeech.v1.SsmlVoiceGender;
+import com.google.cloud.texttospeech.v1.SynthesisInput;
+import com.google.cloud.texttospeech.v1.SynthesizeSpeechResponse;
+import com.google.cloud.texttospeech.v1.TextToSpeechClient;
+import com.google.cloud.texttospeech.v1.VoiceSelectionParams;
+import com.google.protobuf.ByteString;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+
+@Service
+public class Text2SpeechImpl implements Text2Speech{
+    @Autowired
+    Text2SpeechConfig text2SpeechConfig;
+
+    @Override
+    public ByteString text2mp3(String text) throws IOException {
+        try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create()) {
+            // Set the text input to be synthesized
+            SynthesisInput input = SynthesisInput.newBuilder()
+                    .setText(text)
+                    .build();
+
+            // Build the voice request, select the language code ("en-US") and the ssml voice gender
+            // ("neutral")
+            VoiceSelectionParams voice = VoiceSelectionParams.newBuilder()
+                    .setLanguageCode(text2SpeechConfig.getLanguage())
+                    .setSsmlGender(SsmlVoiceGender.NEUTRAL)
+                    .build();
+
+            // Select the type of audio file you want returned
+            AudioConfig audioConfig = AudioConfig.newBuilder()
+                    .setAudioEncoding(AudioEncoding.MP3)
+                    .build();
+
+            // Perform the text-to-speech request on the text input with the selected voice parameters and
+            // audio file type
+            SynthesizeSpeechResponse response = textToSpeechClient.synthesizeSpeech(input, voice,
+                    audioConfig);
+
+            // Get the audio contents from the response
+            ByteString audioContents = response.getAudioContent();
+
+            return audioContents;
+        }
+    }
+}
+
+{{/apiStyle.other.needGootleText2Speech}}

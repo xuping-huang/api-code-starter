@@ -1,0 +1,122 @@
+{{^apiStyle.other.needJwt}}
+// not implement, remove need
+{{/apiStyle.other.needJwt}}
+{{#apiStyle.other.needJwt}}
+package com.{{project.name}}.app.lib.utils;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.{{project.name}}.app.config.AppConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Date;
+
+public class JwtHelper {
+    static final String PHONE = "phone";
+    static final String SEED = "seed";
+    /**
+     * Validate user token
+     * @param token user token
+     * @param phone phone number
+     * @return true/false
+     */
+    public static boolean verify(String secret, String token, String phone) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withClaim(PHONE, phone)
+                    .build();
+            verifier.verify(token);
+            return true;
+        } catch (JWTVerificationException exception) {
+            return false;
+        }
+    }
+    {{#apiStyle.other.needOpt}}
+
+    /**
+     * Validate otp token
+     * @param token otp token
+     * @return true/false
+     */
+    public static boolean verifyOTP(String secret, String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .build();
+            verifier.verify(token);
+            return true;
+        } catch (JWTVerificationException exception) {
+            return false;
+        }
+    }
+    {{/apiStyle.other.needOpt}}
+
+    /**
+     * Get seed from token
+     * @return seed
+     */
+    public static String getSeed(String token) {
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            return jwt.getClaim(SEED).asString();
+        } catch (JWTDecodeException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get phone from token
+     * @return phone
+     */
+    public static String getPhone(String token) {
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            return jwt.getClaim(PHONE).asString();
+        } catch (JWTDecodeException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Generate user request token
+     * @param phone phone number
+     * @return user token
+     */
+    public static String sign(String secret, String phone, int minutes) {
+        Date date = new Date(System.currentTimeMillis()+minutes*60*1000);
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        return JWT.create()
+                .withClaim(PHONE, phone)
+                .withExpiresAt(date)
+                .sign(algorithm);
+    }
+    {{#apiStyle.other.needOpt}}
+
+    /**
+     * Generate otp token
+     * @param seed random seed
+     * @return otp token
+     */
+    public static String signOTP(String secret, String phone, String seed, int seconds) {
+        Date date = new Date(System.currentTimeMillis()+seconds*1000);
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        return JWT.create()
+                .withClaim(PHONE, phone)
+                .withClaim(SEED, seed)
+                .withExpiresAt(date)
+                .sign(algorithm);
+    }
+    {{/apiStyle.other.needOpt}}
+
+    public static String interceptToken(String tokenHeader, String token) {
+        if (token != null && token.startsWith(tokenHeader))
+            return token.substring(tokenHeader.length()).trim();
+        return token;
+    }
+}
+{{/apiStyle.other.needJwt}}

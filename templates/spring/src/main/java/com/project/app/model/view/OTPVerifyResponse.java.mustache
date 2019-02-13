@@ -1,0 +1,125 @@
+package com.{{project.name}}.app.model.view;
+
+import java.util.Objects;
+
+import com.{{project.name}}.app.model.db.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+
+/**
+ * OTPVerifyResponse
+ */
+@Validated
+public class OTPVerifyResponse {
+  @JsonProperty("accessToken")
+  private String accessToken = null;
+
+  @JsonProperty("accessTokenExpiredOn")
+  private String accessTokenExpiredOn = null;
+
+  @JsonProperty("user")
+  private User user = null;
+
+  public OTPVerifyResponse accessToken(String accessToken) {
+    this.accessToken = accessToken;
+    return this;
+  }
+
+  /**
+   * the access token
+   * @return accessToken
+  **/
+  @ApiModelProperty(example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c", value = "the access token")
+
+  public String getAccessToken() {
+    return accessToken;
+  }
+
+  public void setAccessToken(String accessToken) {
+    this.accessToken = accessToken;
+  }
+
+  public OTPVerifyResponse accessTokenExpiredOn(String accessTokenExpiredOn) {
+    this.accessTokenExpiredOn = accessTokenExpiredOn;
+    return this;
+  }
+
+  /**
+   * Get accessTokenExpiredOn
+   * @return accessTokenExpiredOn
+  **/
+  @ApiModelProperty(value = "")
+
+  public String getAccessTokenExpiredOn() {
+    return accessTokenExpiredOn;
+  }
+
+  public void setAccessTokenExpiredOn(String accessTokenExpiredOn) {
+    this.accessTokenExpiredOn = accessTokenExpiredOn;
+  }
+
+  public OTPVerifyResponse user(User user) {
+    this.user = user;
+    return this;
+  }
+
+  /**
+   * Get user
+   * @return user
+  **/
+  @ApiModelProperty(value = "")
+
+  @Valid
+  public User getUser() {
+    return user;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
+
+
+  @Override
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    OTPVerifyResponse OTPVerifyResponse = (OTPVerifyResponse) o;
+    return Objects.equals(this.accessToken, OTPVerifyResponse.accessToken) &&
+        Objects.equals(this.accessTokenExpiredOn, OTPVerifyResponse.accessTokenExpiredOn) &&
+        Objects.equals(this.user, OTPVerifyResponse.user);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(accessToken, accessTokenExpiredOn, user);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class OTPVerifyResponse {\n");
+
+    sb.append("    accessToken: ").append(toIndentedString(accessToken)).append("\n");
+    sb.append("    accessTokenExpiredOn: ").append(toIndentedString(accessTokenExpiredOn)).append("\n");
+    sb.append("    user: ").append(toIndentedString(user)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
+}

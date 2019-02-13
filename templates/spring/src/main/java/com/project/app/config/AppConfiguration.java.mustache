@@ -1,0 +1,75 @@
+package com.autocognita.app.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = "{{project.name}}")
+public class AppConfiguration {
+    {{#apiStyle.other.needOpt}}
+    // otp code expired interval
+    private int otpIntervalSeconds;
+    // otp token secret
+    private String otpSecret;
+    {{/apiStyle.other.needOpt}}
+    {{#apiStyle.other.needJwt}}
+    // request token expired interval
+    private int tokenIntervalMinutes;
+    // request token secret
+    private String tokenSecret;
+    // request authorization header
+    private String authHeader;
+    // jwt header
+    private String jwtHeader;
+    {{/apiStyle.other.needJwt}}
+
+    {{#apiStyle.other.needOpt}}
+    public int getOtpIntervalSeconds() {
+        return otpIntervalSeconds;
+    }
+
+    public void setOtpIntervalSeconds(int otpIntervalSeconds) {
+        this.otpIntervalSeconds = otpIntervalSeconds;
+    }
+
+    public String getOtpSecret() {
+        return otpSecret;
+    }
+
+    public void setOtpSecret(String otpSecret) {
+        this.otpSecret = otpSecret;
+    }
+    {{/apiStyle.other.needOpt}}
+
+    {{#apiStyle.other.needJwt}}
+    public int getTokenIntervalMinutes() {
+        return tokenIntervalMinutes;
+    }
+
+    public void setTokenIntervalMinutes(int tokenIntervalMinutes) {
+        this.tokenIntervalMinutes = tokenIntervalMinutes;
+    }
+
+    public String getTokenSecret() {
+        return tokenSecret;
+    }
+
+    public void setTokenSecret(String tokenSecret) {
+        this.tokenSecret = tokenSecret;
+    }
+
+    public String getAuthHeader() {
+        return authHeader;
+    }
+
+    public void setAuthHeader(String authHeader) {
+        this.authHeader = authHeader;
+    }
+
+    public String getJwtHeader() {
+        return jwtHeader;
+    }
+
+    public void setJwtHeader(String jwtHeader) {
+        this.jwtHeader = jwtHeader;
+    }
+    {{/apiStyle.other.needJwt}}
+}

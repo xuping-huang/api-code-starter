@@ -1,11 +1,11 @@
 defaults: &defaults # default use json-db,express,javascript
   project:
-    name: autocognita-api
+    name: autocognita
     version: 0.0.1
     description: Generate api code start kit for mongo db.
     port: 3000
     module: users
-    basePath: ''
+    basePath: '/api/v1'
     templateSwitch: nodejs
   projectStyle:
     language:
@@ -33,7 +33,8 @@ defaults: &defaults # default use json-db,express,javascript
       needCoverage: false
     other:
       needHealthCheck: false
-      needJwt: false
+      needOpt: true
+      needJwt: true
       needPasswordBcrypt: false
       needTwilio: true
       needAws: true

@@ -1,0 +1,20 @@
+{{^apiStyle.other.needAws}}
+// not implement, remove need
+{{/apiStyle.other.needAws}}
+{{#apiStyle.other.needAws}}
+package com.{{project.name}}.app.lib.aws;
+
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+public interface S3Service {
+    S3Object downloadFile(String keyName);
+    String uploadFile(String keyName, InputStream inputStream, long size) throws IOException;
+    void deleteObject(String keyName);
+    ObjectMetadata getObjectMetadata(String keyName);
+}
+
+{{/apiStyle.other.needAws}}

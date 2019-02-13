@@ -1,0 +1,40 @@
+{{^apiStyle.other.needTwilio}}
+// not implement, remove need
+{{/apiStyle.other.needTwilio}}
+{{#apiStyle.other.needTwilio}}
+package com.{{project.name}}.app.lib.utils;
+
+
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
+
+public class TwilioSender implements Runnable {
+    private Thread thread;
+    private String message;
+    private String from;
+    private String to;
+
+    public TwilioSender(String from, String to, String message) {
+        this.message = message;
+        this.from = from;
+        this.to = to;
+    }
+
+    public void run() {
+        Message message = Message
+            .creator(new PhoneNumber(this.to), // to
+                new PhoneNumber(this.from), // from
+                this.message)
+            .create();
+        String sid = message.getSid();
+    }
+
+    public void start () {
+        if (thread == null) {
+            thread = new Thread (this, "Twilio SMS Sender");
+            thread.start();
+        }
+    }
+}
+
+{{/apiStyle.other.needTwilio}}

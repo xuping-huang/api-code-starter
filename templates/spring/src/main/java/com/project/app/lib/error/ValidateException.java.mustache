@@ -1,0 +1,9 @@
+package com.{{project.name}}.app.lib.error;
+
+import org.springframework.http.HttpStatus;
+
+public class ValidateException extends ExtensibleException{
+    public ValidateException (String msg) {
+        super(msg, HttpStatus.BAD_REQUEST);
+    }
+}

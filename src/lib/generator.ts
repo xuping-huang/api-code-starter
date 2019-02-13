@@ -39,34 +39,59 @@ const codeGenerate = (templatePath: any, config: any) => {
   return renderContent;
 }
 
-const prepareOutputDir = (outputDir: string) => {
-  const srcDir = path.resolve(outputDir, 'src');
-  if (!fs.existsSync(outputDir)){
-    fs.mkdirSync(outputDir);
-    fs.mkdirSync(srcDir);
-  } else {
-    if (!fs.existsSync(srcDir)) {
-      fs.mkdirSync(srcDir);
+const mkdirs = (dirpath, callback) => {
+  fs.exists(dirpath, function (exists) {
+    if (exists) {
+      callback(dirpath);
+    } else {
+      //尝试创建父目录，然后再创建当前目录
+      mkdirs(path.dirname(dirpath), function () {
+        fs.mkdir(dirpath, callback);
+      });
     }
+  });
+};
+
+const mkdirsSync = (dirpath: string) => {
+      try
+      {
+          if (!fs.existsSync(dirpath)) {
+              let pathtmp : fs.PathLike;
+              dirpath.split(/[/\\]/).forEach(function (dirname) {
+                  if (pathtmp) {
+                      pathtmp = path.join(pathtmp.toString(), dirname);
+                  }
+                  else {
+                      pathtmp = dirname;
+                  }
+                  if (!fs.existsSync(pathtmp)) {
+                      fs.mkdirSync(pathtmp);
+                  }
+              });
+          }
+          return true;
+      }catch(e)
+      {
+          debug("create director fail! path=" + dirpath +" errorMsg:" + e);
+          return false;
+      }
   }
-}
 
 export const run = (config: any): any => {
   const templateDir = path.resolve(__dirname, '../../templates', config.project.templateSwitch);
   debug("template dir:"+templateDir);
   const outputDir = path.resolve(__dirname, '../../output');
-  prepareOutputDir(outputDir);
 
   const templates = findTemplates(templateDir, []);
   templates.forEach((template) =>{
     debug(`${template.filePath} -->\n`);
     const renderContent = codeGenerate(template.filePath, config);
     const renderDir = template.fileDir.toString().replace(templateDir.toString(), outputDir.toString());
-    if (!fs.existsSync(renderDir)){
-      fs.mkdirSync(renderDir);
-    }
-    const renderFile = path.resolve(renderDir, template.name);
-    debug(`${renderFile}\n`);
+    const genDir = renderDir.replace("java\\com\\project\\app", `java\\com\\${config.project.name}\\app`);
+    debug(`${genDir}\n`);
+    mkdirsSync(genDir);
+    const renderFile = path.resolve(genDir, template.name);
+    debug(`render file: ${renderFile}\n`);
     fs.writeFileSync(renderFile, renderContent);
   })
 };

@@ -1,0 +1,68 @@
+{{^apiStyle.other.needJwt}}
+// not implement, remove need
+{{/apiStyle.other.needJwt}}
+{{#apiStyle.other.needJwt}}
+package com.{{project.name}}.app.lib.security;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+
+public class JwtUser implements UserDetails {
+
+    private final String id;
+    private final String phone;
+    private final Collection<? extends GrantedAuthority> authorities;
+
+    public JwtUser(String id, String phone, Collection<? extends GrantedAuthority> authorities){
+        this.id = id;
+        this.phone = phone;
+        this.authorities = authorities;
+    }
+
+    // return user's role list
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.authorities;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.phone;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+}
+
+{{/apiStyle.other.needJwt}}

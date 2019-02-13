@@ -1,0 +1,98 @@
+package com.{{project.name}}.app.model.view;
+
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
+import org.springframework.validation.annotation.Validated;
+
+/**
+ * LoginResponse
+ */
+@Validated
+public class LoginResponse {
+  @JsonProperty("otpToken")
+  private String otpToken = null;
+
+  @JsonProperty("otpTokenExpiredAt")
+  private String otpTokenExpiredAt = null;
+
+
+  public LoginResponse otpToken(String otpToken) {
+    this.otpToken = otpToken;
+    return this;
+  }
+
+  /**
+   * the otpToken
+   * @return otpToken
+  **/
+  @ApiModelProperty(example = "4563879a-1490-4472-915e-4ab9c7034a74", value = "the otpToken")
+
+  public String getOtpToken() {
+    return otpToken;
+  }
+
+  public void setOtpToken(String otpToken) {
+    this.otpToken = otpToken;
+  }
+
+  public LoginResponse otpTokenExpiredAt(String otpTokenExpiredAt) {
+    this.otpTokenExpiredAt = otpTokenExpiredAt;
+    return this;
+  }
+
+  /**
+   * the otp token expired time
+   * @return otpTokenExpiredAt
+  **/
+  @ApiModelProperty(example = "2019-01-10T07:10:34.623Z", value = "the otp token expired time")
+
+  public String getOtpTokenExpiredAt() {
+    return otpTokenExpiredAt;
+  }
+
+  public void setOtpTokenExpiredAt(String otpTokenExpiredAt) {
+    this.otpTokenExpiredAt = otpTokenExpiredAt;
+  }
+
+
+  @Override
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    LoginResponse loginResponse = (LoginResponse) o;
+    return Objects.equals(this.otpToken, loginResponse.otpToken) &&
+        Objects.equals(this.otpTokenExpiredAt, loginResponse.otpTokenExpiredAt);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(otpToken, otpTokenExpiredAt);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class LoginResponse {\n");
+    sb.append("    otpToken: ").append(toIndentedString(otpToken)).append("\n");
+    sb.append("    otpTokenExpiredAt: ").append(toIndentedString(otpTokenExpiredAt)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
+
+}

@@ -1,0 +1,68 @@
+package com.{{project.name}}.app.biz.api;
+
+import com.{{project.name}}.app.model.view.*;
+import io.swagger.annotations.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.validation.Valid;
+
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-01-24T14:59:02.249+08:00[GMT+08:00]")
+@Api(value = "security", description = "the security API")
+public interface SecurityApi {
+
+    {{#apiStyle.other.needOpt}}
+    @ApiOperation(value = "Verify OTP", nickname = "verifyOTPPost", notes = "This endpoint will be used to verify OTP ", response = OTPVerifyResponse.class, tags={  })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Authentication/OTP verification response. ", response = OTPVerifyResponse.class),
+        @ApiResponse(code = 400, message = "BAD REQUEST - if there was problem with the request (e.g. malformed or some parameters are missing).", response = ErrorResponse.class),
+        @ApiResponse(code = 401, message = "NOT AUTHORIZED - if the request didn't bear authentication information or the authentication information is invalid.", response = ErrorResponse.class),
+        @ApiResponse(code = 403, message = "FORBIDDEN - if the requesting user didn't have permission to perform the requested operation.", response = ErrorResponse.class),
+        @ApiResponse(code = 500, message = "INTERNAL SERVER ERROR - if the request was properly formatted, but the operation failed on the server side", response = ErrorResponse.class) })
+    @RequestMapping(value = "/verifyOTP",
+        produces = { "application/json" },
+        consumes = { "application/json" },
+        method = RequestMethod.POST)
+    ResponseEntity<OTPVerifyResponse> verifyOTP(@ApiParam(value = "An OTP verification request"  )  @Valid @RequestBody OTPVerifyBody body,
+                                                BindingResult bindingResult);
+    {{/apiStyle.other.needOpt}}
+
+    @ApiOperation(value = "Login", nickname = "loginPost", notes = "This endpoint will be used to perform login.the otpToken will be returned and the otpCode will send to user mobile by SMS (https://www.twilio.com/sms).  - if user not exist, backend should create new user - otpCode(4 digits string) and otpToken(uuid is fine) has the same expired time. ", response = LoginResponse.class, tags={  })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Authentication response. ", response = LoginResponse.class),
+            @ApiResponse(code = 400, message = "BAD REQUEST - if there was problem with the request (e.g. malformed or some parameters are missing).", response = ErrorResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL SERVER ERROR - if the request was properly formatted, but the operation failed on the server side", response = ErrorResponse.class) })
+    @RequestMapping(value = "/login",
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
+    ResponseEntity<LoginResponse> login(@ApiParam(value = "A login request"  )  @Valid @RequestBody LoginBody loginBody,
+                                        BindingResult bindingResult);
+
+    @ApiOperation(value = "Log out.", nickname = "logoutPost", notes = "Logging out. It requires authentication. ", authorizations = {
+            @Authorization(value = "bearerAuth")    }, tags={  })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Successfully logged out."),
+            @ApiResponse(code = 401, message = "NOT AUTHORIZED - if the request didn't bear authentication information or the authentication information is invalid.", response = ErrorResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL SERVER ERROR - if the request was properly formatted, but the operation failed on the server side", response = ErrorResponse.class) })
+    @RequestMapping(value = "/logout",
+            produces = { "application/json" },
+            method = RequestMethod.POST)
+    ResponseEntity<Void> logout(@RequestHeader(value="Authorization") String userToken);
+
+    @ApiOperation(value = "Login (admin)", nickname = "adminLoginPost", notes = "This endpoint will be used to perform login for admin user  - if user role is not admin, it should return error ", response = OTPVerifyResponse.class, tags={  })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Authentication response. ", response = OTPVerifyResponse.class),
+            @ApiResponse(code = 400, message = "BAD REQUEST - if there was problem with the request (e.g. malformed or some parameters are missing).", response = ErrorResponse.class),
+            @ApiResponse(code = 500, message = "INTERNAL SERVER ERROR - if the request was properly formatted, but the operation failed on the server side", response = ErrorResponse.class) })
+    @RequestMapping(value = "/admin/login",
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
+    ResponseEntity<OTPVerifyResponse> adminLogin(@ApiParam(value = "A login request"  )  @Valid @RequestBody AdminLoginBody body, BindingResult bindingResult);
+
+}

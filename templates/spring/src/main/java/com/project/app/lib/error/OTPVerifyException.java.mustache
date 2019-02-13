@@ -1,0 +1,16 @@
+{{^apiStyle.other.needOpt}}
+// not implement, remove need
+{{/apiStyle.other.needOpt}}
+{{#apiStyle.other.needOpt}}
+package com.{{project.name}}.app.lib.error;
+
+import org.springframework.http.HttpStatus;
+
+public class OTPVerifyException extends ExtensibleException {
+    public OTPVerifyException (String msg) {
+
+        super(msg, HttpStatus.NON_AUTHORITATIVE_INFORMATION);
+    }
+}
+
+{{/apiStyle.other.needOpt}}

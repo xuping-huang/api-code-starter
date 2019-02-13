@@ -1,0 +1,8 @@
+package com.{{project.name}}.app.model.repository;
+
+import com.{{project.name}}.app.model.db.UserToken;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface UserTokenRepository extends MongoRepository<UserToken, String> {
+    public UserToken findByShortCode(int shortCode);
+}

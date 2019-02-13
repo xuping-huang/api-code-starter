@@ -1,0 +1,41 @@
+{{^apiStyle.other.needJwt}}
+// not implement, remove need
+{{/apiStyle.other.needJwt}}
+{{#apiStyle.other.needJwt}}
+package com.{{project.name}}.app.lib.security;
+
+import com.{{project.name}}.app.model.db.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public final class JwtUserFactory {
+    private JwtUserFactory() {
+    }
+
+    public static JwtUser create(User user) {
+        List<String> userRoles = user.getRole();
+        List<String> roles = new ArrayList<>();
+        if ( userRoles != null ) {
+            for (String roleName : userRoles) {
+                roles.add(roleName);
+            }
+        }
+        return new JwtUser(
+                user.getId(),
+                user.getPhone(),
+                mapToGrantedAuthorities(roles)
+        );
+    }
+
+    private static List<GrantedAuthority> mapToGrantedAuthorities(List<String> authorities) {
+        return authorities.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+}
+
+{{/apiStyle.other.needJwt}}

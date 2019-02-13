@@ -1,0 +1,46 @@
+defaults: &defaults
+  project:
+    name: autocognita
+    basePath: /api/{apiVersion}/
+    version: v1
+    templateSwitch: swagger
+  api:
+    security:
+      isJwt: true
+    navigation:
+      page: page
+      perPage: perPage
+      sortOrder: sortOrder
+  paths:
+    - path: /login
+      ops:
+        - method: post
+          opreationId: login
+          opreationName: Login
+          tag: Security
+          noSecurity: true
+          needAuth: false
+          needFound: false
+          needPermission: false
+          needReqBody: true
+          needReqBodyRef: false
+          refReqEntity: nouse remove
+          needResponseRef: false
+          refResponseEntity: nouse remove
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /admin/login
+      ops:
+        - method: post
+          opreationId: adminLogin
+          opreationName: AdminLogin
+          tag: Security
+          noSecurity: true
+          needAuth: false
+          needFound: false
+          needPermission: false
+          needReqBody: true
+          needReqBodyRef: false
+          needResponseRef: false
+          needResponsePageHeader: false
+          noResponseContent: false

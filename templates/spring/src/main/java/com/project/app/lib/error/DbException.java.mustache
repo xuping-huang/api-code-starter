@@ -1,0 +1,9 @@
+package com.{{project.name}}.app.lib.error;
+
+import org.springframework.http.HttpStatus;
+
+public class DbException extends ExtensibleException{
+    public DbException (String msg) {
+        super(msg, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}

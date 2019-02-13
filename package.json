@@ -9,6 +9,7 @@
   "keywords": [],
   "scripts": {
     "start": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=no-test-cov,spring,mongo&&ts-node src/main.ts",
+    "swagger": "set DEBUG=code:generator&&set CONFIG_ENV=swagger.yml&&set NODE_ENV=development&&ts-node src/main.ts",
     "describe": "npm-scripts-info",
     "build:main": "tsc -p tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
@@ -17,7 +18,7 @@
     "clean": "trash build test"
   },
   "engines": {
-    "node": ">=8.9"
+    "node": "10.15.1"
   },
   "dependencies": {
     "@types/js-yaml": "^3.11.4",
@@ -30,11 +31,11 @@
     "node-yaml-config": "^0.0.3"
   },
   "devDependencies": {
-    "@types/node": "^9.4.6",
-    "@types/mustache": "^0.8.32",
+    "@types/debug": "^0.0.31",
     "@types/dotenv": "^6.0.0",
     "@types/joi": "^14.0.1",
-    "@types/debug": "^0.0.31",
+    "@types/mustache": "^0.8.32",
+    "@types/node": "^9.6.41",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.17.0",
     "tslint-immutable": "^5.0.0",

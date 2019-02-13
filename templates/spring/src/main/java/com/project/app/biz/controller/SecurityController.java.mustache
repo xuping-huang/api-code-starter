@@ -1,0 +1,128 @@
+package com.{{project.name}}.app.biz.controller;
+
+import com.{{project.name}}.app.biz.api.SecurityApi;
+import com.{{project.name}}.app.config.AppConfiguration;
+{{#apiStyle.other.needTwilio}}
+import com.{{project.name}}.app.config.TwilioConfig;
+{{/apiStyle.other.needTwilio}}
+import com.{{project.name}}.app.model.view.AdminLoginBody;
+{{#apiStyle.other.needOpt}}
+import com.{{project.name}}.app.model.view.OTPVerifyResponse;
+import com.{{project.name}}.app.model.view.OTPVerifyBody;
+{{/apiStyle.other.needOpt}}
+import com.{{project.name}}.app.model.view.ErrorResponse;
+import com.{{project.name}}.app.model.view.LoginBody;
+import com.{{project.name}}.app.model.view.LoginResponse;
+import com.{{project.name}}.app.biz.service.SecurityService;
+import com.{{project.name}}.app.lib.utils.ResponseErrorHelper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.twilio.Twilio;
+import io.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+@RestController
+@RequestMapping("{{{project.basePath}}}")
+public class SecurityController implements SecurityApi {
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityController.class);
+
+    @Autowired
+    AppConfiguration appConfig;
+
+    {{#apiStyle.other.needTwilio}}
+    @Autowired
+    TwilioConfig twilioConfig;
+
+    {{/apiStyle.other.needTwilio}}
+
+    @Autowired
+    SecurityService securityService;
+
+    private final ObjectMapper objectMapper;
+
+    private final HttpServletRequest request;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public SecurityController(ObjectMapper objectMapper, HttpServletRequest request) {
+        this.objectMapper = objectMapper;
+        this.request = request;
+    }
+
+    @PostConstruct
+    public void init(){
+        Twilio.init(twilioConfig.getAccountSid(), twilioConfig.getAccountToken());
+    }
+
+    {{#apiStyle.other.needOpt}}
+    public ResponseEntity<OTPVerifyResponse> verifyOTP(
+            @ApiParam(value = "An OTP verification request"  )  @Valid @RequestBody OTPVerifyBody otpVerifyBody,
+            BindingResult bindingResult) {
+        if(bindingResult.hasErrors()){
+            return new ResponseEntity(ResponseErrorHelper.error(bindingResult), HttpStatus.BAD_REQUEST);
+        }
+        try{
+            OTPVerifyResponse res = securityService.verifyOTP(otpVerifyBody);
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        }catch(Exception ex){
+            log.error(ex.toString());
+            return new ResponseEntity(new ErrorResponse(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    {{/apiStyle.other.needOpt}}
+    /**
+     * Handle user login with otp
+     * @param loginBody contains user phone number
+     * @return otpToken in response body, otpCode send by SMS
+     */
+    public ResponseEntity login(@ApiParam(value = "A login request"  )  @Valid @RequestBody LoginBody loginBody,
+                                BindingResult bindingResult) {
+        if(bindingResult.hasErrors()){
+            return new ResponseEntity(ResponseErrorHelper.error(bindingResult), HttpStatus.BAD_REQUEST);
+        }
+        try{
+            LoginResponse res = securityService.login(loginBody);
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        }catch(Exception ex){
+            log.error(ex.toString());
+            return new ResponseEntity(new ErrorResponse(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Void> logout(@RequestHeader(value="Authorization") String userToken) {
+        try{
+            securityService.logout(userToken);
+        }catch(Exception ex) {
+            // exception not block logout
+            log.error(ex.toString());
+        }
+        return new ResponseEntity<Void>(HttpStatus.OK);
+    }
+
+    public ResponseEntity adminLogin(@ApiParam(value = "A login request"  )  @Valid @RequestBody AdminLoginBody body,
+                                                        BindingResult bindingResult) {
+        if(bindingResult.hasErrors()){
+            return new ResponseEntity(ResponseErrorHelper.error(bindingResult), HttpStatus.BAD_REQUEST);
+        }
+        try{
+            OTPVerifyResponse res = securityService.loginAdmin(body);
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        }catch(Exception ex){
+            log.error(ex.toString());
+            return new ResponseEntity(new ErrorResponse(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+}

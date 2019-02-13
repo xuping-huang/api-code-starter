@@ -1,0 +1,77 @@
+package com.{{project.name}}.app.model.view;
+
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.*;
+
+/**
+ * LoginBody
+ */
+@Validated
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-01-24T14:59:02.249+08:00[GMT+08:00]")
+public class LoginBody {
+  @JsonProperty("phone")
+  private String phone = null;
+
+  public LoginBody phone(String phone) {
+    this.phone = phone;
+    return this;
+  }
+
+  /**
+   * The phone number
+   * @return phone
+  **/
+  @ApiModelProperty(required = true, value = "The phone number")
+  @NotNull(message = "phone can not be null")
+  @Pattern(regexp = "^\\+?\\d{5,20}$",message = "Invalid phone number, the correct format should start with '+'(can omitted), followed by all numbers.")
+  public String getPhone() {
+    return phone;
+  }
+
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
+
+
+  @Override
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    LoginBody loginBody = (LoginBody) o;
+    return Objects.equals(this.phone, loginBody.phone);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(phone);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class LoginBody {\n");
+
+    sb.append("    phone: ").append(toIndentedString(phone)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
+}

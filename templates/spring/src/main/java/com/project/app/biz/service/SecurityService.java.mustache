@@ -1,0 +1,225 @@
+package com.{{project.name}}.app.biz.service;
+
+import com.{{project.name}}.app.config.AppConfiguration;
+import com.{{project.name}}.app.config.TwilioConfig;
+import com.{{project.name}}.app.lib.error.AuthorizationException;
+import com.{{project.name}}.app.lib.error.DbException;
+import com.{{project.name}}.app.lib.error.OTPVerifyException;
+import com.{{project.name}}.app.model.db.UserToken;
+import com.{{project.name}}.app.model.repository.UserTokenRepository;
+import com.{{project.name}}.app.model.view.*;
+import com.{{project.name}}.app.model.db.User;
+import com.{{project.name}}.app.model.repository.UserRepository;
+import com.{{project.name}}.app.lib.utils.JwtHelper;
+import com.{{project.name}}.app.lib.utils.TwilioSender;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.jboss.aerogear.security.otp.Totp;
+import org.jboss.aerogear.security.otp.api.Clock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
+
+@Service
+public class SecurityService {
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityService.class);
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    UserTokenRepository userTokenRepository;
+
+    @Autowired
+    AppConfiguration appConfig;
+
+    @Autowired
+    TwilioConfig twilioConfig;
+
+    @Autowired
+    private ApplicationContext context;
+
+    static final String EXPIRE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
+    private User createUserByPhone(String phone) throws DbException {
+        User user = new User();
+        user.setPhone(phone);
+        user.setCreatedOn(new Date());
+        user.setUpdatedOn(new Date());
+        user.setLastLoginOn(new Date());
+        User newUser = userRepository.save(user);
+        if (newUser == null) {
+            throw new DbException("database persistent error");
+        }
+        return newUser;
+    }
+
+    private void recordUserLogin(User user) {
+        user.setLastLoginOn(new Date());
+        userRepository.save(user);
+    }
+
+    private boolean isDevelopment() {
+        final String dev = "development";
+        String[] activeProfiles = context.getEnvironment().getActiveProfiles();
+        if ( activeProfiles.length == 1 ){
+            if ( activeProfiles[0].equalsIgnoreCase(dev) )
+                return true;
+            else
+                return false;
+        }
+        String[] defaultProfiles = context.getEnvironment().getDefaultProfiles();
+        if ( defaultProfiles.length == 1 ){
+            if ( defaultProfiles[0].equalsIgnoreCase(dev))
+                return true;
+            else
+                return false;
+        }
+        return false;
+    }
+
+    /**
+     * Change the target phone that receives OTP code to the specified phone number for testing
+     * only valid at ( profile = development && twilio.forceTo not empty )
+     * @param phone
+     * @return
+     */
+    private String getTargetPhone(String phone) {
+        if ( !isDevelopment() )
+            return phone;
+        if ( twilioConfig.getForceTo() == null || twilioConfig.getForceTo().isEmpty() )
+            return phone;
+        return twilioConfig.getForceTo();
+    }
+
+    /**
+     * Save user token for logout, don't block process when exception
+     * @param token
+     */
+    private void saveUserToken(String token) {
+        try {
+            int shortCode = Objects.hash(token);
+            UserToken userToken = userTokenRepository.findByShortCode(shortCode);
+            if ( userToken == null ){
+                userToken = new UserToken();
+                userToken.setShortCode(shortCode);
+                userToken.setToken(token);
+                userToken.setEnable(true);
+                userTokenRepository.save(userToken);
+            }
+        }catch(Exception ex) {
+            log.error(ex.toString());
+        }
+    }
+
+    public LoginResponse login(LoginBody loginBody) throws DbException {
+        String phone = loginBody.getPhone();
+        User user = userRepository.findByPhone(phone);
+        if (user == null) {
+            createUserByPhone(phone);
+        }
+
+        // use username and a seed(random alphabetic) to generate otp code
+        // the seed use to make sure otpCode not same at next login after short interval
+        int interval = appConfig.getOtpIntervalSeconds();
+        String seed = RandomStringUtils.randomAlphabetic(8);
+        Totp totp = new Totp(seed, new Clock(interval));
+        String otpCode = totp.now();
+
+        // not block login process, user thread to send otpCode sms
+        TwilioSender sender = new TwilioSender(twilioConfig.getFrom(), getTargetPhone(phone), otpCode);
+        sender.start();
+
+        // generate otpTokenExpiredAt
+        Date date = new Date(System.currentTimeMillis() + interval * 1000);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(EXPIRE_TIME_FORMAT);
+
+        // user phone and seed to generate otpToken
+        String otpToken = JwtHelper.signOTP(appConfig.getOtpSecret(),
+                phone, seed, appConfig.getOtpIntervalSeconds());
+
+        LoginResponse res = new LoginResponse();
+        res.setOtpToken(otpToken);
+        res.setOtpTokenExpiredAt(dateFormat.format(date));
+        return res;
+    }
+
+    public OTPVerifyResponse verifyOTP(OTPVerifyBody otpVerifyBody) throws OTPVerifyException {
+        // get seed from otpToken
+        String otpToken = otpVerifyBody.getOtpToken();
+        boolean validToken = JwtHelper.verifyOTP(appConfig.getOtpSecret(), otpToken);
+        if ( !validToken ) {
+            throw new OTPVerifyException("invalid token or expired");
+        }
+        String seed = JwtHelper.getSeed(otpToken);
+        String phone = JwtHelper.getPhone(otpToken);
+
+        // use seed to verify otpCode
+        Totp totp = new Totp(seed, new Clock(appConfig.getOtpIntervalSeconds()));
+        boolean validOtpCode = totp.verify(otpVerifyBody.getOtpCode());
+        if ( validOtpCode ) {
+            // generate real user token
+            String userToken = JwtHelper.sign(appConfig.getTokenSecret(),
+                    phone, appConfig.getTokenIntervalMinutes());
+            User user = userRepository.findByPhone(phone);
+            if ( user == null ) {
+                throw new OTPVerifyException("OTP verify failed.");
+            }else{
+                recordUserLogin(user);
+            }
+            // save token for logout
+            saveUserToken(userToken);
+            return createVerifyResponse(userToken, user);
+        }
+        throw new OTPVerifyException("OTP verify failed.");
+    }
+
+    public void logout(String token) {
+        String savedToken = JwtHelper.interceptToken(appConfig.getJwtHeader(), token);
+        int shortCode = Objects.hash(savedToken);
+        UserToken userToken = userTokenRepository.findByShortCode(shortCode);
+        if ( userToken != null && userToken.getToken().equals(savedToken)){
+//            userToken.setEnable(false);
+//            userTokenRepository.save(userToken);
+        }
+    }
+
+    public OTPVerifyResponse loginAdmin(AdminLoginBody body) throws AuthorizationException {
+        String email = body.getEmail();
+        String password = body.getPassword();
+        User user = userRepository.findByEmail(email);
+        if (user == null || !user.isAdmin()) {
+            throw new AuthorizationException("login failed.");
+        }
+
+        // password should be encoded before saved
+        BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+        if ( !bcrypt.matches(password, user.getPassword()) )
+            throw new AuthorizationException("login failed.");
+
+        recordUserLogin(user);
+        String userToken = JwtHelper.sign(appConfig.getTokenSecret(),
+                email, appConfig.getTokenIntervalMinutes());
+
+        return createVerifyResponse(userToken, user);
+    }
+
+    private OTPVerifyResponse createVerifyResponse( String userToken, User user) {
+        Date date = new Date(System.currentTimeMillis() + appConfig.getTokenIntervalMinutes() * 60 * 1000);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(EXPIRE_TIME_FORMAT);
+        user.setPassword("");
+
+        OTPVerifyResponse res = new OTPVerifyResponse();
+        res.setAccessToken(userToken);
+        res.setAccessTokenExpiredOn(dateFormat.format(date));
+        res.setUser(user);
+
+        return res;
+    }
+}

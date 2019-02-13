@@ -1,0 +1,12 @@
+package com.{{project.name}}.app.model.repository;
+
+import java.util.List;
+
+import com.{{project.name}}.app.lib.error.DbException;
+import com.{{project.name}}.app.model.db.User;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface UserRepository extends MongoRepository<User, String> {
+    public User findByPhone(String phone);
+    public User findByEmail(String email);
+}

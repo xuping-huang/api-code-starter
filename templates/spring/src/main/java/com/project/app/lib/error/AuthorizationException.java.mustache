@@ -1,0 +1,9 @@
+package com.{{project.name}}.app.lib.error;
+
+import org.springframework.http.HttpStatus;
+
+public class AuthorizationException extends ExtensibleException{
+    public AuthorizationException (String msg) {
+        super(msg, HttpStatus.UNAUTHORIZED);
+    }
+}

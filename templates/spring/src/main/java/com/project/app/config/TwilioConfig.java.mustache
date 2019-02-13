@@ -1,0 +1,46 @@
+{{#apiStyle.other.needTwilio}}
+package com.{{project.name}}.app.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = "twilio")
+public class TwilioConfig {
+    private String accountSid;
+    private String accountToken;
+    private String from;
+    private String forceTo;
+
+    public String getAccountSid() {
+        return accountSid;
+    }
+
+    public void setAccountSid(String accountSid) {
+        this.accountSid = accountSid;
+    }
+
+    public String getAccountToken() {
+        return accountToken;
+    }
+
+    public void setAccountToken(String accountToken) {
+        this.accountToken = accountToken;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public String getForceTo() {
+        return forceTo;
+    }
+
+    public void setForceTo(String forceTo) {
+        this.forceTo = forceTo;
+    }
+}
+
+{{/apiStyle.other.needTwilio}}
