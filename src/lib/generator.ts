@@ -20,7 +20,8 @@ const findTemplates = (rootPath: fs.PathLike, templates: TemplateInfo[]): Templa
       findTemplates(subDir, templates);
     } else {
       const mustacheEnd = '.mustache';
-      if (subItem.endsWith(mustacheEnd)) {
+      const subMustacheEnd = '.sub.mustache';
+      if (subItem.endsWith(mustacheEnd) && !subItem.endsWith(subMustacheEnd)) {
         templates.push({
           filePath: subDir,
           fileDir: rootPath,
@@ -32,9 +33,30 @@ const findTemplates = (rootPath: fs.PathLike, templates: TemplateInfo[]): Templa
   return templates
 }
 
-const codeGenerate = (templatePath: any, config: any) => {
+const findSubTemplates = (rootPath: fs.PathLike, templates: TemplateInfo[]): TemplateInfo[] => {
+  const root = fs.readdirSync(rootPath)
+  root.forEach((subItem) => {
+    const subDir = path.resolve(rootPath.toString(), subItem);
+    const info = fs.statSync(subDir)
+    if (info.isDirectory()) {
+      findTemplates(subDir, templates);
+    } else {
+      const subMustacheEnd = '.sub.mustache';
+      if (subItem.endsWith(subMustacheEnd)) {
+        templates.push({
+          filePath: subDir,
+          fileDir: rootPath,
+          name: subItem.substr(0, subItem.length - subMustacheEnd.length),
+        })
+      }
+    }
+  })
+  return templates
+}
+
+const codeGenerate = (templatePath: any, config: any, subTemplate) => {
   const bf = fs.readFileSync(templatePath)
-  const renderContent = Mustache.render(bf.toString('utf8'), config)
+  const renderContent = Mustache.render(bf.toString('utf8'), config, subTemplate)
 
   return renderContent;
 }
@@ -83,9 +105,19 @@ export const run = (config: any): any => {
   const outputDir = path.resolve(__dirname, '../../output');
 
   const templates = findTemplates(templateDir, []);
+  const subTemplates = findSubTemplates(templateDir, []);
+
+  let subTemplate = {};
+  subTemplates.forEach((tpl)=>{
+    const bf = fs.readFileSync(tpl.filePath);
+    subTemplate[tpl.name] = bf.toString('utf8');
+  });
+  debug('subtemplate:');
+  debug(subTemplate);
+
   templates.forEach((template) =>{
     debug(`${template.filePath} -->\n`);
-    const renderContent = codeGenerate(template.filePath, config);
+    const renderContent = codeGenerate(template.filePath, config, subTemplate);
     const renderDir = template.fileDir.toString().replace(templateDir.toString(), outputDir.toString());
     const genDir = renderDir.replace("java\\com\\project\\app", `java\\com\\${config.project.name}\\app`);
     debug(`${genDir}\n`);
@@ -93,5 +125,5 @@ export const run = (config: any): any => {
     const renderFile = path.resolve(genDir, template.name);
     debug(`render file: ${renderFile}\n`);
     fs.writeFileSync(renderFile, renderContent);
-  })
-};
+  });
+}

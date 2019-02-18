@@ -15,8 +15,8 @@ defaults: &defaults
     - path: /login
       ops:
         - method: post
-          opreationId: login
-          opreationName: Login
+          operationId: login
+          operationName: Login
           tag: Security
           noSecurity: true
           needAuth: false
@@ -24,16 +24,21 @@ defaults: &defaults
           needPermission: false
           needReqBody: true
           needReqBodyRef: false
+          reqBodyParams:
+            - name: phone
           refReqEntity: nouse remove
           needResponseRef: false
+          responseParams:
+            - name: otpToken
+            - name: otpTokenExpiredAt
           refResponseEntity: nouse remove
           needResponsePageHeader: false
           noResponseContent: false
     - path: /admin/login
       ops:
         - method: post
-          opreationId: adminLogin
-          opreationName: AdminLogin
+          operationId: adminLogin
+          operationName: AdminLogin
           tag: Security
           noSecurity: true
           needAuth: false
@@ -41,6 +46,345 @@ defaults: &defaults
           needPermission: false
           needReqBody: true
           needReqBodyRef: false
+          reqBodyParams:
+            - name: email
+            - name: password
           needResponseRef: false
+          responseParams:
+            - name: accessToken
+            - name: accessTokenExpiredOn
+            - name: user
           needResponsePageHeader: false
           noResponseContent: false
+    - path: /verifyOTP
+      ops:
+        - method: post
+          operationId: verifyOTP
+          operationName: verifyOTP
+          tag: Security
+          noSecurity: true
+          needAuth: true
+          needFound: false
+          needPermission: true
+          needReqBody: true
+          needReqBodyRef: false
+          reqBodyParams:
+            - name: otpCode
+            - name: otpToken
+          refReqEntity: nouse remove
+          needResponseRef: false
+          responseParams:
+            - name: accessToken
+            - name: accessTokenExpiredOn
+            - name: user
+          refResponseEntity: nouse remove
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /logout
+      ops:
+        - method: post
+          operationId: logout
+          operationName: Logout
+          tag: Security
+          noSecurity: false
+          needAuth: true
+          needFound: false
+          needPermission: false
+          needReqBody: false
+          needReqBodyRef: false
+          needResponseRef: false
+          needResponsePageHeader: false
+          noResponseContent: true
+    - path: /me
+      ops:
+        - method: get
+          operationId: getCurrentUser
+          operationName: GetCurrentUser
+          tag: User
+          noSecurity: false
+          needAuth: true
+          needFound: false
+          needPermission: false
+          needReqBody: false
+          needReqBodyRef: false
+          needResponseRef: true
+          refResponseEntity: User
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /masters
+      ops:
+        - method: get
+          operationId: searchMasters
+          operationName: SearchMasters
+          tag: Master
+          noSecurity: false
+          needAuth: false
+          needFound: false
+          needPermission: false
+          needReqBody: false
+          needReqBodyRef: false
+          isList: true
+          needResponseRef: true
+          refResponseEntity: Master
+          needResponsePageHeader: false
+          noResponseContent: false
+        - method: post
+          operationId: uploadNewMaster
+          operationName: UploadNewMaster
+          tag: Master
+          noSecurity: false
+          needAuth: true
+          needFound: false
+          needPermission: true
+          needReqBody: true
+          needReqBodyRef: false
+          needResponseRef: true
+          refResponseEntity: FullMaster
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /masters/{id}
+      ops:
+        - method: get
+          operationId: getMasterById
+          operationName: GetMasterById
+          tag: Master
+          noSecurity: false
+          needAuth: true
+          needFound: true
+          needPermission: false
+          needReqBody: false
+          needReqBodyRef: false
+          needResponseRef: true
+          refResponseEntity: FullMaster
+          needResponsePageHeader: false
+          noResponseContent: false
+        - method: put
+          operationId: updateMasterStatus
+          operationName: UpdateMasterStatus
+          tag: Master
+          noSecurity: false
+          needAuth: true
+          needFound: true
+          needPermission: false
+          needReqBody: true
+          needReqBodyRef: false
+          reqBodyParams:
+            - name: status
+          needResponseRef: true
+          refResponseEntity: FullMaster
+          needResponsePageHeader: false
+          noResponseContent: false
+        - method: delete
+          operationId: deleteMasterById
+          operationName: DeleteMasterById
+          tag: Master
+          noSecurity: false
+          needAuth: true
+          needFound: true
+          needPermission: false
+          needReqBody: false
+          needReqBodyRef: false
+          needResponseRef: false
+          needResponsePageHeader: false
+          noResponseContent: true
+    - path: /masters/last
+      ops:
+        - method: get
+          operationId: getLastPublishedMaster
+          operationName: GetLastPublishedMaster
+          tag: Master
+          noSecurity: false
+          needAuth: true
+          needFound: false
+          needPermission: false
+          needReqBody: false
+          needReqBodyRef: false
+          needResponseRef: true
+          refResponseEntity: FullMaster
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /me/placment
+      ops:
+        - method: put
+          operationId: updatePlacement
+          operationName: UpdatePlacement
+          tag: Record
+          noSecurity: false
+          needAuth: true
+          needFound: false
+          needPermission: false
+          needReqBody: true
+          needReqBodyRef: true
+          refReqEntity: Progress
+          needResponseRef: false
+          needResponsePageHeader: false
+          noResponseContent: true
+    - path: /me/uploadRecords
+      ops:
+        - method: post
+          operationId: uploadUserRecords
+          operationName: UploadUserRecords
+          tag: Record
+          noSecurity: false
+          needAuth: true
+          needFound: false
+          needPermission: false
+          isList: false
+          needReqBody: true
+          needReqBodyRef: false
+          reqBodyParams:
+            - name: record
+            - name: currentProgress
+          needResponseRef: false
+          responseParams:
+            - name: badges
+            - name: certificates
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /me/badges
+      ops:
+        - method: get
+          operationId: getMyBadges
+          operationName: GetMyBadges
+          tag: Badge
+          noSecurity: false
+          needAuth: true
+          needReqBody: false
+          needReqBodyRef: false
+          needResponseRef: true
+          refResponseEntity: UserBadge
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /me/units
+      ops:
+        - method: get
+          operationId: getCompletedUnits
+          operationName: GetCompletedUnits
+          tag: Unit
+          noSecurity: false
+          needAuth: true
+          needReqBody: false
+          needReqBodyRef: false
+          isList: true
+          needNavPage: false
+          needResponseRef: false
+          responseParams:
+            - name: unitName
+            - name: imageFile
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /me/shareImage
+      ops:
+        - method: post
+          operationId: generateShareImage
+          operationName: GenerateShareImage
+          tag: Share
+          noSecurity: false
+          needAuth: true
+          needReqBody: false
+          needReqBodyRef: false
+          needResponseRef: false
+          responseParams:
+            - name: id
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /me/certificates
+      ops:
+        - method: get
+          operationId: getMyCertificates
+          operationName: GetMyCertificates
+          tag: Ceritificates
+          noSecurity: false
+          needAuth: true
+          needReqBody: false
+          needReqBodyRef: false
+          needResponseRef: true
+          refResponseEntity: UserCertificate
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /me/usages
+      ops:
+        - method: get
+          operationId: getUserUsageTime
+          operationName: GetUserUsageTime
+          tag: Usage
+          noSecurity: false
+          needAuth: true
+          queryParams:
+            - name: startTime
+            - name: endTime
+          needReqBody: false
+          needReqBodyRef: false
+          needResponseRef: false
+          responseParams:
+            - name: totalOfDays
+            - name: totalOfHours
+            - name: items
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /resources
+      ops:
+        - method: get
+          operationId: searchResource
+          operationName: SearchResource
+          tag: File
+          noSecurity: false
+          needAuth: true
+          queryParams:
+            - name: type
+          needReqBody: false
+          needReqBodyRef: false
+          isList: true
+          needNavPage: true
+          needResponseRef: true
+          refResponseEntity: File
+          needResponsePageHeader: true
+          noResponseContent: false
+        - method: post
+          operationId: uploadResourcesFile
+          operationName: UploadResourcesFile
+          tag: File
+          noSecurity: false
+          needAuth: true
+          needFound: false
+          needPermission: false
+          needReqBody: true
+          needReqBodyRef: false
+          reqBodyParams:
+            - name: file
+            - name: name
+            - name: lookOn
+            - name: lookAt
+            - name: lookDate
+            - name: lookTime
+          needResponseRef: true
+          refResponseEntity: File
+          needResponsePageHeader: false
+          noResponseContent: false
+  responses:
+    - entity: GroupMembershipArrayResponse
+      needResponsePageHeader: true
+      entityParams:
+        - name: groupMembership_array_ref
+        - name: total
+        - name: callOn
+  requestBodies:
+    - entity: NewGroupMembershipBodyParam
+      entityParams:
+        - name: name
+        - name: description
+        - name: privateGroup_bool
+        - name: selfRegister_bool
+        - name: membershipType_enum
+  schemas:
+    - entity: GroupMembership
+      entityParams:
+        - name: id
+        - name: groupId
+        - name: groupName
+        - name: createdAt
+        - name: createdBy
+        - name: updatedAt
+        - name: updatedBy
+        - name: memberId
+        - name: membershipType_enum

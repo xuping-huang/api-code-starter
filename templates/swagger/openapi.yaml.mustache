@@ -17,7 +17,7 @@ security:
 
 paths:
   {{#paths}}
-  {{path}}:
+  {{{path}}}:
     parameters:
       - $ref: '#/components/parameters/id'
     {{#ops}}
@@ -30,11 +30,35 @@ paths:
       {{#noSecurity}}
       security: []
       {{/noSecurity}}
+      parameters:
+      {{#needNavPage}}
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+        - $ref: '#/components/parameters/sortOrder'
+        - name: sortBy
+          in: query
+          description: The sort order
+          required: false
+          schema:
+            type: string
+            enum: [createdAt,updatedAt]
+      {{/needNavPage}}
+      {{#queryParams}}
+        - name: {{name}}
+          in: query
+          description: {{name}}
+          required: true
+          example: {{name}}
+          schema:
+            type: string
+      {{/queryParams}}
       {{#needReqBody}}
-      
-      requestBody
+      requestBody:
         {{#needReqBodyRef}}
-        $ref: {{#refReqEntity}}'#/components/schemas/{{refReqEntity}}'{{/refReqEntity}}{{^refReqEntity}}'#/components/requestBodies/{{opreationName}}Body'{{/refReqEntity}}
+        content:
+          application/json:
+            schema:
+              $ref: {{#refReqEntity}}'#/components/schemas/{{refReqEntity}}'{{/refReqEntity}}{{^refReqEntity}}'#/components/requestBodies/{{opreationName}}Body'{{/refReqEntity}}
         {{/needReqBodyRef}}
         {{^needReqBodyRef}}
         description: {{operationId}} request
@@ -43,35 +67,99 @@ paths:
             schema:
               type: object
               required:
-                -
+                {{#reqBodyParams}}
+                - {{name}}
+                {{/reqBodyParams}}
               properties:
-                name:
-                  type: string
-                  description:
-                  example:
+                {{#reqBodyParams}}
+                {{> param}}
+                {{/reqBodyParams}}
         {{/needReqBodyRef}}
       {{/needReqBody}}
       responses:
         {{#noResponseContent}}
         204:
-          description: Successfully {{opreationName}}.
+          description: Successfully {{operationName}}.
         {{/noResponseContent}}
         {{^noResponseContent}}
         200:
           {{#needResponseRef}}
-          $ref: {{#refResponseEntity}}'#/components/schemas/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/components/responses/{{opreationName}}Response'{{/refResponseEntity}}
+          description: The operation succeeded.
+          content:
+            application/json:
+              schema:
+                {{^isList}}
+                $ref: {{#refResponseEntity}}'#/components/schemas/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/components/responses/{{opreationName}}Response'{{/refResponseEntity}}
+                {{/isList}}
+                {{#isList}}
+                {{^needNavPage}}
+                type: array
+                items:
+                  $ref: {{#refResponseEntity}}'#/components/schemas/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/components/responses/{{opreationName}}Response'{{/refResponseEntity}}
+                {{/needNavPage}}
+                {{#needNavPage}}
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: {{#refResponseEntity}}'#/components/schemas/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/components/responses/{{opreationName}}Response'{{/refResponseEntity}}
+                  total:
+                    type: integer
+                    description: the total of count
+                    example: 35
+                  page:
+                    type: integer
+                    example: 1
+                  perPage:
+                    type: integer
+                    example: 20
+                {{/needNavPage}}
+                {{/isList}}
           {{/needResponseRef}}
           {{^needResponseRef}}
           description: The operation succeeded.
           content:
             application/json:
               schema:
+                {{^isList}}
                 type: object
                 properties:
-                  name:
-                    type: string
-                    description:
-                    example:
+                  {{#responseParams}}
+                  {{> param}}
+                  {{/responseParams}}
+                {{/isList}}
+                {{#isList}}
+                type: array
+                items:
+                  type: object
+                  properties:
+                    {{^needNavPage}}
+                    {{#responseParams}}
+                    {{> param}}
+                    {{/responseParams}}
+                    {{/needNavPage}}
+                    {{#needNavPage}}
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          {{#responseParams}}
+                          {{> param}}
+                          {{/responseParams}}
+                    total:
+                      type: integer
+                      description: the total of count
+                      example: 35
+                    page:
+                      type: integer
+                      example: 1
+                    perPage:
+                      type: integer
+                      example: 20
+                    {{/needNavPage}}
+                {{/isList}}
           {{#needResponsePageHeader}}
           headers:
             X-Next-Page:
@@ -212,23 +300,17 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
 
-    {{#paths}}
-    {{#ops}}
-    {{#needResponseRef}}
-    {{^refResponseEntity}}
-    {{opreationName}}Response:
-      description: {{opreationName}} response
+    {{#responses}}
+    {{entity}}:
+      description: {{entity}} response
       content:
         application/json:
           schema:
             type: object
-            required:
-              -
             properties:
-              name:
-                type: string
-                description:
-                example:
+              {{#entityParams}}
+              {{> param}}
+              {{/entityParams}}
       {{#needResponsePageHeader}}
       headers:
         X-Next-Page:
@@ -256,35 +338,27 @@ components:
             type: string
           description: Pagination link header
       {{/needResponsePageHeader}}
-    {{/refResponseEntity}}
-    {{/needResponseRef}}
-    {{/ops}}
-    {{/paths}}
+    {{/responses}}
   #-------------------------------
   # Request Bodies
   #-------------------------------
   requestBodies:
-    {{#paths}}
-    {{#ops}}
-    {{#needReqBodyRef}}
-    {{^refReqEntity}}
-    {{opreationName}}Body:
-      description: {{opreationName}} request
+    {{#requestBodies}}
+    {{entity}}:
+      description: {{entity}} request body
       content:
         application/json:
           schema:
             type: object
             required:
-              -
+              {{#entityParams}}
+              - {{name}}
+              {{/entityParams}}
             properties:
-              name:
-                type: string
-                description:
-                example:
-    {{/refReqEntity}}
-    {{/needReqBodyRef}}
-    {{/ops}}
-    {{/paths}}
+              {{#entityParams}}
+              {{> param}}
+              {{/entityParams}}
+    {{/requestBodies}}
   #-------------------------------
   # Entities
   #-------------------------------
@@ -302,39 +376,14 @@ components:
           type: string
           description: The error message.
 
-    {{#paths}}
-    {{#ops}}
-    {{#needReqBodyRef}}
-    {{#refReqEntity}}
-    {{refReqEntity}}:
+    {{#schemas}}
+    {{entity}}:
       description: |
-        The {{refReqEntity}} entity.
+        The {{entity}} entity.
+      required:
+        {{#entityParams}}
+        - {{name}}
+        {{/entityParams}}
       properties:
-        id:
-          $ref: '#/components/schemas/Id'
-        name:
-          type: string
-          description:
-          example:
-    {{/refReqEntity}}
-    {{/needReqBodyRef}}
-    {{/ops}}
-    {{/paths}}
-    {{#paths}}
-    {{#ops}}
-    {{#needResponseRef}}
-    {{#refResponseEntity}}
-    {{refResponseEntity}}:
-      description: |
-        The {{refResponseEntity}} entity.
-      properties:
-        id:
-          $ref: '#/components/schemas/Id'
-        name:
-          type: string
-          description:
-          example:
-    {{/refResponseEntity}}
-    {{/needResponseRef}}
-    {{/ops}}
-    {{/paths}}
+        {{#entityParams}}{{> param}}{{/entityParams}}
+    {{/schemas}}

@@ -1,0 +1,123 @@
+defaults: &defaults
+  project:
+    name: autocognita
+    basePath: /api/{apiVersion}/
+    version: v1
+    templateSwitch: swagger
+  api:
+    security:
+      isJwt: true
+    navigation:
+      page: page
+      perPage: perPage
+      sortOrder: sortOrder
+  paths:
+    - path: /me/usages
+      ops:
+        - method: get
+          operationId: getUserUsageTime
+          operationName: GetUserUsageTime
+          tag: Usage
+          noSecurity: false
+          needAuth: true
+          queryParams:
+            - name: startTime
+            - name: endTime
+          needReqBody: false
+          needReqBodyRef: false
+          needResponseRef: false
+          responseParams:
+            - name: email
+            - name: password
+            - name: items
+          needResponsePageHeader: false
+          noResponseContent: false
+    - path: /resources
+      ops:
+        - method: get
+          operationId: searchResource
+          operationName: SearchResource
+          tag: File
+          noSecurity: false
+          needAuth: true
+          queryParams:
+            - name: type
+          needReqBody: false
+          needReqBodyRef: false
+          isList: true
+          needNavPage: true
+          needResponseRef: true
+          refResponseEntity: File
+          needResponsePageHeader: true
+          noResponseContent: false
+        - method: post
+          operationId: uploadResourcesFile
+          operationName: UploadResourcesFile
+          tag: File
+          noSecurity: false
+          needAuth: true
+          needFound: false
+          needPermission: false
+          needReqBody: true
+          needReqBodyRef: false
+          reqBodyParams:
+            - name: file
+            - name: name
+            - name: lookOn
+            - name: dateOfLook
+            - name: lookTime
+            - name: isLookup
+            - name: haveLookup
+            - name: beenLookup
+            - name: hasLookup
+            - name: hadLookup
+            - name: lookup_bool
+            - name: dataIndex
+            - name: ballNumber
+            - name: findMuch_int
+            - name: missedMuch_long
+            - name: height_num
+            - name: weight_float
+            - name: createdBy
+            - name: lookupBy
+            - name: userId
+            - name: decision_enum
+            - name: finalPassed_bool_enum
+            - name: user_ref
+            - name: Country_entity
+            - name: allUnitNames_array
+            - name: fullMaster_obj
+            - name: User_array_ref
+            - name: steps_array_int
+            - name: finds_long_array
+          needResponseRef: true
+          refResponseEntity: File
+          needResponsePageHeader: false
+          noResponseContent: false
+  responses:
+    - entity: GroupMembershipArrayResponse
+      needResponsePageHeader: true
+      entityParams:
+        - name: groupMembership_array_ref
+        - name: total
+        - name: callOn
+  requestBodies:
+    - entity: NewGroupMembershipBodyParam
+      entityParams:
+        - name: name
+        - name: description
+        - name: privateGroup_bool
+        - name: selfRegister_bool
+        - name: membershipType_enum
+  schemas:
+    - entity: GroupMembership
+      entityParams:
+        - name: id
+        - name: groupId
+        - name: groupName
+        - name: createdAt
+        - name: createdBy
+        - name: updatedAt
+        - name: updatedBy
+        - name: memberId
+        - name: membershipType_enum

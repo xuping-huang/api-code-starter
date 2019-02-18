@@ -9,7 +9,7 @@
   "keywords": [],
   "scripts": {
     "start": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=no-test-cov,spring,mongo&&ts-node src/main.ts",
-    "swagger": "set DEBUG=code:generator&&set CONFIG_ENV=swagger.yml&&set NODE_ENV=development&&ts-node src/main.ts",
+    "swagger": "set DEBUG=code:config&&set CONFIG_ENV=swagger.yml&&set NODE_ENV=development&&ts-node src/main.ts",
     "describe": "npm-scripts-info",
     "build:main": "tsc -p tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
@@ -28,7 +28,8 @@
     "js-yaml": "^3.12.1",
     "merge-deep": "^3.0.2",
     "mustache": "^3.0.1",
-    "node-yaml-config": "^0.0.3"
+    "node-yaml-config": "^0.0.3",
+    "underscore": "^1.9.1"
   },
   "devDependencies": {
     "@types/debug": "^0.0.31",
