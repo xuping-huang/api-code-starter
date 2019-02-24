@@ -1,0 +1,288 @@
+swagger: "2.0"
+info:
+  description: "{{project.name}} Backend API Services"
+  version: "5.0.0"
+  title: "{{project.name}} API"
+  termsOfService: ""
+host: "localhost"
+basePath: "api/v5"
+tags:
+- name: "challenge"
+security:
+{{#api.security.isJwt}}
+- bearerAuth: []
+{{/api.security.isJwt}}
+
+paths:
+  {{#paths}}
+  {{{path}}}:
+    parameters:
+      - $ref: '#/parameters/id'
+    {{#ops}}
+    {{method}}:
+      summary: {{operationId}} {{method}}
+      description: |
+        {{operationId}} {{method}}
+      tags:
+        - {{tag}}
+      {{#noSecurity}}
+      security: []
+      {{/noSecurity}}
+      parameters:
+      {{#needNavPage}}
+        - $ref: '#/parameters/page'
+        - $ref: '#/parameters/perPage'
+        - $ref: '#/parameters/sortOrder'
+        - name: sortBy
+          in: query
+          description: The sort order
+          required: false
+          schema:
+            type: string
+            enum: [createdAt,updatedAt]
+      {{/needNavPage}}
+      {{#pathParams}}
+        - name: {{name}}
+          in: path
+          description: {{name}}
+          example: {{name}}
+          schema:
+            type: string
+      {{/pathParams}}
+      {{#queryParams}}
+        - name: {{name}}
+          in: query
+          description: {{name}}
+          required: true
+          example: {{name}}
+          schema:
+            type: string
+      {{/queryParams}}
+      {{#needReqBody}}
+        - in: "body"
+          name: "body"
+          required: true
+          {{#needReqBodyRef}}
+          schema:
+            $ref: {{#refReqEntity}}'#/definitions/{{refReqEntity}}'{{/refReqEntity}}
+          {{/needReqBodyRef}}
+          {{^needReqBodyRef}}
+          description: {{operationId}} request
+          schema:
+            type: object
+            required:
+              {{#reqBodyParams}}
+              - {{name}}
+              {{/reqBodyParams}}
+            properties:
+              {{#reqBodyParams}}
+              {{> prop}}
+              {{/reqBodyParams}}
+          {{/needReqBodyRef}}
+      {{/needReqBody}}
+      responses:
+        {{#noResponseContent}}
+        204:
+          description: Successfully {{operationName}}.
+        {{/noResponseContent}}
+        {{^noResponseContent}}
+        200:
+          {{#needResponseRef}}
+          description: The operation succeeded.
+          schema:
+            {{^isList}}
+            $ref: {{#refResponseEntity}}'#/definitions/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/definitions/{{opreationName}}Response'{{/refResponseEntity}}
+            {{/isList}}
+            {{#isList}}
+            {{^needNavPage}}
+            type: array
+            items:
+              $ref: {{#refResponseEntity}}'#/definitions/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/definitions/{{opreationName}}Response'{{/refResponseEntity}}
+            {{/needNavPage}}
+            {{#needNavPage}}
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: {{#refResponseEntity}}'#/definitions/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/definitions/{{opreationName}}Response'{{/refResponseEntity}}
+              total:
+                type: integer
+                description: the total of count
+                example: 35
+              page:
+                type: integer
+                example: 1
+              perPage:
+                type: integer
+                example: 20
+            {{/needNavPage}}
+            {{/isList}}
+          {{/needResponseRef}}
+          {{^needResponseRef}}
+          description: The operation succeeded.
+          schema:
+            {{^isList}}
+            type: object
+            properties:
+              {{#responseParams}}
+              {{> prop}}
+              {{/responseParams}}
+            {{/isList}}
+            {{#isList}}
+            type: array
+            items:
+              type: object
+              properties:
+                {{^needNavPage}}
+                {{#responseParams}}
+                {{> prop}}
+                {{/responseParams}}
+                {{/needNavPage}}
+                {{#needNavPage}}
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      {{#responseParams}}
+                      {{> prop}}
+                      {{/responseParams}}
+                total:
+                  type: integer
+                  description: the total of count
+                  example: 35
+                page:
+                  type: integer
+                  example: 1
+                perPage:
+                  type: integer
+                  example: 20
+                {{/needNavPage}}
+            {{/isList}}
+          {{#needResponsePageHeader}}
+          headers:
+            X-Next-Page:
+              type: integer
+              description: The index of the next page
+            X-Page:
+              type: integer
+              description: The index of the current page (starting at 1)
+            X-Per-Page:
+              type: integer
+              description: The number of items to list per page
+            X-Total:
+              type: integer
+              description: The total number of items
+            X-Total-Pages:
+              type: integer
+              description: The total number of pages
+          {{/needResponsePageHeader}}
+          {{/needResponseRef}}
+        {{/noResponseContent}}
+        400:
+          $ref: '#/responses/BadRequest'
+        {{#needAuth}}
+        401:
+          $ref: '#/responses/Unauthenticated'
+        {{/needAuth}}
+        {{#needPermission}}
+        403:
+          $ref: '#/responses/Forbidden'
+        {{/needPermission}}
+        {{#needFound}}
+        404:
+          $ref: '#/responses/NotFound'
+        {{/needFound}}
+        500:
+          $ref: '#/responses/InternalServerError'
+    {{/ops}}
+  {{/paths}}
+
+responses:
+  BadRequest:
+    description: BAD REQUEST - if there was problem with the request (e.g. malformed or some parameters are missing).
+    schema:
+      $ref: '#/definitions/Error'
+  Unauthenticated:
+    description: UNAUTHENTICATED - if the request didn't bear authentication information or the authentication information is invalid.
+    schema:
+      $ref: '#/definitions/Error'
+  Forbidden:
+    description: FORBIDDEN - if the requesting user didn't have permission to perform the requested operation.
+    schema:
+      $ref: '#/definitions/Error'
+  NotFound:
+    description: NOT FOUND - if the resource in request did not exist
+    schema:
+      $ref: '#/definitions/Error'
+  InternalServerError:
+    description: INTERNAL SERVER ERROR - if the request was properly formatted, but the operation failed on the server side
+    schema:
+      $ref: '#/definitions/Error'
+
+parameters:
+  page:
+    name: {{api.navigation.page}}
+    in: query
+    description: The page number.
+    required: false
+    schema:
+      type: integer
+      default: 1
+    example: 1
+
+  perPage:
+    name: {{api.navigation.perPage}}
+    in: query
+    description: The number of items to list per page.
+    required: false
+    schema:
+      type: integer
+      default: 20
+      maximum: 100
+    example: 20
+
+  sortOrder:
+    name: {{api.navigation.sortOrder}}
+    in: query
+    description: The sort order.
+    required: false
+    schema:
+      type: string
+      enum: [asc, desc]
+      default: desc
+    example: asc
+
+  id:
+    name: id
+    in: path
+    description: The entity id.
+    required: true
+    schema:
+      type: string
+    example: 564935d6-16d5-4410-b415-55d369b90327
+
+definitions:
+  Id:
+    type: string
+    description: The id.
+    example: 564935d6-16d5-4410-b415-55d369b90327
+
+  Error:
+    description: |
+      An error entity.
+    properties:
+      message:
+        type: string
+        description: The error message.
+
+  {{#schemas}}
+  {{entity}}:
+    required:
+      {{#entityParams}}
+      - {{name}}
+      {{/entityParams}}
+    properties:
+      {{#entityParams}}{{> prop}}{{/entityParams}}
+  {{/schemas}}

@@ -8,8 +8,8 @@
   "license": "MIT",
   "keywords": [],
   "scripts": {
-    "start": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=no-test-cov,spring,mongo&&ts-node src/main.ts",
-    "swagger": "set DEBUG=code:config&&set CONFIG_ENV=swagger.yml&&set NODE_ENV=development&&ts-node src/main.ts",
+    "start": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=no-test-cov&&ts-node src/main.ts",
+    "swagger": "set DEBUG=code:config&&set CONFIG_ENV=challengsV5.yml&&set NODE_ENV=development&&ts-node src/main.ts",
     "describe": "npm-scripts-info",
     "build:main": "tsc -p tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json",

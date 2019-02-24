@@ -60,12 +60,14 @@ const OTHERWISE_PARAM = {
 
 const ID_PARAM = {
   $ref: "#/components/schemas/Id",
+  $ref2: "#/definitions/Id",
   description: "id",
   isRef: true
 }
 
 const REF_PARAM = {
   $ref: "#/components/schemas/",
+  $ref2: "#/definitions/",
   isRef: true
 }
 
@@ -122,6 +124,7 @@ const LONG_ARRAY_PARAM = {
 const REF_ARRAY_PARAM = {
   type: "array",
   $ref: "#/components/schemas/",
+  $ref2: "#/definitions/",
   description: "array of ",
   isArray: true,
   isRefArray: true
@@ -290,6 +293,7 @@ const refArrayUnderMatch = matchWrap(REF_ARRAY_PARAM, (word: ParsedName, paramEx
   if ( param ) {
     param.description = "array of " + word.description;
     param.$ref = param.$ref + word.pureNameCamel;
+    param.$ref2 = param.$ref2 + word.pureNameCamel;
   }
   return param;
 });
@@ -314,6 +318,7 @@ const refUnderMatch = matchWrap(REF_PARAM, (word: ParsedName, paramEx)=>{
   const param = underMatch( word, ['_ref', '_entity'], paramEx);
   if ( param ) {
     param.$ref = param.$ref + word.pureNameCamel;
+    param.$ref2 = param.$ref2 + word.pureNameCamel;
   }
   return param;
 });

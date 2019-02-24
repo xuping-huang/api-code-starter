@@ -1,11 +1,11 @@
 defaults: &defaults # default use json-db,express,javascript
   project:
-    name: autocognita
+    name: Challenge V5
     version: 0.0.1
-    description: Generate api code start kit for mongo db.
+    description: Challenge V5 Backend API.
     port: 3000
     module: users
-    basePath: '/api/v1'
+    basePath: '/v5'
     templateSwitch: nodejs
   projectStyle:
     language:
@@ -18,35 +18,36 @@ defaults: &defaults # default use json-db,express,javascript
       isExpress: true
       isKoa: false
     db:
-      name: JSON-DB
+      name: challenge
       isJsonDB: true
       isMongoDB: false
       isNeo4j: false
       isMysql: false
+      isDynamoDB: false
     deploy:
       useDocker: true
       useHeroku: false
   apiStyle:
     log:
       needLog: true
-      needTest: true
+      needTest: false
       needCoverage: false
     other:
       needHealthCheck: false
-      needOpt: true
+      needOpt: false
       needJwt: true
       needPasswordBcrypt: false
-      needTwilio: true
-      needAws: true
-      needGootleText2Speech: true
+      needTwilio: false
+      needAws: false
+      needGootleText2Speech: false
     lint:
       isAribnbBase: true
       isESlingStandard: false
       isESlintRecommended: false
     doc:
-      isSwaggerDoc: true
+      isSwaggerDoc: false
     date:
-      isThreeTenbp: true
+      isThreeTenbp: false
       isJava8: false
       isJoda: false
   devDependencies:
@@ -77,14 +78,14 @@ defaults: &defaults # default use json-db,express,javascript
       need_joi: true
       need_validator: false
     secure:
-      need_bcrypt_nodejs: true
-      need_crypto: true
+      need_bcrypt_nodejs: false
+      need_crypto: false
     db:
-      need_json_file_db: true
+      need_json_file_db: false
       need_mongoose: false
       need_neo4j_driver: false
     express:
-      need_express_status_monitor: true # monitor express status
+      need_express_status_monitor: false # monitor express status
       need_compression: true # compress http response & request
       need_bodyParser: true
       need_expressValidator: true
@@ -97,11 +98,11 @@ defaults: &defaults # default use json-db,express,javascript
       need_http_status: true
       need_error_handle: true
       need_uuid: true
-      need_swagger_jsdoc: true
+      need_swagger_jsdoc: false
       need_debug: true
     spring:
-      need_spring_fox: true
-      need_otp_aerogera: true
+      need_spring_fox: false
+      need_otp_aerogera: false
 no-test-cov:
   apiStyle:
     log:
