@@ -8,8 +8,8 @@
   "license": "MIT",
   "keywords": [],
   "scripts": {
-    "start": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=no-test-cov&&ts-node src/main.ts",
-    "swagger": "set DEBUG=code:config&&set CONFIG_ENV=challengsV5.yml&&set NODE_ENV=development&&ts-node src/main.ts",
+    "js": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=eslint,jwt,jsondb,javascript&&ts-node src/main.ts",
+    "swagger": "set DEBUG=code:param&&set CONFIG_ENV=challengsV5.yml&&set NODE_ENV=development&&ts-node src/main.ts",
     "describe": "npm-scripts-info",
     "build:main": "tsc -p tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
@@ -21,7 +21,6 @@
     "node": "10.15.1"
   },
   "dependencies": {
-    "@types/js-yaml": "^3.11.4",
     "debug": "^4.1.0",
     "dotenv": "^6.0.0",
     "joi": "^14.3.0",
@@ -32,6 +31,7 @@
     "underscore": "^1.9.1"
   },
   "devDependencies": {
+    "@types/js-yaml": "^3.11.4",
     "@types/debug": "^0.0.31",
     "@types/dotenv": "^6.0.0",
     "@types/joi": "^14.0.1",

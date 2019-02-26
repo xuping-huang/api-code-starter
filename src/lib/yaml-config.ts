@@ -19,10 +19,41 @@ function handleYamlConfig(config) {
   for (const path of config.paths) {
     for ( const method of path.ops ) {
       debug( `method: ${method.operationId}`);
+      if(method.method) {
+        switch(method.method){
+          case "get":
+            method.isGet = true;
+            break;
+          case "put":
+            method.isPut = true;
+            break;
+          case "patch":
+            method.isPatch = true;
+            break;
+          case "post":
+            method.isPost = true;
+            break;
+          case "delete":
+            method.isDelete = true;
+            break;
+        }
+      }
+      if(method.operationId) {
+        method.summary = method.operationId.match(/[A-Z]*[^A-Z]+/g).map(word => word.toLowerCase().trim()).join(' ');
+        method.operationName = method.operationId[0].toUpperCase() + method.operationId.substr(1, method.operationId.length - 1);
+      }
+      if (method.pathParams){
+        for(let pathParam of method.pathParams){
+          pathParam.ex = nameMatchs(pathParam.name);
+          pathParam.name = pathParam.ex.pureName;
+          pathParam.isPathParam = true;
+        }
+      }
       if ( method.queryParams ){
         for( let queryParam of method.queryParams ) {
           queryParam.ex = nameMatchs(queryParam.name);
           queryParam.name = queryParam.ex.pureName;
+          queryParam.isQueryParam = true;
         }
         debug( method.queryParams );
       }

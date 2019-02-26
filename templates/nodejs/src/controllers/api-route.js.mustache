@@ -1,73 +1,23 @@
-{{#dependencies.other.need_debug}}
-const debug = require('debug')('api:api-route');
-{{/dependencies.other.need_debug}}
 {{#projectStyle.server.isExpress}}
-const server = require('express');
+const server = require('express')
 {{/projectStyle.server.isExpress}}
 {{#apiStyle.other.needJwt}}
-{{#dependencies.express.need_express_jwt}}
-const jwt = require('jsonwebtoken');
-const expressJwt = require('express-jwt');
-{{/dependencies.express.need_express_jwt}}
+{{#dependencies.express.express-jwt}}
+const jwt = require('jsonwebtoken')
+const expressJwt = require('express-jwt')
+{{/dependencies.express.express-jwt}}
 {{/apiStyle.other.needJwt}}
-{{#dependencies.other.need_http_status}}
-const httpStatus = require('http-status');
-{{/dependencies.other.need_http_status}}
 
-const config = require('../config/config');
+const config = require('../config/config')
 {{#apiStyle.log.needLog}}
-{{#dependencies.logger.need_bunyan}}
-const logger = require('../lib/logger');
-{{/dependencies.logger.need_bunyan}}
+{{#dependencies.logger.bunyan}}
+const logger = require('../lib/logger')
+{{/dependencies.logger.bunyan}}
 {{/apiStyle.log.needLog}}
-const {{project.module}} = require('../services/api-service');
-const validates = require('./validate');
 
-const router = new server.Router();
-const { AuthenticateError } = require('../lib/app-error');
-{{#apiStyle.other.needJwt}}
+const router = new server.Router()
 
-/**
- * Return member info packaged at jwt sign
- * @param {request} req request object from client
- * @returns member info with userId
- */
-const getUserInfoFromToken = async (req) => {
-  const auth = req.get(config.jwt.headerName);
-  if (!auth) return Promise.reject(new AuthenticateError());
-
-  const jwtObj = jwt.verify(auth.substr(7), config.jwt.secretKey);
-  return Promise.resolve({ userId: jwtObj.userId });
-};
-{{/apiStyle.other.needJwt}}
-
-/**
- * Format returned error info
- * @param {*} err caught error
- * @param {*} res http response
- * @returns Error object with status & error info
- */
-const formatError = (err, res) => {
-  {{#apiStyle.log.needLog}}
-  {{#dependencies.logger.need_bunyan}}
-  logger.error(err);
-  {{/dependencies.logger.need_bunyan}}
-  {{/apiStyle.log.needLog}}
-  if (!err || !err.status) {
-    return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-      status: httpStatus.INTERNAL_SERVER_ERROR,
-      message: config.response.err.internalServerError
-    });
-  }
-  return res.status(err.status).send({
-    status: err.status,
-    message: err.error || err.message
-  });
-};
-{{#apiStyle.other.needJwt}}
-
-
-{{#dependencies.other.need_swagger_jsdoc}}
+{{#dependencies.other.swagger-jsdoc}}
 /**
  * @swagger
  * /auth/login/{userId}:
@@ -89,119 +39,28 @@ const formatError = (err, res) => {
  *       400:
  *         description: "Invalid ID supplied"
  */
-{{/dependencies.other.need_swagger_jsdoc}}
-{{^dependencies.other.need_swagger_jsdoc}}
+{{/dependencies.other.swagger-jsdoc}}
+{{^dependencies.other.swagger-jsdoc}}
 /**
  * Return token for userid
  */
-{{/dependencies.other.need_swagger_jsdoc}}
+{{/dependencies.other.swagger-jsdoc}}
 router.get('/auth/login/:userId', async (req, res, next) => {
   /** ignore validate because this api not in demand */
-  const { userId } = req.params;
-
-  /** TODO: find user info by userId */
+  const { userId } = req.params
+  const { role } = req.query
 
   const token = jwt.sign({
-    userId
+    userId,
+    role
   }, config.jwt.secretKey, {
     expiresIn: config.jwt.expired
-  });
+  })
   return res.json({
     token,
-    userId
-  });
-});
+    userId,
+    role
+  })
+})
 
-{{#dependencies.other.need_swagger_jsdoc}}
-/**
- * @swagger
- * /auth/token:
- *   get:
- *     description: Validate token, removed after dev complete
- *     tags:
- *       - auth
- *     produces:
- *       - "application/json"
- *     parameters:
- *     responses:
- *       200:
- *         description: "successful operation"
- *       400:
- *         description: "Invalid token"
- */
-{{/dependencies.other.need_swagger_jsdoc}}
-{{^dependencies.other.need_swagger_jsdoc}}
-/**
- * Validate token, removed after dev complete
- */
-{{/dependencies.other.need_swagger_jsdoc}}
-router.route('/auth/token')
-  .get(expressJwt({
-    secret: config.jwt.secretKey
-  }), async (req, res, next) => {
-    try {
-      const result = await getUserInfoFromToken(req);
-      if (!result) {
-        return formatError(null, res);
-      }
-      return res.status(result.status || 200).json(result);
-    } catch (err) {
-      debug('err: %s', JSON.stringify(err));
-      return formatError(err, res);
-    }
-  });
-{{/apiStyle.other.needJwt}}
-
-{{#dependencies.other.need_swagger_jsdoc}}
-/**
- * @swagger
- * /{{project.module}}/userId/{userId}:
- *   get:
- *     description: Find user by id
- *     tags:
- *       - auth
- *     produces:
- *       - "application/json"
- *     parameters:
- *       - name: userId
- *         description: user id
- *         in: path
- *         required: true
- *         type: string
- *     responses:
- *       200:
- *         description: "successful operation"
- *         schema:
- *           $ref: "#/definitions/User"
- *       400:
- *         description: "Invalid ID supplied"
- *       404:
- *         description: "User not found"
- */
-{{/dependencies.other.need_swagger_jsdoc}}
-{{^dependencies.other.need_swagger_jsdoc}}
-/**
- * Find user by id
- */
-{{/dependencies.other.need_swagger_jsdoc}}
-router.route('/{{project.module}}/userId/:userId')
-  .get({{#apiStyle.other.needJwt}}expressJwt({
-    secret: config.jwt.secretKey
-  }), {{/apiStyle.other.needJwt}}async (req, res, next) => {
-    try {
-      const options = {
-        userId: req.params.userId,
-        page: req.query.page,
-        perPage: req.query.perPage
-      };
-
-      const validOptions = await validates.validForSampleRoute(options);
-      const result = await {{project.module}}.sampleService(validOptions);
-      res.status(result.status || 200).json(result);
-    } catch (err) {
-      return formatError(err, res);
-    }
-  });
-
-
-module.exports = router;
+module.exports = router

@@ -1,8 +1,10 @@
 defaults: &defaults
   project:
     name: challengs
-    basePath: /api/v5
+    basePath: /v5
+    host: api.topcoder.com
     templateSwitch: swagger
+    needExample: false
   api:
     security:
       isJwt: true
@@ -11,97 +13,75 @@ defaults: &defaults
       perPage: perPage
       sortOrder: sortOrder
   paths:
-    - path: /challenge/settings/{id}
+    - path: /challengeSettings/{challengeSettingId}
       ops:
       - method: get
         operationId: findChallengeSettingById
         operationName: FindChallengeSettingById
-        tag: challenge
+        tag: ChallengeSetting
         noSecurity: false
         needAuth: true
         needFound: true
         needPermission: false
         pathParams:
-          - name: id
+          - name: challengeSettingId
         needReqBody: false
         needReqBodyRef: false
         needResponseRef: true
-        refResponseEntity: ChallengeSettings
+        refResponseEntity: ChallengeSetting
         needResponsePageHeader: false
         noResponseContent: false
-      - method: delete
-        operationId: removeChallengeSettingById
-        operationName: RemoveChallengeSettingById
-        tag: challenge
+      - method: put
+        operationId: updateChallengeSetting
+        tag: ChallengeSetting
         noSecurity: false
         needAuth: true
         needFound: true
         needPermission: true
         pathParams:
-          - name: id
-        needReqBody: false
-        needReqBodyRef: false
-        needResponseRef: false
+          - name: challengeSettingId
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: ChallengeSettingData
+        needResponseRef: true
+        refResponseEntity: ChallengeSetting
         needResponsePageHeader: false
-        noResponseContent: true
-    - path: /challenge/settings
+        noResponseContent: false
+    - path: /challengeSettings
       ops:
       - method: get
-        operationId: findChallengeSettings
-        operationName: FindChallengeSettings
-        tag: challenge
+        operationId: findAllChallengeSettings
+        tag: ChallengeSetting
         noSecurity: false
         needAuth: true
         needFound: false
         needPermission: false
         queryParams:
-          - name: settingId
+          - name: name
         needReqBody: false
         needReqBodyRef: false
         isList: true
         needNavPage: true
-        needResponseRef: false
-        responseParams:
-          - name: id
-          - name: type
-          - name: value
-          - name: setting_ref
+        needResponseRef: true
+        refResponseEntity: ChallengeSetting
         needResponsePageHeader: true
         noResponseContent: false
       - method: post
         operationId: createChallengeSetting
         operationName: CreateChallengeSetting
-        tag: challenge
+        tag: ChallengeSetting
         noSecurity: false
         needAuth: true
         needFound: false
         needPermission: true
         needReqBody: true
-        needReqBodyRef: false
-        reqBodyParams:
-          - name: name
-          - name: description
+        needReqBodyRef: true
+        refReqEntity: ChallengeSettingData
         needResponseRef: true
-        refResponseEntity: ChallengeSettings
+        refResponseEntity: ChallengeSetting
         needResponsePageHeader: false
         noResponseContent: false
-      - method: put
-        operationId: updateChallengeSetting
-        operationName: UpdateChallengeSetting
-        tag: challenge
-        noSecurity: false
-        needAuth: true
-        needFound: true
-        needPermission: true
-        needReqBody: true
-        needReqBodyRef: true
-        reqBodyParams:
-          - name: id
-        refReqEntity: ChallengeSettings
-        needResponseRef: false
-        needResponsePageHeader: false
-        noResponseContent: true
-    - path: /challenge/types/{id}
+    - path: /challenge/types/{challengeTypeId}
       ops:
       - method: get
         operationId: findChallengeTypeById
@@ -112,9 +92,41 @@ defaults: &defaults
         needFound: true
         needPermission: false
         pathParams:
-          - name: id
+          - name: challengeTypeId
         needReqBody: false
         needReqBodyRef: false
+        needResponseRef: true
+        refResponseEntity: ChallengeType
+        needResponsePageHeader: false
+        noResponseContent: false
+      - method: put
+        operationId: updateChallengeType
+        tag: challenge
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        pathParams:
+          - name: challengeTypeId
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: ChallengeTypeData
+        needResponseRef: true
+        refResponseEntity: ChallengeType
+        needResponsePageHeader: false
+        noResponseContent: false
+      - method: patch
+        operationId: partialUpdateChallengeType
+        tag: ChallengeType
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        pathParams:
+          - name: challengeTypeId
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: ChallengeTypeData
         needResponseRef: true
         refResponseEntity: ChallengeType
         needResponsePageHeader: false
@@ -128,7 +140,7 @@ defaults: &defaults
         needFound: true
         needPermission: true
         pathParams:
-          - name: id
+          - name: challengeTypeId
         needReqBody: false
         needReqBodyRef: false
         needResponseRef: false
@@ -137,247 +149,75 @@ defaults: &defaults
     - path: /challenge/types
       ops:
       - method: get
-        operationId: findChallengeTypes
-        operationName: FindChallengeTypes
-        tag: challenge
+        operationId: findAllChallengeTypes
+        tag: ChallengeTypes
         noSecurity: false
         needAuth: true
         needFound: false
         needPermission: false
         queryParams:
           - name: name
+          - name: description
+          - name: isActive
         needReqBody: false
         needReqBodyRef: false
         isList: true
         needNavPage: true
-        needResponseRef: false
+        needResponseRef: true
         refResponseEntity: ChallengeType
         needResponsePageHeader: true
         noResponseContent: false
       - method: post
         operationId: createChallengeType
         operationName: CreateChallengeType
-        tag: challenge
+        tag: ChallengeTypes
         noSecurity: false
         needAuth: true
         needFound: false
         needPermission: true
         needReqBody: true
-        needReqBodyRef: false
-        reqBodyParams:
-          - name: name
-          - name: description
-          - name: isActive
-          - name: field
+        needReqBodyRef: true
+        refReqEntity: ChallengeTypeData
         needResponseRef: true
         refResponseEntity: ChallengeType
         needResponsePageHeader: false
         noResponseContent: false
-      - method: put
-        operationId: updateChallengeType
-        operationName: UpdateChallengeType
-        tag: challenge
-        noSecurity: false
-        needAuth: true
-        needFound: true
-        needPermission: true
-        needReqBody: true
-        needReqBodyRef: true
-        refReqEntity: ChallengeType
-        needResponseRef: false
-        needResponsePageHeader: false
-        noResponseContent: true
-    - path: /challenge/auditlogs/{id}
+    - path: /challengeAuditLogs
       ops:
       - method: get
-        operationId: findChallengeAuditLogById
-        operationName: FindChallengeAuditLogById
-        tag: callenge
-        noSecurity: false
-        needAuth: true
-        needFound: true
-        needPermission: true
-        pathParams:
-          - name: id
-        needReqBody: false
-        needReqBodyRef: false
-        needResponseRef: true
-        refResponseEntity: ChallengeAuditLog
-        needResponsePageHeader: false
-        noResponseContent: false
-    - path: /challenge/auditlogs
-      ops:
-      - method: get
-        operationId: findChallengeAuditLogs
-        operationName: FindChallengeAuditLogs
-        tag: challenge
+        operationId: findAllChallengeAuditLogs
+        tag: AuditLog
         noSecurity: false
         needAuth: true
         needFound: false
         needPermission: true
         queryParams:
-          - name: challengeName
-          - name: fieldName
+          - name: challengeId
+          - name: createdStartDate
+          - name: createdEndDate
+          - name: createdBy
         needReqBody: false
         needReqBodyRef: false
         isList: true
         needNavPage: true
-        needResponseRef: false
-        responseParams:
-          - name: id
-          - name: challengeId
-          - name: challengeName
-          - name: fieldName
-          - name: oldValue
-          - name: newValue
-          - name: created_time
-          - name: createdBy
-        needResponsePageHeader: true
-        noResponseContent: false
-      - method: post
-        operationId: createChallengeAuditLog
-        operationName: CreateChallengeAuditLog
-        tag: challenge
-        noSecurity: false
-        needAuth: true
-        needFound: false
-        needPermission: true
-        needReqBody: true
-        needReqBodyRef: false
-        reqBodyParams:
-          - name: challengeId
-          - name: fieldName
-          - name: oldValue
-          - name: newValue
-          - name: created_time
-          - name: createdBy
         needResponseRef: true
-        refResponseEntity: ChallengeAuditLog
-        needResponsePageHeader: false
+        refResponseEntity: AuditLogEntry
+        needResponsePageHeader: true
         noResponseContent: false
     - path: /challenges/{id}
       ops:
       - method: get
+        tag: Challenge
         operationId: findChallengeById
         operationName: FindChallengeById
-        tag: challenge
         noSecurity: false
         needAuth: true
         needFound: true
         needPermission: false
         pathParams:
-          - name: id
+          - name: challengeId
         needReqBody: false
         needReqBodyRef: false
-        needResponseRef: false
-        responseParams:
-          - name: id
-          - name: legacyId
-          - name: typeId
-          - name: challengeType_ref
-          - name: track
-          - name: name
-          - name: description
-          - name: currentPhaseId
-          - name: phase_ref
-          - name: timelineTemplateId
-          - name: timelineTemplate_ref
-          - name: termsId
-          - name: terms_ref
-          - name: scoreCardId
-          - name: scoreCard_ref
-          - name: challengeSettingsId
-          - name: challengeSettings_ref
-          - name: created_time
-          - name: updated_time
-          - name: createdBy
-          - name: updatedBy
-        needResponsePageHeader: false
-        noResponseContent: false
-      - method: delete
-        operationId: removeChallengeById
-        operationName: RemoveChallengeById
-        tag: challenge
-        noSecurity: false
-        needAuth: true
-        needFound: true
-        needPermission: true
-        pathParams:
-          - name: id
-        needReqBody: false
-        needReqBodyRef: false
-        needResponseRef: false
-        needResponsePageHeader: false
-        noResponseContent: true
-    - path: /challenges
-      ops:
-      - method: get
-        operationId: findChallenges
-        operationName: FindChallenges
-        tag: challenge
-        noSecurity: false
-        needAuth: true
-        needFound: false
-        needPermission: false
-        queryParams:
-          - name: name
-          - name: challengeTypeName
-          - name: phaseName
-        needReqBody: false
-        needReqBodyRef: false
-        isList: true
-        needNavPage: true
-        needResponseRef: false
-        responseParams:
-          - name: id
-          - name: legacyId
-          - name: typeId
-          - name: challengeTypeName
-          - name: track
-          - name: name
-          - name: description
-          - name: currentPhaseId
-          - name: currentPhaseName
-          - name: timelineTemplateId
-          - name: timelineTemplateName
-          - name: termsId
-          - name: termsName
-          - name: scoreCardId
-          - name: scoreCardName
-          - name: challengeSettingsId
-          - name: challengeSettingsType
-          - name: challengeSettingsValue
-          - name: created_time
-          - name: updated_time
-          - name: createdBy
-          - name: updatedBy
-        needResponsePageHeader: true
-        noResponseContent: false
-      - method: post
-        operationId: createChallenge
-        operationName: CreateChallenge
-        tag: challenge
-        noSecurity: false
-        needAuth: true
-        needFound: false
-        needPermission: true
-        needReqBody: true
-        needReqBodyRef: false
-        reqBodyParams:
-          - name: legacyId
-          - name: typeId
-          - name: track
-          - name: name
-          - name: description
-          - name: currentPhaseId
-          - name: timelineTemplateId
-          - name: termsId
-          - name: scoreCardId
-          - name: challengeSettingsId
-          - name: created_time
-          - name: updated_time
-          - name: createdBy
-          - name: updatedBy
         needResponseRef: true
         refResponseEntity: Challenge
         needResponsePageHeader: false
@@ -390,39 +230,96 @@ defaults: &defaults
         needAuth: true
         needFound: true
         needPermission: true
+        pathParams:
+          - name: challengeId
         needReqBody: true
         needReqBodyRef: true
-        refReqEntity: Challenge
-        needResponseRef: false
+        refReqEntity: ChallengeData
+        needResponseRef: true
+        refResponseEntity: Challenge
         needResponsePageHeader: false
-        noResponseContent: true
+        noResponseContent: false
+      - method: patch
+        operationId: partialUpdateChallenge
+        tag: challenge
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        pathParams:
+          - name: challengeId
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: ChallengeData
+        needResponseRef: true
+        refResponseEntity: Challenge
+        needResponsePageHeader: false
+        noResponseContent: false
+    - path: /challenges
+      ops:
+      - method: get
+        tag: challenge
+        operationId: findChallenges
+        operationName: FindChallenges
+        noSecurity: false
+        needAuth: true
+        needFound: false
+        needPermission: false
+        queryParams:
+          - name: name
+          - name: description
+          - name: createdDateStart
+          - name: createdDateEnd
+          - name: updatedDateStart
+          - name: updatedDateEnd
+          - name: createdBy
+        needReqBody: false
+        needReqBodyRef: false
+        isList: true
+        needNavPage: true
+        needResponseRef: true
+        refResponseEntity: Challenge
+        needResponsePageHeader: true
+        noResponseContent: false
+      - method: post
+        operationId: createChallenge
+        operationName: CreateChallenge
+        tag: challenge
+        noSecurity: false
+        needAuth: true
+        needFound: false
+        needPermission: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: ChallengeData
+        needResponseRef: true
+        refResponseEntity: Challenge
+        needResponsePageHeader: false
+        noResponseContent: false
   schemas:
-    - entity: ChallengeSettings
+    - entity: ChallengeSettingData
       entityParams:
-        - name: id
         - name: type
         - name: value
-        - name: settingId
     - entity: ChallengeType
+      isGetReturn: true
+      returnRef: ChallengeTypeData
+    - entity: ChallengeTypeData
       entityParams:
-        - name: id
         - name: name
         - name: description
         - name: isActive
-        - name: field
     - entity: Challenge
+      isGetReturn: true
+      returnRef: ChallengeData
+    - entity: ChallengeData
       entityParams:
-        - name: id
-        - name: legacyId
-        - name: typeId
+        - name: legacyId_number
+        - name: typeId_str
         - name: track
         - name: name
         - name: description
-        - name: currentPhaseId
-        - name: timelineTemplateId
-        - name: termsId
-        - name: scoreCardId
-        - name: challengeSettingsId
+        - name: challengeSettingsData_ref_array
         - name: created_time
         - name: updated_time
         - name: createdBy
@@ -436,31 +333,10 @@ defaults: &defaults
         - name: newValue
         - name: created_time
         - name: createdBy
-    - entity: Phase
-      entityParams:
-        - name: id
-        - name: name
-        - name: description
-        - name: predecessor
-        - name: field
-    - entity: TimelineTemplate
-      entityParams:
-        - name: id
-        - name: name
-        - name: description
-        - name: isActive
-        - name: field
     - entity: Setting
+      isGetReturn: true
+      returnRef: SettingData
+    - entity: SettingData
       entityParams:
         - name: id
         - name: name
-    - entity: Terms
-      entityParams:
-        - name: id
-        - name: name
-        - name: description
-    - entity: ScoreCard
-      entityParams:
-        - name: id
-        - name: name
-        - name: description

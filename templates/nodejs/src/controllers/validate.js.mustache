@@ -1,7 +1,7 @@
-{{#dependencies.validate.need_joi}}
-const Joi = require('joi');
-const config = require('../config/config');
-const { JoiValidationError } = require('../lib/app-error');
+{{#dependencies.validate.joi}}
+const Joi = require('joi')
+const config = require('../config/config')
+const { JoiValidationError } = require('../lib/app-error')
 
 const validPageSchema = async (options) => {
   const schema = Joi.object({
@@ -11,38 +11,38 @@ const validPageSchema = async (options) => {
     perPage: Joi.number().integer().min(1).max(config.page.perPageMax)
       .optional()
       .default(config.page.perPage)
-  });
+  })
   const {
     error,
     value: validOptions
   } = Joi.validate(options, schema, {
     abortEarly: false,
     stripUnknown: true
-  });
+  })
   if (error) {
-    return Promise.reject(new JoiValidationError(error));
+    return Promise.reject(new JoiValidationError(error))
   }
 
-  validOptions.skipTotal = (validOptions.page - 1) * validOptions.perPage;
-  return Promise.resolve({ pageOption: validOptions });
-};
+  validOptions.skipTotal = (validOptions.page - 1) * validOptions.perPage
+  return Promise.resolve({ pageOption: validOptions })
+}
 
 module.exports.validForSampleRoute = async (options) => {
   const schema = Joi.object({
     userId: Joi.string().required()
-  }).unknown().required();
+  }).unknown().required()
   const {
     error,
     value: validOptions
   } = Joi.validate(options, schema, {
     abortEarly: false
-  });
-  const { pageError, pageOption } = await validPageSchema(options);
+  })
+  const { pageError, pageOption } = await validPageSchema(options)
 
   if (error || pageError) {
-    return Promise.reject(new JoiValidationError([error, pageError]));
+    return Promise.reject(new JoiValidationError([error, pageError]))
   }
-  validOptions.pagination = pageOption;
-  return Promise.resolve(validOptions);
-};
-{{/dependencies.validate.need_joi}}
+  validOptions.pagination = pageOption
+  return Promise.resolve(validOptions)
+}
+{{/dependencies.validate.joi}}

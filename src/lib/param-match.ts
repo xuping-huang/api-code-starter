@@ -22,7 +22,14 @@ const DATE_PARAM = {
 const BOOL_PARAM = {
   type: "boolean",
   description: "boolean",
-  example: false
+  example: false,
+  isBool: true
+}
+
+const STR_PARAM = {
+  type: "string",
+  description: "string",
+  example: 'str'
 }
 
 const INT_PARAM = {
@@ -62,7 +69,9 @@ const ID_PARAM = {
   $ref: "#/components/schemas/Id",
   $ref2: "#/definitions/Id",
   description: "id",
-  isRef: true
+  isRef: true,
+  isId: true,
+  type: "string"
 }
 
 const REF_PARAM = {
@@ -162,25 +171,32 @@ interface ParsedName {
   underSuffix: string,
   purePrefix: string,
   pureSuffix: string,
+  beforeSuffix: string,
   description: string
 }
 
 function parseName(name: string) : ParsedName {
+  // name = challengeType_ref
+  // lowname = challengetype_ref
   const lowerName = name.toLowerCase().trim();
   // 按照第一个_进行分离
   const underInd = name.indexOf('_');
   let pureName = name ;
   let underSuffix = "";
   if ( underInd > -1 ){
+    // pureName = challengeType
     pureName = name.substr(0, underInd);
+    // underSuffix = ref
     underSuffix = name.substr(underInd, name.length - underInd);
   }
+  // pureNameCamel = ChallengeType
   let pureNameCamel = pureName[0].toUpperCase() + pureName.substr(1, pureName.length - 1);
-  let nameWords = pureName.match(/[A-Z]*[^A-Z]+/g);
-  let lowerWords = nameWords.map(word => word.toLowerCase().trim());
-  let purePrefix = lowerWords[0];
-  let pureSuffix = lowerWords[lowerWords.length-1];
+  let nameWords = pureName.match(/[A-Z]*[^A-Z]+/g); // nameWords = ['challenge', 'Type']
+  let lowerWords = nameWords.map(word => word.toLowerCase().trim()); // lowerWords = ['challenge', 'type']
+  let purePrefix = lowerWords[0];  // challenge
+  let pureSuffix = lowerWords[lowerWords.length-1]; // type
   let description = lowerWords.join(' ');
+  let beforeSuffix = pureNameCamel.substr(0, pureNameCamel.length - lowerWords[lowerWords.length-1].length)
   return {
     lowerName,
     pureName,
@@ -188,6 +204,7 @@ function parseName(name: string) : ParsedName {
     underSuffix,
     purePrefix,
     pureSuffix,
+    beforeSuffix,
     description
   }
 }
@@ -215,7 +232,7 @@ const lookupMatch = matchWrap({}, (word: ParsedName) => {
 
 const arrayMatch = (lookElm: string, word: ParsedName, matches: Array<string>, paramEx) =>{
   if ( matches.find(elm => elm === lookElm) ){
-    return merge(paramEx, { description: word.description, pureName: word.pureName });
+    return merge(paramEx, { beforeSuffix: word.beforeSuffix, description: word.description, pureName: word.pureName });
   }
   return undefined;
 }
@@ -252,6 +269,10 @@ const intEndMatch = matchWrap(INT_PARAM, (word: ParsedName, paramEx)=>{
   return endMatch( word, ['count', 'total', 'index', 'level', 'score', 'version', 'number'], paramEx);
 });
 
+const strUnderMatch = matchWrap(STR_PARAM, (word: ParsedName, paramEx)=>{
+  return underMatch( word, ['_str', '_string'], paramEx);
+});
+
 const intUnderMatch = matchWrap(INT_PARAM, (word: ParsedName, paramEx)=>{
   return underMatch( word, ['_int'], paramEx);
 });
@@ -261,7 +282,7 @@ const longUnderMatch = matchWrap(LONG_PARAM, (word: ParsedName, paramEx)=>{
 });
 
 const floatUnderMatch = matchWrap(FLOAT_PARAM, (word: ParsedName, paramEx)=>{
-  return underMatch( word, ['_num', '_float'], paramEx);
+  return underMatch( word, ['_num', '_number', '_float'], paramEx);
 });
 
 const enumUnderMatch = matchWrap(ENUM_PARAM, (word: ParsedName, paramEx)=>{
@@ -324,6 +345,8 @@ const refUnderMatch = matchWrap(REF_PARAM, (word: ParsedName, paramEx)=>{
 });
 
 const idEndMatch = matchWrap(ID_PARAM, (word: ParsedName, paramEx)=>{
+  debug('-----------idEndMatch----------------')
+  debug(word)
   return endMatch( word, ['id'], paramEx);
 });
 
@@ -353,6 +376,7 @@ export const nameMatchs = dispatch( lookupMatch, // lookupMatch must at start
   boolUnderMatch,
   intEndMatch,
   intUnderMatch,
+  strUnderMatch,
   longUnderMatch,
   floatUnderMatch,
   idEndMatch,

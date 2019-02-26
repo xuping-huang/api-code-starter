@@ -22,7 +22,9 @@
                                     {{^ex.isRefArray}}
                                     {{^ex.isObject}}
                                     {{^ex.isObjectArray}}
+                                    {{#project.needExample}}
                                     example: {{{ex.example}}}
+                                    {{/project.needExample}}
                                     {{/ex.isObjectArray}}
                                     {{/ex.isObject}}
                                     {{/ex.isRefArray}}

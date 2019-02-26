@@ -3,164 +3,176 @@
   "version": "{{project.version}}",
   "description": "{{project.description}}",
   "author": {
-    "name": "Xuping Huang",
-    "email": "it@huangxuping.com"
+    "name": "Someone"
   },
   "license": "",
   "scripts": {
     {{#projectStyle.language.isJavaScript}}
-      {{#devDependencies.other.need_nodemon}}
+      {{#devDependencies.other.nodemon}}
     "debug": "set DEBUG=api:*&&set NODE_ENV=development&&nodemon app.js",
     "start": "node app.js",
-      {{/devDependencies.other.need_nodemon}}
-      {{^devDependencies.other.need_nodemon}}
+      {{/devDependencies.other.nodemon}}
+      {{^devDependencies.other.nodemon}}
     "debug": "set DEBUG=*&&set NODE_ENV=development&&node app.js",
     "start": "node app.js",
-      {{/devDependencies.other.need_nodemon}}
-      {{#devDependencies.codeStyle.need_eslint}}
-    "lint": "eslint \"**/*.js\"",
-      {{/devDependencies.codeStyle.need_eslint}}
-      {{#devDependencies.test.need_mocha}}
-        {{#devDependencies.coverage.need_nyc}}
+      {{/devDependencies.other.nodemon}}
+      {{#devDependencies.test.mocha}}
+        {{#devDependencies.coverage.nyc}}
     "test": "nyc mocha --timeout=10000 --exit"
-        {{/devDependencies.coverage.need_nyc}}
-      {{/devDependencies.test.need_mocha}}
+        {{/devDependencies.coverage.nyc}}
+      {{/devDependencies.test.mocha}}
+      {{#devDependencies.codeStyle.eslint}}
+    "lint": "eslint \"**/*.js\""
+      {{/devDependencies.codeStyle.eslint}}
     {{/projectStyle.language.isJavaScript}}
     {{#projectStyle.language.isTypeScript}}
     "start": "ts-node app.ts“,
     "debug": "set DEBUG=*&&set CODE_ENV=development&&ts-node app.ts",
     "build": "tsc",
     "watch": "tsc -w",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
-      {{#devDependencies.test.need_jest}}
+      {{#devDependencies.test.jest}}
     "test": "jest --forceExit --coverage --verbose",
-      {{/devDependencies.test.need_jest}}
+      {{/devDependencies.test.jest}}
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
     {{/projectStyle.language.isTypeScript}}
   },
   "dependencies": {
-    {{#dependencies.secure.need_bcrypt_nodejs}}
+    {{#dependencies.secure.bcrypt-nodejs}}
     "bcrypt-nodejs": "^0.0.3",
-    {{/dependencies.secure.need_bcrypt_nodejs}}
+    {{/dependencies.secure.bcrypt-nodejs}}
     {{#projectStyle.server.isExpress}}
     "express": "^4.16.3",
-      {{#dependencies.express.need_multer}}
+      {{#dependencies.express.multer}}
     "multer": "^1.3.0",
-      {{/dependencies.express.need_multer}}
-      {{#dependencies.express.need_bodyParser}}
+      {{/dependencies.express.multer}}
+      {{#dependencies.express.body-parser}}
     "body-parser": "^1.18.3",
-      {{/dependencies.express.need_bodyParser}}
-      {{#dependencies.express.need_compression}}
+      {{/dependencies.express.body-parser}}
+      {{#dependencies.express.compression}}
     "compression": "^1.7.3",
-      {{/dependencies.express.need_compression}}
-      {{#dependencies.express.need_cors}}
+      {{/dependencies.express.compression}}
+      {{#dependencies.express.cors}}
     "cors": "^2.8.5",
-      {{/dependencies.express.need_cors}}
-      {{#dependencies.express.need_express_status_monitor}}
+      {{/dependencies.express.cors}}
+      {{#dependencies.express.express-status-monitor}}
     "express-status-monitor": "^1.1.5",
-      {{/dependencies.express.need_express_status_monitor}}
-      {{#dependencies.express.need_expressValidator}}
+      {{/dependencies.express.express-status-monitor}}
+      {{#dependencies.express.express-validator}}
     "express-validator": "^5.3.0",
-      {{/dependencies.express.need_expressValidator}}
-      {{#dependencies.express.need_helmet}}
+      {{/dependencies.express.express-validator}}
+      {{#dependencies.express.helmet}}
     "helmet": "^3.15.0",
-      {{/dependencies.express.need_helmet}}
+      {{/dependencies.express.helmet}}
     {{/projectStyle.server.isExpress}}
-    {{#dependencies.config.need_dotenv}}
+    {{#dependencies.config.dotenv}}
     "dotenv": "^6.0.0",
-    {{/dependencies.config.need_dotenv}}
-    {{#dependencies.other.need_error_handle}}
+    {{/dependencies.config.dotenv}}
+    {{#dependencies.other.error-handle}}
     "errorhandler": "^1.5.0",
-    {{/dependencies.other.need_error_handle}}
-    {{#dependencies.validate.need_joi}}
+    {{/dependencies.other.error-handle}}
+    {{#dependencies.validate.joi}}
     "joi": "^14.3.0",
-    {{/dependencies.validate.need_joi}}
-    {{#dependencies.logger.need_morgan}}
+    {{/dependencies.validate.joi}}
+    {{#dependencies.logger.morgan}}
     "morgan": "^1.9.1",
-    {{/dependencies.logger.need_morgan}}
-    {{#dependencies.logger.need_bunyan}}
+    {{/dependencies.logger.morgan}}
+    {{#dependencies.logger.bunyan}}
     "bunyan": "1.5.1",
-    {{/dependencies.logger.need_bunyan}}
-    {{#dependencies.validate.need_validator}}
+    {{/dependencies.logger.bunyan}}
+    {{#dependencies.validate.validator}}
     "validator": "^10.7.1",
-    {{/dependencies.validate.need_validator}}
+    {{/dependencies.validate.validator}}
     {{#projectStyle.db.isNeo4j}}
-      {{#dependencies.db.need_neo4j_driver}}
+      {{#dependencies.db.neo4j-driver}}
     "neo4j-driver": "^1.7.2",
-      {{/dependencies.db.need_neo4j_driver}}
+      {{/dependencies.db.neo4j-driver}}
     {{/projectStyle.db.isNeo4j}}
     {{#projectStyle.db.isJsonDB}}
-      {{#dependencies.db.need_json_file_db}}
+      {{#dependencies.db.json-file-db}}
     "json-file-db": "^0.0.2",
-      {{/dependencies.db.need_json_file_db}}
+      {{/dependencies.db.json-file-db}}
     {{/projectStyle.db.isJsonDB}}
-    {{#dependencies.express.need_lusca}}
+    {{#dependencies.express.lusca}}
     "lusca": "^1.6.1",
-    {{/dependencies.express.need_lusca}}
-    {{#dependencies.other.need_uuid}}
+    {{/dependencies.express.lusca}}
+    {{#dependencies.other.uuid}}
     "uuid": "^3.3.2",
-    {{/dependencies.other.need_uuid}}
-    {{#dependencies.other.need_debug}}
+    {{/dependencies.other.uuid}}
+    {{#dependencies.other.debug}}
     "debug": "^4.1.0",
-    {{/dependencies.other.need_debug}}
+    {{/dependencies.other.debug}}
     {{#apiStyle.other.needJwt}}
     {{#projectStyle.server.isExpress}}
-    {{#dependencies.express.need_express_jwt}}
+    {{#dependencies.express.express-jwt}}
     "express-jwt": "^5.3.1",
     "jsonwebtoken": "^8.4.0",
-    {{/dependencies.express.need_express_jwt}}
+    {{/dependencies.express.express-jwt}}
     {{/projectStyle.server.isExpress}}
     {{/apiStyle.other.needJwt}}
     {{#projectStyle.db.isMongoDB}}
-    {{#dependencies.db.need_mongoose}}
+    {{#dependencies.db.mongoose}}
     "mongoose": "^5.2.15",
-    {{/dependencies.db.need_mongoose}}
+    {{/dependencies.db.mongoose}}
     {{/projectStyle.db.isMongoDB}}
-    {{#dependencies.other.need_swagger_jsdoc}}
+    {{#dependencies.other.swagger-jsdoc}}
     "swagger-jsdoc": "^3.2.6",
-    {{/dependencies.other.need_swagger_jsdoc}}
-    {{#dependencies.other.need_http_status}}
+    {{/dependencies.other.swagger-jsdoc}}
+    {{#dependencies.other.http-status}}
     "http-status": "^1.3.1",
-    {{/dependencies.other.need_http_status}}
+    {{/dependencies.other.http-status}}
     "request": "^2.88.0"
   },
   "devDependencies": {
-    {{#devDependencies.test.need_chai}}
+    {{#devDependencies.test.chai}}
     "chai": "^4.1.2",
-    {{/devDependencies.test.need_chai}}
-    {{#devDependencies.test.need_mocha}}
+    {{/devDependencies.test.chai}}
+    {{#devDependencies.test.mocha}}
     "mocha": "^5.2.0",
-    {{/devDependencies.test.need_mocha}}
-    {{#devDependencies.test.need_sinon}}
+    {{/devDependencies.test.mocha}}
+    {{#devDependencies.test.sinon}}
     "sinon": "^6.3.3",
-    {{/devDependencies.test.need_sinon}}
-    {{#devDependencies.test.need_supertest}}
+    {{/devDependencies.test.sinon}}
+    {{#devDependencies.test.supertest}}
     "supertest": "^3.3.0",
-    {{/devDependencies.test.need_supertest}}
-    {{#devDependencies.test.need_sinon_mongoose}}
+    {{/devDependencies.test.supertest}}
+    {{#devDependencies.test.sinon-mongoose}}
     {{#projectStyle.db.isMongoDB}}
     "sinon-mongoose": "^2.2.1",
     {{/projectStyle.db.isMongoDB}}
-    {{/devDependencies.test.need_sinon_mongoose}}
-    {{#projectStyle.language.isJavaScript}}
-    {{#devDependencies.codeStyle.need_eslint}}
+    {{/devDependencies.test.sinon-mongoose}}
+    {{#devDependencies.codeStyle.eslint}}
     "eslint": "^5.6.0",
-    {{/devDependencies.codeStyle.need_eslint}}
-    {{#devDependencies.codeStyle.need_eslint_airbnb_base}}
+    {{/devDependencies.codeStyle.eslint}}
+    {{#devDependencies.codeStyle.babel-eslint}}
+    "babel-eslint": "^10.0.1",
+    {{/devDependencies.codeStyle.babel-eslint}}
+    {{#devDependencies.codeStyle.eslint-config-standard}}
+    "eslint-config-standard": "^12.0.0",
+    {{/devDependencies.codeStyle.eslint-config-standard}}
+    {{#devDependencies.codeStyle.eslint-airbnb-base}}
     "eslint-config-airbnb-base": "^13.1.0",
-    {{/devDependencies.codeStyle.need_eslint_airbnb_base}}
-    {{#devDependencies.codeStyle.need_eslint_chai_friendly}}
+    {{/devDependencies.codeStyle.eslint-airbnb-base}}
+    {{#devDependencies.codeStyle.eslint-chai-friendly}}
     "eslint-plugin-chai-friendly": "^0.4.1",
-    {{/devDependencies.codeStyle.need_eslint_chai_friendly}}
-    {{#devDependencies.codeStyle.need_eslint_plugin_import}}
+    {{/devDependencies.codeStyle.eslint-chai-friendly}}
+    {{#devDependencies.codeStyle.eslint-plugin-import}}
     "eslint-plugin-import": "^2.14.0",
-    {{/devDependencies.codeStyle.need_eslint_plugin_import}}
-    {{/projectStyle.language.isJavaScript}}
-    {{#devDependencies.coverage.need_nyc}}
+    {{/devDependencies.codeStyle.eslint-plugin-import}}
+    {{#devDependencies.codeStyle.eslint-plugin-node}}
+    "eslint-plugin-node": "^8.0.1",
+    {{/devDependencies.codeStyle.eslint-plugin-node}}
+    {{#devDependencies.codeStyle.eslint-plugin-promise}}
+    "eslint-plugin-promise": "^4.0.1",
+    {{/devDependencies.codeStyle.eslint-plugin-promise}}
+    {{#devDependencies.codeStyle.eslint-plugin-standard}}
+    "eslint-plugin-standard": "^4.0.0",
+    {{/devDependencies.codeStyle.eslint-plugin-standard}}
+    {{#devDependencies.coverage.nyc}}
     "nyc": "^13.0.1",
-    {{/devDependencies.coverage.need_nyc}}
-    {{#devDependencies.other.need_nodemon}}
+    {{/devDependencies.coverage.nyc}}
+    {{#devDependencies.other.nodemon}}
     "nodemon": "^1.18.9"
-    {{/devDependencies.other.need_nodemon}}
+    {{/devDependencies.other.nodemon}}
   },
   "engines": {
     "node": ">=10.14.0",

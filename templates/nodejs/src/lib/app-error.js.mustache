@@ -1,23 +1,23 @@
-{{#dependencies.other.need_http_status}}
-const httpStatus = require('http-status');
-{{/dependencies.other.need_http_status}}
+{{#dependencies.other.http-status}}
+const httpStatus = require('http-status')
+{{/dependencies.other.http-status}}
 {{#apiStyle.log.needLog}}
-{{#dependencies.logger.need_bunyan}}
-const logger = require('../lib/logger');
-{{/dependencies.logger.need_bunyan}}
+{{#dependencies.logger.bunyan}}
+const logger = require('../lib/logger')
+{{/dependencies.logger.bunyan}}
 {{/apiStyle.log.needLog}}
-const config = require('../config/config');
+const config = require('../config/config')
 
 /**
  * @extends Error
  */
 class ExtendableError extends Error {
-  constructor(message, status) {
-    super(message);
-    this.error = message;
-    this.name = this.constructor.name;
-    this.status = status;
-    Error.captureStackTrace(this, this.constructor.name);
+  constructor (message, status) {
+    super(message)
+    this.error = message
+    this.name = this.constructor.name
+    this.status = status
+    Error.captureStackTrace(this, this.constructor.name)
   }
 }
 
@@ -29,16 +29,16 @@ class DBError extends ExtendableError {
   /**
    * Creates an Internal Server error.
    */
-  constructor(err, httpCode = httpStatus.INTERNAL_SERVER_ERROR) {
+  constructor (err, httpCode = httpStatus.INTERNAL_SERVER_ERROR) {
     if (err.message) {
-      super(err.message, httpCode, false);
+      super(err.message, httpCode, false)
     } else {
-      super('an error happened in db', httpCode, false);
+      super('an error happened in db', httpCode, false)
     }
     {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.need_bunyan}}
-    logger.error(err);
-    {{/dependencies.logger.need_bunyan}}
+    {{#dependencies.logger.bunyan}}
+    logger.error(err)
+    {{/dependencies.logger.bunyan}}
     {{/apiStyle.log.needLog}}
   }
 }
@@ -51,13 +51,13 @@ class InternalServerError extends ExtendableError {
   /**
    * Creates an Internal Server error.
    */
-  constructor(message = config.response.err.internalServerError,
+  constructor (message = config.response.err.internalServerError,
     httpCode = httpStatus.INTERNAL_SERVER_ERROR) {
-    super(message, httpCode, false);
+    super(message, httpCode, false)
     {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.need_bunyan}}
-    logger.error(message);
-    {{/dependencies.logger.need_bunyan}}
+    {{#dependencies.logger.bunyan}}
+    logger.error(message)
+    {{/dependencies.logger.bunyan}}
     {{/apiStyle.log.needLog}}
   }
 }
@@ -66,12 +66,12 @@ class AuthenticateError extends ExtendableError {
   /**
    * Creates an authenticate fail error.
    */
-  constructor(message = config.response.err.unauthenticated, httpCode = httpStatus.UNAUTHORIZED) {
-    super(message, httpCode, false);
+  constructor (message = config.response.err.unauthenticated, httpCode = httpStatus.UNAUTHORIZED) {
+    super(message, httpCode, false)
     {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.need_bunyan}}
-    logger.error(message);
-    {{/dependencies.logger.need_bunyan}}
+    {{#dependencies.logger.bunyan}}
+    logger.error(message)
+    {{/dependencies.logger.bunyan}}
     {{/apiStyle.log.needLog}}
   }
 }
@@ -80,12 +80,12 @@ class BadRequestError extends ExtendableError {
   /**
    * Creates an bad request error.
    */
-  constructor(message = config.response.err.badRequest, httpCode = httpStatus.BAD_REQUEST) {
-    super(message, httpCode, false);
+  constructor (message = config.response.err.badRequest, httpCode = httpStatus.BAD_REQUEST) {
+    super(message, httpCode, false)
     {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.need_bunyan}}
-    logger.error(message);
-    {{/dependencies.logger.need_bunyan}}
+    {{#dependencies.logger.bunyan}}
+    logger.error(message)
+    {{/dependencies.logger.bunyan}}
     {{/apiStyle.log.needLog}}
   }
 }
@@ -94,13 +94,13 @@ class RequestValidationError extends ExtendableError {
   /**
    * Creates an bad request error.
    */
-  constructor(errors, httpCode = httpStatus.BAD_REQUEST) {
-    super('Validation failed', httpCode, false);
-    this.details = errors;
+  constructor (errors, httpCode = httpStatus.BAD_REQUEST) {
+    super('Validation failed', httpCode, false)
+    this.details = errors
     {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.need_bunyan}}
-    logger.error(errors);
-    {{/dependencies.logger.need_bunyan}}
+    {{#dependencies.logger.bunyan}}
+    logger.error(errors)
+    {{/dependencies.logger.bunyan}}
     {{/apiStyle.log.needLog}}
   }
 }
@@ -110,16 +110,16 @@ class JoiValidationError extends ExtendableError {
    * Creates an bad request error.
    * TODO: multi joi error combin to message
    */
-  constructor(err, httpCode = httpStatus.BAD_REQUEST) {
-    super('Validation failed', httpCode, false);
-    this.message = 'Joi validation failed';
+  constructor (err, httpCode = httpStatus.BAD_REQUEST) {
+    super('Validation failed', httpCode, false)
+    this.message = 'Joi validation failed'
     if (err) {
-      // this.details = err.details;
-      // this._object = err._object;
+      // this.details = err.details
+      // this._object = err._object
       {{#apiStyle.log.needLog}}
-      {{#dependencies.logger.need_bunyan}}
-      logger.error(err);
-      {{/dependencies.logger.need_bunyan}}
+      {{#dependencies.logger.bunyan}}
+      logger.error(err)
+      {{/dependencies.logger.bunyan}}
       {{/apiStyle.log.needLog}}
     }
   }
@@ -129,12 +129,12 @@ class NotFoundError extends ExtendableError {
   /**
    * Creates an bad request error.
    */
-  constructor(message = config.response.err.notFound, httpCode = httpStatus.NOT_FOUND) {
-    super(message, httpCode, false);
+  constructor (message = config.response.err.notFound, httpCode = httpStatus.NOT_FOUND) {
+    super(message, httpCode, false)
     {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.need_bunyan}}
-    logger.error(message);
-    {{/dependencies.logger.need_bunyan}}
+    {{#dependencies.logger.bunyan}}
+    logger.error(message)
+    {{/dependencies.logger.bunyan}}
     {{/apiStyle.log.needLog}}
   }
 }
@@ -146,4 +146,4 @@ module.exports = {
   RequestValidationError,
   JoiValidationError,
   DBError
-};
+}

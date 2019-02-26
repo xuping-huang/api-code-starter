@@ -1,66 +1,91 @@
-swagger: "2.0"
+swagger: '2.0'
 info:
-  description: "{{project.name}} Backend API Services"
-  version: "5.0.0"
-  title: "{{project.name}} API"
-  termsOfService: ""
-host: "localhost"
-basePath: "api/v5"
-tags:
-- name: "challenge"
-security:
-{{#api.security.isJwt}}
-- bearerAuth: []
-{{/api.security.isJwt}}
+  version: 1.0.0
+  title: {{project.name}} API
+  description: >
+    ## Pagination
 
+    - Requests that return multiple items will be paginated to 20 items by
+    default.
+
+    - You can specify further pages with the `page` parameter.
+
+    - You can also set a custom page size up to 100 with the `perPage`
+    parameter.
+
+    - Pagination response data is included in http headers.
+
+    - By default, the response header contains links with `next`, `last`,
+    `first`, `prev` resource links.
+
+    ## Access levels
+
+    - Admin
+host: {{project.host}}
+basePath: {{{project.basePath}}}
+schemes:
+  - http
+  - https
+securityDefinitions:
+  bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+tags:
+  -Add New Tags
 paths:
   {{#paths}}
   {{{path}}}:
-    parameters:
-      - $ref: '#/parameters/id'
     {{#ops}}
     {{method}}:
-      summary: {{operationId}} {{method}}
-      description: |
-        {{operationId}} {{method}}
+      summary: {{summary}}
       tags:
         - {{tag}}
+      description: >
+        {{#isPatch}}
+        Partially update the {{refResponseEntity}} with the provided id.  Only the fields
+        that are provided in the body will be changed.
+        {{/isPatch}}
+        {{#isPut}}
+        Update the {{refResponseEntity}} with the provided id.
+        {{/isPut}}
+        {{#isGet}}
+        {{#isList}}
+        Retrieve {{refResponseEntity}}s in the system.
+        {{/isList}}
+        {{^isList}}
+        Retrieve the {{refResponseEntity}} with provided id.
+        {{/isList}}
+        {{/isGet}}
+        {{#isPost}}
+        Create a new {{refResponseEntity}} in the system.
+        {{/isPost}}
+        {{#isDelete}}
+        Delete the {{tag}} with the provided id.
+        {{/isDelete}}
       {{#noSecurity}}
       security: []
       {{/noSecurity}}
+      {{^noSecurity}}
+      security:
+        - bearer: []
+      {{/noSecurity}}
+      produces:
+        - application/json
       parameters:
       {{#needNavPage}}
         - $ref: '#/parameters/page'
         - $ref: '#/parameters/perPage'
-        - $ref: '#/parameters/sortOrder'
-        - name: sortBy
-          in: query
-          description: The sort order
-          required: false
-          schema:
-            type: string
-            enum: [createdAt,updatedAt]
       {{/needNavPage}}
       {{#pathParams}}
-        - name: {{name}}
-          in: path
-          description: {{name}}
-          example: {{name}}
-          schema:
-            type: string
+        {{> urlprop}}
       {{/pathParams}}
       {{#queryParams}}
-        - name: {{name}}
-          in: query
-          description: {{name}}
-          required: true
-          example: {{name}}
-          schema:
-            type: string
+        {{> urlprop}}
       {{/queryParams}}
       {{#needReqBody}}
-        - in: "body"
-          name: "body"
+        - in: body
+          name: body
           required: true
           {{#needReqBodyRef}}
           schema:
@@ -86,42 +111,20 @@ paths:
           description: Successfully {{operationName}}.
         {{/noResponseContent}}
         {{^noResponseContent}}
-        200:
-          {{#needResponseRef}}
+        {{#isPost}}201{{/isPost}}{{^isPost}}200{{/isPost}}:
           description: The operation succeeded.
           schema:
+          {{#needResponseRef}}
             {{^isList}}
             $ref: {{#refResponseEntity}}'#/definitions/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/definitions/{{opreationName}}Response'{{/refResponseEntity}}
             {{/isList}}
             {{#isList}}
-            {{^needNavPage}}
             type: array
             items:
               $ref: {{#refResponseEntity}}'#/definitions/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/definitions/{{opreationName}}Response'{{/refResponseEntity}}
-            {{/needNavPage}}
-            {{#needNavPage}}
-            type: object
-            properties:
-              items:
-                type: array
-                items:
-                  $ref: {{#refResponseEntity}}'#/definitions/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/definitions/{{opreationName}}Response'{{/refResponseEntity}}
-              total:
-                type: integer
-                description: the total of count
-                example: 35
-              page:
-                type: integer
-                example: 1
-              perPage:
-                type: integer
-                example: 20
-            {{/needNavPage}}
             {{/isList}}
           {{/needResponseRef}}
           {{^needResponseRef}}
-          description: The operation succeeded.
-          schema:
             {{^isList}}
             type: object
             properties:
@@ -134,32 +137,11 @@ paths:
             items:
               type: object
               properties:
-                {{^needNavPage}}
                 {{#responseParams}}
                 {{> prop}}
                 {{/responseParams}}
-                {{/needNavPage}}
-                {{#needNavPage}}
-                items:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      {{#responseParams}}
-                      {{> prop}}
-                      {{/responseParams}}
-                total:
-                  type: integer
-                  description: the total of count
-                  example: 35
-                page:
-                  type: integer
-                  example: 1
-                perPage:
-                  type: integer
-                  example: 20
-                {{/needNavPage}}
             {{/isList}}
+          {{/needResponseRef}}
           {{#needResponsePageHeader}}
           headers:
             X-Next-Page:
@@ -171,14 +153,19 @@ paths:
             X-Per-Page:
               type: integer
               description: The number of items to list per page
+            X-Prev-Page:
+              type: integer
+              description: The number of the previous page
             X-Total:
               type: integer
               description: The total number of items
             X-Total-Pages:
               type: integer
               description: The total number of pages
+            Link:
+              type: string
+              description: Pagination link header.
           {{/needResponsePageHeader}}
-          {{/needResponseRef}}
         {{/noResponseContent}}
         400:
           $ref: '#/responses/BadRequest'
@@ -243,26 +230,6 @@ parameters:
       maximum: 100
     example: 20
 
-  sortOrder:
-    name: {{api.navigation.sortOrder}}
-    in: query
-    description: The sort order.
-    required: false
-    schema:
-      type: string
-      enum: [asc, desc]
-      default: desc
-    example: asc
-
-  id:
-    name: id
-    in: path
-    description: The entity id.
-    required: true
-    schema:
-      type: string
-    example: 564935d6-16d5-4410-b415-55d369b90327
-
 definitions:
   Id:
     type: string
@@ -279,10 +246,23 @@ definitions:
 
   {{#schemas}}
   {{entity}}:
+    {{^isGetReturn}}
+    type: object
     required:
       {{#entityParams}}
       - {{name}}
       {{/entityParams}}
     properties:
       {{#entityParams}}{{> prop}}{{/entityParams}}
+    {{/isGetReturn}}
+    {{#isGetReturn}}
+    type: object
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: The id.
+      - $ref: '#/definitions/{{returnRef}}'
+    {{/isGetReturn}}
   {{/schemas}}

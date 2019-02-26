@@ -5,16 +5,16 @@ class BaseModel {
    * for complex types, type must be defined.
    * not support for complex types with subtypes
    */
-  static fillModelArray(object, key, values, TypeClass = undefined) {
+  static fillModelArray (object, key, values, TypeClass = undefined) {
     if (values) {
-      object[key] = [];
+      object[key] = []
       values.forEach((value) => {
         if (TypeClass) {
-          object[key].push(new TypeClass(value));
+          object[key].push(new TypeClass(value))
         } else {
-          object[key].push(value);
+          object[key].push(value)
         }
-      });
+      })
     }
   }
 
@@ -24,8 +24,8 @@ class BaseModel {
    * @param search
    * @returns
    */
-  static isInclude(target, search) {
-    return target && target.toString().toLowerCase().includes(search);
+  static isInclude (target, search) {
+    return target && target.toString().toLowerCase().includes(search)
   }
   {{/projectStyle.db.isJsonDB}}
   {{#projectStyle.db.isNeo4j}}
@@ -33,10 +33,10 @@ class BaseModel {
    * isNotFound
    */
   static isNotFound(neoResult) {
-    const notFound = neoResult.records.length === 0;
-    return notFound;
+    const notFound = neoResult.records.length === 0
+    return notFound
   }
   {{/projectStyle.db.isNeo4j}}
 }
 
-module.exports = BaseModel;
+module.exports = BaseModel

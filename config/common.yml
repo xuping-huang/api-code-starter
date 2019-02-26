@@ -1,16 +1,16 @@
 defaults: &defaults # default use json-db,express,javascript
   project:
-    name: Challenge V5
+    name: project-name
     version: 0.0.1
-    description: Challenge V5 Backend API.
+    description: Project Name
     port: 3000
     module: users
-    basePath: '/v5'
+    basePath: '/api/v1'
     templateSwitch: nodejs
   projectStyle:
     language:
       name: JavaScript
-      isJavaScript: true
+      isJavaScript: false
       isTypeScript: false
       isJava: false
     server:
@@ -19,7 +19,7 @@ defaults: &defaults # default use json-db,express,javascript
       isKoa: false
     db:
       name: challenge
-      isJsonDB: true
+      isJsonDB: false
       isMongoDB: false
       isNeo4j: false
       isMysql: false
@@ -27,21 +27,23 @@ defaults: &defaults # default use json-db,express,javascript
     deploy:
       useDocker: true
       useHeroku: false
+    maven:
+      groupId: ''
   apiStyle:
     log:
-      needLog: true
+      needLog: false
       needTest: false
       needCoverage: false
     other:
       needHealthCheck: false
       needOpt: false
-      needJwt: true
+      needJwt: false
       needPasswordBcrypt: false
       needTwilio: false
       needAws: false
       needGootleText2Speech: false
     lint:
-      isAribnbBase: true
+      isAribnbBase: false
       isESlingStandard: false
       isESlintRecommended: false
     doc:
@@ -52,62 +54,154 @@ defaults: &defaults # default use json-db,express,javascript
       isJoda: false
   devDependencies:
     codeStyle:
-      need_tslint: false
-      need_eslint: true
-      need_eslint_airbnb_base: true
-      need_eslint_chai_friendly: true
-      need_eslint_plugin_import: true
+      tslint: false
+      eslint: false
+      eslint-config-airbnb-base: false
+      eslint-chai-friendly: false
+      babel-eslint: false
+      eslint-config-standard: false
+      eslint-plugin-node: false
+      eslint-plugin-import: false
+      eslint-plugin-promise: false
+      eslint-plugin-standard: false
     test:
-      need_chai: false
-      need_mocha: false
-      need_sinon: false
-      need_supertest: false
-      need_sinon_mongoose: false
-      need_jest: false
+      chai: false
+      mocha: false
+      sinon: false
+      supertest: false
+      sinon-mongoose: false
+      jest: false
     coverage:
-      need_nyc: false # Istanbul's state of the art command line interface
+      nyc: false # Istanbul's state of the art command line interface
     other:
-      need_nodemon: true # if false, becareful devDependencies has a extend comma
+      nodemon: true # if false, becareful devDependencies has a extend comma
   dependencies:
     config:
-      need_dotenv: true # load .env
+      dotenv: true # load .env
     logger:
-      need_morgan: true # logger
-      need_bunyan: false
+      morgan: false # logger
+      bunyan: false
     validate:
-      need_joi: true
-      need_validator: false
+      joi: true
+      validator: false
     secure:
-      need_bcrypt_nodejs: false
-      need_crypto: false
+      bcrypt-nodejs: false
+      crypto: false
     db:
-      need_json_file_db: false
-      need_mongoose: false
-      need_neo4j_driver: false
+      json-file-db: false
+      mongoose: false
+      neo4j-driver: false
     express:
-      need_express_status_monitor: false # monitor express status
-      need_compression: true # compress http response & request
-      need_bodyParser: true
-      need_expressValidator: true
-      need_cors: true # enable CORS with various options.
-      need_helmet: true # secure Express/Connect apps with various HTTP headers
-      need_lusca: true # Web application security middleware.
-      need_express_jwt: true
-      need_multer: true # Middleware for handling `multipart/form-data
+      express-status-monitor: false # monitor express status
+      compression: true # compress http response & request
+      body-parser: true
+      express-validator: true
+      cors: true # enable CORS with various options.
+      helmet: true # secure Express/Connect apps with various HTTP headers
+      lusca: true # Web application security middleware.
+      express-jwt: false
+      multer: true # Middleware for handling `multipart/form-data
     other:
-      need_http_status: true
-      need_error_handle: true
-      need_uuid: true
-      need_swagger_jsdoc: false
-      need_debug: true
+      http-status: true
+      error-handle: true
+      uuid: true
+      swagger-jsdoc: false
+      debug: true
     spring:
-      need_spring_fox: false
-      need_otp_aerogera: false
-no-test-cov:
+      spring-fox: false
+      otp-aerogera: false
+test:
   apiStyle:
     log:
-      needTest: false
+      needTest: true
+  devDependencies:
+    test:
+      chai: true
+      mocha: true
+      sinon: true
+      supertest: true
+      sinon-mongoose: false
+      jest: true
+cov:
+  apiStyle:
+    log:
       needCoverage: false
+  devDependencies:
+    coverage:
+      nyc: true
+eslint:
+  apiStyle:
+    lint:
+      isESlingStandard: true
+  devDependencies:
+    codeStyle:
+      eslint: true
+      babel-eslint: true
+      eslint-config-standard: true
+      eslint-plugin-import: true
+      eslint-plugin-node: true
+      eslint-plugin-promise: true
+      eslint-plugin-standard: true
+tslint:
+  devDependencies:
+    codeStyle:
+      tslint: true
+      tslint-config-prettier: true
+      tslint-immutable: true
+heroku:
+  projectStyle:
+    deploy:
+      useDocker: false
+      useHeroku: true
+swgdoc:
+  apiStyle:
+    doc:
+      isSwaggerDoc: true
+  dependencies:
+    other:
+      swagger-jsdoc: true
+log:
+  apiStyle:
+    log:
+      needLog: true
+  dependencies:
+    logger:
+      morgan: true
+koa:
+  projectStyle:
+    server:
+      name: koa
+      isExpress: false
+      isKoa: true
+jwt:
+  apiStyle:
+    other:
+      needJwt: true
+  dependencies:
+    express:
+      express-jwt: true
+secure:
+  apiStyle:
+    needPasswordBcrypt: true
+  dependencies:
+    secure:
+      bcrypt-nodejs: true
+      crypto: true
+aws:
+  apiStyle:
+    other:
+      needAws: true
+  dependencies:
+    other:
+      aws-sdk: true
+twilio:
+  apiStyle:
+    other:
+      needTwilio: true
+  dependencies:
+    other:
+      twilio: true
+#### DB
 jsondb:
   projectStyle:
     db:
@@ -115,54 +209,53 @@ jsondb:
       isJsonDB: true
   devDependencies:
     test:
-      need_sinon_mongoose: false
+      sinon-mongoose: false
   dependencies:
     db:
-      need_json_file_db: true
+      json-file-db: true
 neo4j:
   projectStyle:
     db:
       name: Neo4j
-      isJsonDB: false
       isNeo4j: true
-  devDependencies:
-    test:
-      need_sinon_mongoose: false
   dependencies:
-    logger:
-      need_morgan: true # logger
-      need_bunyan: false
     db:
-      need_json_file_db: false
-      need_neo4j_driver: true
+      neo4j-driver: true
 mongo:
   projectStyle:
     db:
       name: MongoDB
-      isJsonDB: false
       isMongoDB: true
   dependencies:
-    secure:
-      need_bcrypt_nodejs: true
-      need_crypto: true
     db:
-      need_json_file_db: false
-      need_mongoose: true
-ts:
+      mongoose: true
+dynamo:
+  projectStyle:
+    db:
+      name: DynamoDB
+      isDynamoDB: true
+mysql:
+  projectStyle:
+    db:
+      name: Mysql
+      isMysql: true
+## Language
+typescript:
   projectStyle:
     language:
       name: TypeScript
-      isJavaScript: false
       isTypeScript: true
+javascript:
+  projectStyle:
+    language:
+      name: JavaScript
+      isJavaScript: true
 spring:
   project:
-    port: 3000
     templateSwitch: spring
   projectStyle:
     language:
       name: Java
-      isJavaScript: false
-      isTypeScript: false
       isJava: true
     maven:
       groupId: com.autocognita

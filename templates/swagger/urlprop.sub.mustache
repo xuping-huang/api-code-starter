@@ -1,0 +1,30 @@
+        {{^ex.isRef}}
+        - name: {{name}}
+          in: {{#isQueryParam}}query{{/isQueryParam}}{{#isPathParam}}path{{/isPathParam}}
+          description: {{#isQueryParam}}Filter by '{{name}}'.{{/isQueryParam}}
+          required: {{#isQueryParam}}false{{/isQueryParam}}{{#isPathParam}}true{{/isPathParam}}
+          type: {{ex.type}}
+          {{^ex.isRef}}
+          {{^ex.isRefArray}}
+          {{^ex.isObject}}
+          {{^ex.isObjectArray}}
+          {{#project.needExample}}
+          example: {{{ex.example}}}
+          {{/project.needExample}}
+          {{/ex.isObjectArray}}
+          {{/ex.isObject}}
+          {{/ex.isRefArray}}
+          {{/ex.isRef}}
+        {{/ex.isRef}}
+        {{#ex.isRef}}
+        {{^ex.isId}}
+        - $ref: '{{{ex.$ref2}}}'
+        {{/ex.isId}}
+        {{#ex.isId}}
+        - name: {{name}}
+          in: {{#isPathParam}}path{{/isPathParam}}{{#isQueryParam}}query{{/isQueryParam}}
+          required: {{#isQueryParam}}false{{/isQueryParam}}{{#isPathParam}}true{{/isPathParam}}
+          type: {{ex.type}}
+          description: {{#isPathParam}}The id of {{ex.beforeSuffix}}.{{/isPathParam}}{{#isQueryParam}}Filter by '{{name}}'(id of {{ex.beforeSuffix}}).{{/isQueryParam}}
+        {{/ex.isId}}
+        {{/ex.isRef}}

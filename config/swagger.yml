@@ -1,8 +1,8 @@
 defaults: &defaults
   project:
     name: autocognita
-    basePath: /api/{apiVersion}/
-    version: v1
+    host: api.topcoder.com
+    basePath: /v5
     templateSwitch: swagger
   api:
     security:

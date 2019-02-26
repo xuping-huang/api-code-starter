@@ -17,9 +17,9 @@
 	<properties>
 		<java.version>1.8</java.version>
     {{#apiStyle.doc.isSwaggerDoc}}
-    {{#dependencies.spring.need_spring_fox}}
+    {{#dependencies.spring.spring-fox}}
 		<springfox-version>2.7.0</springfox-version>
-    {{/dependencies.spring.need_spring_fox}}
+    {{/dependencies.spring.spring-fox}}
     {{/apiStyle.doc.isSwaggerDoc}}
 	</properties>
 
@@ -29,7 +29,7 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
     {{#apiStyle.doc.isSwaggerDoc}}
-    {{#dependencies.spring.need_spring_fox}}
+    {{#dependencies.spring.spring-fox}}
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
@@ -40,7 +40,7 @@
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>${springfox-version}</version>
 		</dependency>
-    {{/dependencies.spring.need_spring_fox}}
+    {{/dependencies.spring.spring-fox}}
     {{/apiStyle.doc.isSwaggerDoc}}
     {{#apiStyle.date.isJoda}}
     <dependency>
@@ -56,13 +56,13 @@
 			<version>2.6.4</version>
 		</dependency>
     {{/apiStyle.date.isThreeTenbp}}
-    {{#dependencies.spring.need_otp_aerogera}}
+    {{#dependencies.spring.otp-aerogera}}
 		<dependency>
 			<groupId>org.jboss.aerogear</groupId>
 			<artifactId>aerogear-otp-java</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-    {{/dependencies.spring.need_otp_aerogera}}
+    {{/dependencies.spring.otp-aerogera}}
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>

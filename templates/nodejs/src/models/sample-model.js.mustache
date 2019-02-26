@@ -1,39 +1,39 @@
 {{#projectStyle.db.isJsonDB}}
-const path = require('path');
-{{#dependencies.db.need_json_file_db}}
-const openDB = require('json-file-db');
-{{/dependencies.db.need_json_file_db}}
+const path = require('path')
+{{#dependencies.db.json-file-db}}
+const openDB = require('json-file-db')
+{{/dependencies.db.json-file-db}}
 
-const BaseModel = require('./base-model');
+const BaseModel = require('./base-model')
 
-const JSON_FILE_PATH = path.join(__dirname, '../../db/SampleModel.json');
-const ID_PROP = 'userId';
+const JSON_FILE_PATH = path.join(__dirname, '../../db/SampleModel.json')
+const ID_PROP = 'userId'
 {{/projectStyle.db.isJsonDB}}
 {{#projectStyle.db.isMongoDB}}
-{{#dependencies.secure.need_bcrypt_nodejs}}
-const bcrypt = require('bcrypt-nodejs');
-{{/dependencies.secure.need_bcrypt_nodejs}}
-{{#dependencies.secure.need_crypto}}
-const crypto = require('crypto');
-{{/dependencies.secure.need_crypto}}
-const mongoose = require('mongoose');
+{{#dependencies.secure.bcrypt-nodejs}}
+const bcrypt = require('bcrypt-nodejs')
+{{/dependencies.secure.bcrypt-nodejs}}
+{{#dependencies.secure.crypto}}
+const crypto = require('crypto')
+{{/dependencies.secure.crypto}}
+const mongoose = require('mongoose')
 
-const config = require('../config/config');
+const config = require('../config/config')
 {{/projectStyle.db.isMongoDB}}
 {{#projectStyle.db.isNeo4j}}
-  {{#dependencies.db.need_neo4j_driver}}
-const neo4j = require('neo4j-driver').v1;
-const config = require('../config/config');
-  {{/dependencies.db.need_neo4j_driver}}
-const BaseModel = require('./base-model');
+  {{#dependencies.db.neo4j-driver}}
+const neo4j = require('neo4j-driver').v1
+const config = require('../config/config')
+  {{/dependencies.db.neo4j-driver}}
+const BaseModel = require('./base-model')
 
-  {{#dependencies.db.need_neo4j_driver}}
+  {{#dependencies.db.neo4j-driver}}
 const driver = neo4j.driver(config.db.url,
-  neo4j.auth.basic(config.db.username, config.db.password));
-const session = driver.session();
-  {{/dependencies.db.need_neo4j_driver}}
+  neo4j.auth.basic(config.db.username, config.db.password))
+const session = driver.session()
+  {{/dependencies.db.neo4j-driver}}
 {{/projectStyle.db.isNeo4j}}
-{{#dependencies.other.need_swagger_jsdoc}}
+{{#dependencies.other.swagger-jsdoc}}
 
 /**
  * @swagger
@@ -50,25 +50,25 @@ const session = driver.session();
  *         type: string
  *         description: user name
  */
-{{/dependencies.other.need_swagger_jsdoc}}
-{{^dependencies.other.need_swagger_jsdoc}}
+{{/dependencies.other.swagger-jsdoc}}
+{{^dependencies.other.swagger-jsdoc}}
 /**
  * User info
  */
-{{/dependencies.other.need_swagger_jsdoc}}
+{{/dependencies.other.swagger-jsdoc}}
 {{#projectStyle.db.isJsonDB}}
 class SampleModel extends BaseModel {
   /**
    * constructor
    * @param values Can be used to set a webapi response
    */
-  constructor(values) {
-    super();
-    this.userId = undefined;
-    this.username = undefined;
+  constructor (values) {
+    super()
+    this.userId = undefined
+    this.username = undefined
 
     if (values) {
-      this.setValues(values);
+      this.setValues(values)
     }
   }
 
@@ -76,10 +76,10 @@ class SampleModel extends BaseModel {
    * set the values.
    * @param values Can be used to set a webapi response to this newly constructed model
    */
-  setValues(values) {
+  setValues (values) {
     if (values) {
-      this.userId = values.userId;
-      this.username = values.username;
+      this.userId = values.userId
+      this.username = values.username
     }
   }
 
@@ -87,15 +87,15 @@ class SampleModel extends BaseModel {
    * find policy by ID
    * @param {string} userId
    */
-  static async findById(userId) {
-    const db = openDB(JSON_FILE_PATH, ID_PROP);
+  static async findById (userId) {
+    const db = openDB(JSON_FILE_PATH, ID_PROP)
     // Note: never change to Promise.resolve/Promise.reject mode
     return new Promise((resolve, reject) => {
       db.get({ userId }, (err, records) => {
-        if (err) return reject(err);
-        return resolve(records);
-      });
-    });
+        if (err) return reject(err)
+        return resolve(records)
+      })
+    })
   }
 }
 {{/projectStyle.db.isJsonDB}}
@@ -104,44 +104,44 @@ const userSchema = new mongoose.Schema({
   userId: { type: String, unique: true },
   username: { type: String },
   password: String
-}, { timestamps: true });
+}, { timestamps: true })
 
 /**
  * Password hash middleware.
  */
-userSchema.pre('save', function save(next) {
-  const user = this;
-  if (!user.isModified('password')) { return next(); }
+userSchema.pre('save', function save (next) {
+  const user = this
+  if (!user.isModified('password')) { return next() }
   bcrypt.genSalt(10, (err, salt) => {
-    if (err) { return next(err); }
+    if (err) { return next(err) }
     bcrypt.hash(user.password, salt, null, (err, hash) => {
-      if (err) { return next(err); }
-      user.password = hash;
-      next();
-    });
-  });
-});
+      if (err) { return next(err) }
+      user.password = hash
+      next()
+    })
+  })
+})
 
 /**
  * Helper method for validating user's password.
  *
  * The password send by request client should be encoded like below:
-   const encodeData = crypto.publicEncrypt(publicKey, Buffer.from(password)).toString('base64');
+   const encodeData = crypto.publicEncrypt(publicKey, Buffer.from(password)).toString('base64')
  */
-userSchema.methods.comparePassword = function comparePassword(candidatePassword, cb) {
+userSchema.methods.comparePassword = function comparePassword (candidatePassword, cb) {
   try {
     const password = crypto.privateDecrypt(config.privateKey,
-      Buffer.from(candidatePassword.toString('base64'), 'base64'));
+      Buffer.from(candidatePassword.toString('base64'), 'base64'))
 
     bcrypt.compare(password.toString(), this.password, (err, isMatch) => {
-      cb(err, isMatch);
-    });
+      cb(err, isMatch)
+    })
   } catch (err) {
-    cb(err, false);
+    cb(err, false)
   }
-};
+}
 
-const SampleModel = mongoose.model('User', userSchema);
+const SampleModel = mongoose.model('User', userSchema)
 {{/projectStyle.db.isMongoDB}}
 {{#projectStyle.db.isNeo4j}}
 class SampleModel extends BaseModel {
@@ -149,17 +149,17 @@ class SampleModel extends BaseModel {
    * find policy by ID
    * @param {string} userId
    */
-  static async findById(userId) {
-    const cql = 'MATCH (n:User) WHERE n.userId={userId} RETURN n';
-    const results = await session.run(cql, { userId });
-    session.close();
+  static async findById (userId) {
+    const cql = 'MATCH (n:User) WHERE n.userId={userId} RETURN n'
+    const results = await session.run(cql, { userId })
+    session.close()
 
     if (this.isNotFound(results)) {
-      return Promise.resolve([]);
+      return Promise.resolve([])
     }
-    return Promise.resolve(results.records);
+    return Promise.resolve(results.records)
   }
 }
 {{/projectStyle.db.isNeo4j}}
 
-module.exports = SampleModel;
+module.exports = SampleModel

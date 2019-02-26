@@ -25,6 +25,7 @@
   ex:
     $ref: '#/components/schemas/Id'
     isRef: true
+    isId: true
 - name: createdon
   ex:
     type: string

@@ -1,6 +1,6 @@
 /* eslint-disable no-process-env */
-const Joi = require('joi');
-const dotenv = require('dotenv');
+const Joi = require('joi')
+const dotenv = require('dotenv')
 /**
  * Use dotenv to load environment variables from '.env' file.
  * The '.env file not found' error is thrown only in development env.
@@ -10,9 +10,9 @@ const dotenv = require('dotenv');
  * environment variables in a more secure way,
  * rather than through the .env file
  */
-const result = dotenv.load();
+const result = dotenv.load()
 if (result.error && process.env.NODE_ENV === 'development') {
-  throw result.error;
+  throw result.error
 }
 
 // define validation for all the env vars
@@ -35,14 +35,14 @@ const envVarsSchema = Joi.object({
   JWT_EXPIRED: Joi.string().optional().default('10d'),
   {{/apiStyle.other.needJwt}}
   {{#apiStyle.log.needLog}}
-  {{#dependencies.logger.need_morgan}}
+  {{#dependencies.logger.morgan}}
   LOGGER_DIR: Joi.string().optional().default('log'),
   LOGGER_FILE: Joi.string().optional().default('access.log'),
   LOGGER_INTERVAL: Joi.string().default('10d'),
   LOGGER_SIZE: Joi.string().default('100M'),
   LOGGER_COMPRESS_FORMAT: Joi.string().default('gzip'),
-  {{/dependencies.logger.need_morgan}}
-  {{#dependencies.logger.need_bunyan}}
+  {{/dependencies.logger.morgan}}
+  {{#dependencies.logger.bunyan}}
   LOGGER_DIR: Joi.string().optional().default('log'),
   LOGGER_NAME: Joi.string().default('{{project.name}}'),
   LOGGER_LEVEL: Joi.string().default('debug'),
@@ -52,7 +52,7 @@ const envVarsSchema = Joi.object({
   LOGGER_LEVELS_WARN: Joi.string().optional().allow(''),
   LOGGER_LEVELS_ERROR: Joi.string().optional().default('STDERR'),
   LOGGER_LEVELS_FATAL: Joi.string().optional().allow(''),
-  {{/dependencies.logger.need_bunyan}}
+  {{/dependencies.logger.bunyan}}
   {{/apiStyle.log.needLog}}
   {{#projectStyle.db.isNeo4j}}
   {{#projectStyle.deploy.useDocker}}
@@ -75,15 +75,15 @@ const envVarsSchema = Joi.object({
   RESPONSE_FORBIDDEN: Joi.string().optional().default('You are not allowed to access the request.'),
   RESPONSE_UNAUTHENTICATED: Joi.string().optional().default('Unable to authenticate the user.'),
   RESPONSE_NOTFOUND: Joi.string().optional().default('A resource with the parameters could not be found.'),
-  RESPONSE_BADREQUEST: Joi.string().optional().default('Invalid input.'),
-}).unknown().required();
+  RESPONSE_BADREQUEST: Joi.string().optional().default('Invalid input.')
+}).unknown().required()
 
 const {
   error,
   value: envVars
-} = Joi.validate(process.env, envVarsSchema);
+} = Joi.validate(process.env, envVarsSchema)
 if (error) {
-  throw new Error(`Config validation error: ${error.message}`);
+  throw new Error(`Config validation error: ${error.message}`)
 }
 
 const config = {
@@ -99,7 +99,7 @@ const config = {
   },
   {{/apiStyle.other.needJwt}}
   {{#apiStyle.log.needLog}}
-  {{#dependencies.logger.need_morgan}}
+  {{#dependencies.logger.morgan}}
   logger: {
     dirname: envVars.LOGGER_DIR,
     interval: envVars.LOGGER_INTERVAL,
@@ -107,8 +107,8 @@ const config = {
     compressFormat: envVars.LOGGER_COMPRESS_FORMAT,
     filename: envVars.LOGGER_FILE
   },
-  {{/dependencies.logger.need_morgan}}
-  {{#dependencies.logger.need_bunyan}}
+  {{/dependencies.logger.morgan}}
+  {{#dependencies.logger.bunyan}}
   logger: {
     dirname: envVars.LOGGER_DIR,
     name: envVars.LOGGER_NAME,
@@ -122,7 +122,7 @@ const config = {
       fatal: envVars.LOGGER_LEVELS_FATAL,
     }
   },
-  {{/dependencies.logger.need_bunyan}}
+  {{/dependencies.logger.bunyan}}
   {{/apiStyle.log.needLog}}
   db: {
     {{#projectStyle.db.isMongoDB}}
@@ -154,6 +154,6 @@ const config = {
       badRequest: envVars.RESPONSE_BADREQUEST
     }
   }
-};
+}
 
-module.exports = config;
+module.exports = config

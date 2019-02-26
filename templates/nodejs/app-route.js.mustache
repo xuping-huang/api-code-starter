@@ -1,13 +1,14 @@
-const express = require('express');
-{{#dependencies.other.need_swagger_jsdoc}}
-const swaggerJSDoc = require('swagger-jsdoc');
-{{/dependencies.other.need_swagger_jsdoc}}
-const apiRoute = require('./src/controllers/api-route');
-const config = require('./src/config/config');
+const express = require('express')
+{{#dependencies.other.swagger-jsdoc}}
+const swaggerJSDoc = require('swagger-jsdoc')
+{{/dependencies.other.swagger-jsdoc}}
+const apiRoute = require('./src/controllers/api-route')
+{{#dependencies.other.swagger-jsdoc}}
+const config = require('./src/config/config')
+{{/dependencies.other.swagger-jsdoc}}
 
-const router = express.Router(); // eslint-disable-line new-cap
-{{#dependencies.other.need_swagger_jsdoc}}
-const basePath = '';
+const router = express.Router() // eslint-disable-line new-cap
+{{#dependencies.other.swagger-jsdoc}}
 
 /**
  * Swagger-jsdoc
@@ -21,7 +22,7 @@ const swaggerDefinition = {
   },
   host: `${config.host}:${config.port}`, // Host (optional)
   basePath: `${basePath}`, // Base path (optional)
-};
+}
 
 // Options for the swagger docs
 const options = {
@@ -31,7 +32,7 @@ const options = {
   // Note that this path is relative to the current directory from which the Node.js is ran,
   // not the application itself.
   apis: ['./app-route.js', './src/controllers/*.js', './src/models/*.js'],
-};
+}
 
 /**
   * @swagger
@@ -43,23 +44,24 @@ const options = {
   */
 
 // Initialize swagger-jsdoc -> returns validated swagger spec in json format
-const swaggerSpec = swaggerJSDoc(options);
+const swaggerSpec = swaggerJSDoc(options)
 
 // Serve swagger docs the way you like (Recommendation: swagger-tools)
 router.get('/swagger', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.send(swaggerSpec);
-});
-{{/dependencies.other.need_swagger_jsdoc}}
+  res.setHeader('Content-Type', 'application/json')
+  res.send(swaggerSpec)
+})
+{{/dependencies.other.swagger-jsdoc}}
 {{#apiStyle.other.needHealthCheck}}
 
 /** GET /health-check - Check service health */
 router.get('/health-check', (req, res) => {
-  res.send('OK');
-});
+  res.send('OK')
+})
 {{/apiStyle.other.needHealthCheck}}
 
 // mount routes
-router.use(basePath, apiRoute);
+const basePath = '{{{project.basePath}}}'
+router.use(basePath, apiRoute)
 
-module.exports = router;
+module.exports = router
