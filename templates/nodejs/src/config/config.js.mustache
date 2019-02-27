@@ -15,6 +15,9 @@ if (result.error && process.env.NODE_ENV === 'development') {
   throw result.error
 }
 
+const JStrOptional = Joi.string().optional()
+const JStrRequired = Joi.string().required()
+
 // define validation for all the env vars
 const envVarsSchema = Joi.object({
   NODE_ENV: Joi.string()
@@ -29,53 +32,59 @@ const envVarsSchema = Joi.object({
       then: Joi.boolean().default(true),
       otherwise: Joi.boolean().default(false)
     }),
+  {{#projectStyle.db.isDynamoDB}}
+  AWS_DYNAMODB_REGION: JStrRequired,
+  AWS_DYNAMODB_ENDPOINT: JStrOptional,
+  {{/projectStyle.db.isDynamoDB}}
   {{#apiStyle.other.needJwt}}
-  JWT_SECRET_KEY: Joi.string().required(),
-  JWT_HEADER_NAME: Joi.string().optional().default('Authorization'),
-  JWT_EXPIRED: Joi.string().optional().default('10d'),
+  JWT_SECRET_KEY: JStrRequired,
+  JWT_HEADER_NAME: JStrOptional.default('Authorization'),
+  JWT_EXPIRED: JStrOptional.default('10d'),
   {{/apiStyle.other.needJwt}}
   {{#apiStyle.log.needLog}}
   {{#dependencies.logger.morgan}}
-  LOGGER_DIR: Joi.string().optional().default('log'),
-  LOGGER_FILE: Joi.string().optional().default('access.log'),
+  LOGGER_DIR: JStrOptional.default('log'),
+  LOGGER_FILE: JStrOptional.default('access.log'),
   LOGGER_INTERVAL: Joi.string().default('10d'),
   LOGGER_SIZE: Joi.string().default('100M'),
   LOGGER_COMPRESS_FORMAT: Joi.string().default('gzip'),
   {{/dependencies.logger.morgan}}
   {{#dependencies.logger.bunyan}}
-  LOGGER_DIR: Joi.string().optional().default('log'),
+  LOGGER_DIR: JStrOptional.default('log'),
   LOGGER_NAME: Joi.string().default('{{project.name}}'),
   LOGGER_LEVEL: Joi.string().default('debug'),
-  LOGGER_LEVELS_TRACE: Joi.string().optional().allow(''),
-  LOGGER_LEVELS_DEBUG: Joi.string().optional().default('STDOUT'),
-  LOGGER_LEVELS_INFO: Joi.string().optional().allow(''),
-  LOGGER_LEVELS_WARN: Joi.string().optional().allow(''),
-  LOGGER_LEVELS_ERROR: Joi.string().optional().default('STDERR'),
-  LOGGER_LEVELS_FATAL: Joi.string().optional().allow(''),
+  LOGGER_LEVELS_TRACE: JStrOptional.allow(''),
+  LOGGER_LEVELS_DEBUG: JStrOptional.default('STDOUT'),
+  LOGGER_LEVELS_INFO: JStrOptional.allow(''),
+  LOGGER_LEVELS_WARN: JStrOptional.allow(''),
+  LOGGER_LEVELS_ERROR: JStrOptional.default('STDERR'),
+  LOGGER_LEVELS_FATAL: JStrOptional.allow(''),
   {{/dependencies.logger.bunyan}}
   {{/apiStyle.log.needLog}}
   {{#projectStyle.db.isNeo4j}}
   {{#projectStyle.deploy.useDocker}}
-  NEO4J_BOLT_URL: Joi.string().required(),
-  NEO4J_BOLT_USER: Joi.string().required(),
-  NEO4J_BOLT_PASSWORD: Joi.string().required(),
+  NEO4J_BOLT_URL: JStrRequired,
+  NEO4J_BOLT_USER: JStrRequired,
+  NEO4J_BOLT_PASSWORD: JStrRequired,
   {{/projectStyle.deploy.useDocker}}
   {{#projectStyle.deploy.useHeroku}}
-  GRAPHENEDB_BOLT_URL: Joi.string().required(),
-  GRAPHENEDB_BOLT_USER: Joi.string().required(),
-  GRAPHENEDB_BOLT_PASSWORD: Joi.string().required(),
+  GRAPHENEDB_BOLT_URL: JStrRequired,
+  GRAPHENEDB_BOLT_USER: JStrRequired,
+  GRAPHENEDB_BOLT_PASSWORD: JStrRequired,
   {{/projectStyle.deploy.useHeroku}}
   {{/projectStyle.db.isNeo4j}}
   {{#projectStyle.db.isMongoDB}}
-  MONGODB_URI: Joi.string().required(),
+  MONGODB_URI: JStrRequired,
   {{/projectStyle.db.isMongoDB}}
   PAGE_PERPAGE_MAX: Joi.string().default(100),
   PAGE_PERPAGE_DEFAULT: Joi.string().default(20),
-  RESPONSE_INTERNAL_SERVER_ERROR: Joi.string().optional().default('Something went wrong while processing your request. We’re sorry for the trouble. We’ve been notified of the error and will correct it as soon as possible. Please try your request again in a moment.'),
-  RESPONSE_FORBIDDEN: Joi.string().optional().default('You are not allowed to access the request.'),
-  RESPONSE_UNAUTHENTICATED: Joi.string().optional().default('Unable to authenticate the user.'),
-  RESPONSE_NOTFOUND: Joi.string().optional().default('A resource with the parameters could not be found.'),
-  RESPONSE_BADREQUEST: Joi.string().optional().default('Invalid input.')
+  RESPONSE_INTERNAL_SERVER_ERROR: JStrOptional.default('Something went wrong while processing your request. We’re sorry for the trouble. We’ve been notified of the error and will correct it as soon as possible. Please try your request again in a moment.'),
+  RESPONSE_FORBIDDEN: JStrOptional.default('You are not allowed to access the request.'),
+  RESPONSE_UNAUTHENTICATED: JStrOptional.default('Unable to authenticate the user.'),
+  RESPONSE_NOTFOUND: JStrOptional.default('A resource with the parameters could not be found.'),
+  RESPONSE_BADREQUEST: JStrOptional.default('Invalid input.'),
+  REQUEST_NO_CONTENT: JStrOptional.default('no content to update'),
+  RESPONSE_ENTITY_PROTECTED: JStrOptional.default('Only admin or creator can update.')
 }).unknown().required()
 
 const {
@@ -125,6 +134,10 @@ const config = {
   {{/dependencies.logger.bunyan}}
   {{/apiStyle.log.needLog}}
   db: {
+    {{#projectStyle.db.isDynamoDB}}
+    region: envVars.AWS_DYNAMODB_REGION,
+    endpoint: envVars.AWS_DYNAMODB_ENDPOINT
+    {{/projectStyle.db.isDynamoDB}}
     {{#projectStyle.db.isMongoDB}}
     url: envVars.MONGODB_URI
     {{/projectStyle.db.isMongoDB}}
@@ -151,7 +164,9 @@ const config = {
       forbidden: envVars.RESPONSE_FORBIDDEN,
       unauthenticated: envVars.RESPONSE_UNAUTHENTICATED,
       notFound: envVars.RESPONSE_NOTFOUND,
-      badRequest: envVars.RESPONSE_BADREQUEST
+      badRequest: envVars.RESPONSE_BADREQUEST,
+      noContent: envVars.REQUEST_NO_CONTENT,
+      entityProtected: envVars.RESPONSE_ENTITY_PROTECTED
     }
   }
 }

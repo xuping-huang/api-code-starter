@@ -1,3 +1,4 @@
+const { BadRequestError } = require('./app-error')
 {{#dependencies.validate.joi}}
 const Joi = require('joi')
 /**
@@ -13,8 +14,8 @@ const JoiBoolean = Joi.boolean().insensitive()
 
 const JoiUpperEnum = Joi.string().trim().uppercase()
 const JoiLowerEnum = Joi.string().trim().lowercase()
-
-const JoiInt = Joi.number().integer()
+const JoiPage = Joi.number().integer().min(1).optional().default(1)
+const JoiPerPage = Joi.number().integer().min(1).max(100).optional().default(20)
 {{/dependencies.validate.joi}}
 
 /**
@@ -58,14 +59,25 @@ const checkId = (obj, idProp) => {
   {{/dependencies.validate.joi}}
 }
 
+/**
+ * validate role is admin
+ */
+const checkAdmin = (role) => {
+  if (role !== 'admin') {
+    throw new BadRequestError(`Unauthorized. Only admin can browser audit logs.`)
+  }
+}
+
 module.exports = {
   {{#dependencies.validate.joi}}
   JoiBoolean,
   JoiUpperEnum,
   JoiLowerEnum,
-  JoiInt,
   checkId,
+  JoiPage,
+  JoiPerPage,
   {{/dependencies.validate.joi}}
   RegexDef,
+  checkAdmin,
   checkEnumValue
 }

@@ -2,10 +2,49 @@
 
 {{project.description}}
 
-# Install & Run
+# Environment Setup
 
+## Project install
+```
 $ npm install
+```
+
+## {{projectStyle.db.name}} setup
+{{#projectStyle.db.isDynamoDB}}
+  - Install dynamoDB & AWS CLI
+    Detail can be seen in `./dynamoDB.readme.md`
+  - Create table with the db script
+    `create-table.aws.db` or `create-table.aws.local.db`
+{{/projectStyle.db.isDynamoDB}}
+
+## Server run
+```
 $ npm run start
+```
+
+# Resources
+
+|Resource file|Description|
+|--|--|
+|./postman/apicode.postman_collection.json| Postman Collection|
+|./postman/apicode.postman_environment.json| Postman Environment|
+{{#projectStyle.db.isDynamoDB}}
+|./db/create-table.aws.db|Create dynamoDb table for web|
+|./db/create-table.aws.local.db|Create dynamoDb table for local and docker|
+{{/projectStyle.db.isDynamoDB}}
+|./.env|Environment variables RTU |
+
+# Authrization API
+
+```
+GET /auth/login/444?role=admin
+
+userId=444
+role=admin
+```
+You can choose any userId as you like. Role can be user/admin. After login, the jwt token will be saved to {{jwtToken}} and postman environment.
+
+# Algorithm
 
 # Configuration
 
@@ -16,6 +55,14 @@ Configuration saved in .env file.
 |HOST|Server host address.|
 |PORT|Server running port.|
 |NODE_ENV|Server running context. `development` in developing.|
+|JWT_TOKEN_EXPIRE|Jwt token expired days|
+|JWT_SECRET_KEY|Jwt secret key|
+{{#projectStyle.db.isDynamoDB}}
+|AWS_DYNAMODB_REGION|Aws dynamodb default region|
+|AWS_DYNAMODB_ENDPOINT|Aws local dynamodb endpoint, comment it if use web.|
+{{/projectStyle.db.isDynamoDB}}
+|LOGGER_DIR|Log file saved path.|
+|LOGGER_FILE|Log file name.|
 
 # Scripts
 
@@ -42,4 +89,7 @@ Configuration saved in .env file.
  {{#projectStyle.db.isMongoDB}}
  - DB Data Import: `db/user.json`, `db/import.sh`
  {{/projectStyle.db.isMongoDB}}
+ {{#projectStyle.db.isDynamoDB}}
+ - DB table init: `db/create-table.aws.local.db`
+ {{/projectStyle.db.isDynamoDB}}
  - Running: `docker-compose up`

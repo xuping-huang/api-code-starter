@@ -9,7 +9,8 @@
   "keywords": [],
   "scripts": {
     "js": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=eslint,jwt,jsondb,javascript&&ts-node src/main.ts",
-    "swagger": "set DEBUG=code:param&&set CONFIG_ENV=challengsV5.yml&&set NODE_ENV=development&&ts-node src/main.ts",
+    "dynamo-js": "set DEBUG=code:generator&&set NODE_ENV=development&&set CODE_ENV=eslint,jwt,aws,dynamo,javascript&&ts-node src/main.ts",
+    "swagger": "set DEBUG=code:generator&&set CONFIG_ENV=challengsV5.yml&&set NODE_ENV=development&&ts-node src/main.ts",
     "describe": "npm-scripts-info",
     "build:main": "tsc -p tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json",

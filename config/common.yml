@@ -18,7 +18,7 @@ defaults: &defaults # default use json-db,express,javascript
       isExpress: true
       isKoa: false
     db:
-      name: challenge
+      name: DynamoDB
       isJsonDB: false
       isMongoDB: false
       isNeo4j: false
@@ -42,6 +42,7 @@ defaults: &defaults # default use json-db,express,javascript
       needTwilio: false
       needAws: false
       needGootleText2Speech: false
+      needErrorEmail: false
     lint:
       isAribnbBase: false
       isESlingStandard: false
@@ -91,6 +92,7 @@ defaults: &defaults # default use json-db,express,javascript
       json-file-db: false
       mongoose: false
       neo4j-driver: false
+      aws-sdk: false
     express:
       express-status-monitor: false # monitor express status
       compression: true # compress http response & request
@@ -107,6 +109,10 @@ defaults: &defaults # default use json-db,express,javascript
       uuid: true
       swagger-jsdoc: false
       debug: true
+      bluebird: false
+      merge-deep: true
+      pagination: true
+      hasha: true
     spring:
       spring-fox: false
       otp-aerogera: false
@@ -234,6 +240,12 @@ dynamo:
     db:
       name: DynamoDB
       isDynamoDB: true
+  dependencies:
+    db:
+      aws-sdk: true
+    other:
+      bluebird: true
+      merge-deep: true
 mysql:
   projectStyle:
     db:

@@ -1,0 +1,206 @@
+const AWS = require('aws-sdk')
+const merge = require('merge-deep')
+const config = require('../config/config')
+const { hashCode } = require('./common')
+
+AWS.config.setPromisesDependency(require('bluebird'))
+
+if (config.db.endpoint) {
+  AWS.config.update({
+    region: config.db.region,
+    endpoint: config.db.endpoint
+  })
+} else {
+  AWS.config.update({
+    region: config.db.region
+  })
+}
+
+class DynamoItem {
+  constructor (param) {
+    this.param = param || {}
+  }
+
+  table (tableName) {
+    return new DynamoItem(merge(this.param, { TableName: tableName }))
+  }
+
+  index (indexName) {
+    return new DynamoItem(merge(this.param, { IndexName: indexName }))
+  }
+
+  countOnly (fieldName) {
+    return new DynamoItem(merge(this.param, {
+      FilterExpression: `#name = :a and #name = :b`,
+      ProjectionExpression: '#name',
+      ExpressionAttributeNames: {
+        '#name': fieldName
+      },
+      ExpressionAttributeValues: {
+        ':a': 'a',
+        ':b': 'b'
+      }
+    }))
+  }
+
+  and () {
+    const orginFilter = this.param.FilterExpression
+    if (!orginFilter) return new DynamoItem(this.param)
+    let opt = {
+      FilterExpression: orginFilter + ' AND '
+    }
+    return new DynamoItem(merge(this.param, opt))
+  }
+
+  or () {
+    const orginFilter = this.param.FilterExpression
+    if (!orginFilter) return new DynamoItem(this.param)
+    let opt = {
+      FilterExpression: orginFilter + ' OR '
+    }
+    return new DynamoItem(merge(this.param, opt))
+  }
+
+  contains (fieldName, valueObj) {
+    let filter = this.getFilter(`contains(#${fieldName}, :${fieldName}Value)`)
+    let opt = this.getFilterOpt(filter, fieldName, valueObj)
+    return new DynamoItem(merge(this.param, opt))
+  }
+
+  equalFind (fieldName, valueObj) {
+    let filter = this.getFilter(`#${fieldName} = :${fieldName}Value`)
+    let opt = this.getFilterOpt(filter, fieldName, valueObj)
+    return new DynamoItem(merge(this.param, opt))
+  }
+
+  between (fieldName, startValue, endValue) {
+    let filter = this.getFilter(`#${fieldName} between :${fieldName}StartValue and :${fieldName}EndValue`)
+    let opt = {
+      FilterExpression: filter,
+      ExpressionAttributeNames: {},
+      ExpressionAttributeValues: {}
+    }
+
+    opt.ExpressionAttributeNames[`#${fieldName}`] = fieldName
+    opt.ExpressionAttributeValues[`:${fieldName}StartValue`] = startValue
+    opt.ExpressionAttributeValues[`:${fieldName}EndValue`] = endValue
+    return new DynamoItem(merge(this.param, opt))
+  }
+
+  greaterEqual (fieldName, valueObj) {
+    let filter = this.getFilter(`#${fieldName} >= :${fieldName}Value`)
+    let opt = this.getFilterOpt(filter, fieldName, valueObj)
+    return new DynamoItem(merge(this.param, opt))
+  }
+
+  lessEqual (fieldName, valueObj) {
+    let filter = this.getFilter(`#${fieldName} <= :${fieldName}Value`)
+    let opt = this.getFilterOpt(filter, fieldName, valueObj)
+    return new DynamoItem(merge(this.param, opt))
+  }
+
+  getFilter (filter) {
+    if (this.param.FilterExpression) {
+      return this.param.FilterExpression + ' ' + filter
+    }
+    return filter
+  }
+
+  getFilterOpt (filter, fieldName, valueObj) {
+    let opt = {
+      FilterExpression: filter,
+      ExpressionAttributeNames: {},
+      ExpressionAttributeValues: {}
+    }
+
+    opt.ExpressionAttributeNames[`#${fieldName}`] = fieldName
+    opt.ExpressionAttributeValues[`:${fieldName}Value`] = valueObj
+    return opt
+  }
+
+  projectionAppend (fields) {
+    let proj = this.param.ProjectionExpression || ''
+    if (proj.length > 0) proj = proj + ','
+    proj = proj + fields.join(',')
+
+    return new DynamoItem(merge(this.param, {
+      ProjectionExpression: proj
+    }))
+  }
+
+  projectionAll () {
+    let op = merge({}, this.param)
+    delete op.ProjectionExpression
+    return new DynamoItem(op)
+  }
+
+  item (itemObj) {
+    return new DynamoItem(merge(this.param, {
+      Item: itemObj
+    }))
+  }
+
+  key (keyObj) {
+    return new DynamoItem(merge(this.param, {
+      Key: keyObj
+    }))
+  }
+
+  limit (max) {
+    return new DynamoItem(merge(this.param, {
+      Limit: max
+    }))
+  }
+
+  startKey (key) {
+    return new DynamoItem(merge(this.param, {
+      ExclusiveStartKey: key
+    }))
+  }
+
+  transcationUpdate (option) {
+    if (!this.param.TransactItems) {
+      return new DynamoItem(merge(this.param, {
+        TransactItems: [
+          { Update: option }
+        ]
+      }))
+    } else {
+      let newParam = merge({}, this.param)
+      newParam.TransactItems.push({ Update: option })
+      return new DynamoItem(newParam)
+    }
+  }
+
+  hasFilter () {
+    return !!this.param.FilterExpression
+  }
+
+  cleanLimit () {
+    let data = merge({}, this.param)
+    delete data.Limit
+    delete data.ExclusiveStartKey
+    return new DynamoItem(data)
+  }
+
+  option () {
+    return merge({}, this.param)
+  }
+}
+
+exports.DynamoItem = DynamoItem
+
+exports.DynamoDb = new AWS.DynamoDB.DocumentClient()
+
+exports.getPartitionKey = function (prefix, str) {
+  const partitionNo = hashCode(str) % config.db.lookupPartitionMax
+  return `${prefix}:${partitionNo}`
+}
+
+exports.getAllPartitionKey = function (prefix) {
+  const keys = []
+  for (let i = 0; i < config.db.lookupPartitionMax; i++) {
+    keys.push(`${prefix}:${i}`)
+  }
+  return keys
+}

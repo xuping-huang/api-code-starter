@@ -17,10 +17,16 @@ services:
     command:
       /mongo-seed/import.sh
   {{/projectStyle.db.isMongoDB}}
+  {{#projectStyle.db.isDynamoDB}}
+  dynamodb:
+    image: amazon/dynamodb-local
+    ports:
+    - "8000:8000"
+  {{/projectStyle.db.isDynamoDB}}
   web:
     build: .
     ports:
-    - "80:80"
+    - "3000:3000"
     environment:
     # web connect to the db in the mongo service
     {{#projectStyle.db.isMongoDB}}
@@ -30,8 +36,15 @@ services:
     links:
     - mongo
     {{/projectStyle.db.isMongoDB}}
+    {{#projectStyle.db.isDynamoDB}}
+    depends_on:
+    - dynamodb
+    links:
+    - dynamodb
+    {{/projectStyle.db.isDynamoDB}}
     volumes:
     # map current dir to docker machine dir: /starter
     - .:/starter
     # create a volumes /starter/node_modules in docker machine only
     - /starter/node_modules
+version: '3'

@@ -25,35 +25,13 @@ class ExtendableError extends Error {
  * Class representing an Internal Server error.
  * @extends ExtendableError
  */
-class DBError extends ExtendableError {
-  /**
-   * Creates an Internal Server error.
-   */
-  constructor (err, httpCode = httpStatus.INTERNAL_SERVER_ERROR) {
-    if (err.message) {
-      super(err.message, httpCode, false)
-    } else {
-      super('an error happened in db', httpCode, false)
-    }
-    {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.bunyan}}
-    logger.error(err)
-    {{/dependencies.logger.bunyan}}
-    {{/apiStyle.log.needLog}}
-  }
-}
-
-/**
- * Class representing an Internal Server error.
- * @extends ExtendableError
- */
 class InternalServerError extends ExtendableError {
   /**
    * Creates an Internal Server error.
    */
   constructor (message = config.response.err.internalServerError,
     httpCode = httpStatus.INTERNAL_SERVER_ERROR) {
-    super(message, httpCode, false)
+    super(message, httpCode)
     {{#apiStyle.log.needLog}}
     {{#dependencies.logger.bunyan}}
     logger.error(message)
@@ -67,7 +45,7 @@ class AuthenticateError extends ExtendableError {
    * Creates an authenticate fail error.
    */
   constructor (message = config.response.err.unauthenticated, httpCode = httpStatus.UNAUTHORIZED) {
-    super(message, httpCode, false)
+    super(message, httpCode)
     {{#apiStyle.log.needLog}}
     {{#dependencies.logger.bunyan}}
     logger.error(message)
@@ -81,47 +59,12 @@ class BadRequestError extends ExtendableError {
    * Creates an bad request error.
    */
   constructor (message = config.response.err.badRequest, httpCode = httpStatus.BAD_REQUEST) {
-    super(message, httpCode, false)
+    super(message, httpCode)
     {{#apiStyle.log.needLog}}
     {{#dependencies.logger.bunyan}}
     logger.error(message)
     {{/dependencies.logger.bunyan}}
     {{/apiStyle.log.needLog}}
-  }
-}
-
-class RequestValidationError extends ExtendableError {
-  /**
-   * Creates an bad request error.
-   */
-  constructor (errors, httpCode = httpStatus.BAD_REQUEST) {
-    super('Validation failed', httpCode, false)
-    this.details = errors
-    {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.bunyan}}
-    logger.error(errors)
-    {{/dependencies.logger.bunyan}}
-    {{/apiStyle.log.needLog}}
-  }
-}
-
-class JoiValidationError extends ExtendableError {
-  /**
-   * Creates an bad request error.
-   * TODO: multi joi error combin to message
-   */
-  constructor (err, httpCode = httpStatus.BAD_REQUEST) {
-    super('Validation failed', httpCode, false)
-    this.message = 'Joi validation failed'
-    if (err) {
-      // this.details = err.details
-      // this._object = err._object
-      {{#apiStyle.log.needLog}}
-      {{#dependencies.logger.bunyan}}
-      logger.error(err)
-      {{/dependencies.logger.bunyan}}
-      {{/apiStyle.log.needLog}}
-    }
   }
 }
 
@@ -130,7 +73,7 @@ class NotFoundError extends ExtendableError {
    * Creates an bad request error.
    */
   constructor (message = config.response.err.notFound, httpCode = httpStatus.NOT_FOUND) {
-    super(message, httpCode, false)
+    super(message, httpCode)
     {{#apiStyle.log.needLog}}
     {{#dependencies.logger.bunyan}}
     logger.error(message)
@@ -138,12 +81,22 @@ class NotFoundError extends ExtendableError {
     {{/apiStyle.log.needLog}}
   }
 }
+
+class EntityExistError extends ExtendableError {
+  constructor (message) {
+    super(message, httpStatus.BAD_REQUEST)
+    {{#apiStyle.log.needLog}}
+    {{#dependencies.logger.bunyan}}
+    logger.error(message)
+    {{/dependencies.logger.bunyan}}
+    {{/apiStyle.log.needLog}}
+  }
+}
+
 module.exports = {
   AuthenticateError,
   BadRequestError,
   InternalServerError,
   NotFoundError,
-  RequestValidationError,
-  JoiValidationError,
-  DBError
+  EntityExistError
 }
