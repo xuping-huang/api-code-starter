@@ -9,9 +9,15 @@ const logger = require('../lib/logger')
 const config = require('../config/config')
 
 /**
+ * Parent class for error
  * @extends Error
  */
 class ExtendableError extends Error {
+  /**
+   * Init error
+   * @param {string} message - error message
+   * @param {integer} status - error status http code
+   */
   constructor (message, status) {
     super(message)
     this.error = message
@@ -28,6 +34,8 @@ class ExtendableError extends Error {
 class InternalServerError extends ExtendableError {
   /**
    * Creates an Internal Server error.
+   * @param {string} message - error message
+   * @param {integer} status - error status http code
    */
   constructor (message = config.response.err.internalServerError,
     httpCode = httpStatus.INTERNAL_SERVER_ERROR) {
@@ -40,9 +48,15 @@ class InternalServerError extends ExtendableError {
   }
 }
 
+/**
+ * Class representing an authenticate error.
+ * @extends ExtendableError
+ */
 class AuthenticateError extends ExtendableError {
   /**
    * Creates an authenticate fail error.
+   * @param {string} message - error message
+   * @param {integer} status - error status http code
    */
   constructor (message = config.response.err.unauthenticated, httpCode = httpStatus.UNAUTHORIZED) {
     super(message, httpCode)
@@ -54,9 +68,15 @@ class AuthenticateError extends ExtendableError {
   }
 }
 
+/**
+ * Class representing a bad request error.
+ * @extends ExtendableError
+ */
 class BadRequestError extends ExtendableError {
   /**
    * Creates an bad request error.
+   * @param {string} message - error message
+   * @param {integer} status - error status http code
    */
   constructor (message = config.response.err.badRequest, httpCode = httpStatus.BAD_REQUEST) {
     super(message, httpCode)
@@ -68,9 +88,15 @@ class BadRequestError extends ExtendableError {
   }
 }
 
+/**
+ * Class representing a object not found error.
+ * @extends ExtendableError
+ */
 class NotFoundError extends ExtendableError {
   /**
    * Creates an bad request error.
+   * @param {string} message - error message
+   * @param {integer} status - error status http code
    */
   constructor (message = config.response.err.notFound, httpCode = httpStatus.NOT_FOUND) {
     super(message, httpCode)
@@ -81,8 +107,16 @@ class NotFoundError extends ExtendableError {
     {{/apiStyle.log.needLog}}
   }
 }
-
+/**
+ * Class representing a entity had exist error.
+ * @extends ExtendableError
+ */
 class EntityExistError extends ExtendableError {
+  /**
+   * Creates an bad request error.
+   * @param {string} message - error message
+   * @param {integer} status - error status http code
+   */
   constructor (message) {
     super(message, httpStatus.BAD_REQUEST)
     {{#apiStyle.log.needLog}}

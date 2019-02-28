@@ -3,12 +3,20 @@ const config = require('../config/config')
 
 const isCriticalError = error => error.isCritical
 
+/**
+ * Send e-mail for critical error
+ * @param {Error} error - error object
+ */
 const sendMailIfCritical = (error) => {
   if (isCriticalError(error)) {
     // TODO: send mail
   }
 }
 
+/**
+ * Save critical error to message queue
+ * @param {Error} error - error object
+ */
 const saveQueueIfCritical = (error) => {
   if (isCriticalError(error)) {
     // TODO: save error log to queue
@@ -18,6 +26,10 @@ const saveQueueIfCritical = (error) => {
 const sendMailToAdminIfCritical = promisify(sendMailIfCritical)
 const saveInOpsQueueIfCritical = promisify(saveQueueIfCritical)
 
+/**
+ * Actions associated with the error
+ * @param {Error} error - error object
+ */
 exports.handleError = async (error) => {
   if (config.env === 'development') {
     console.error(error)

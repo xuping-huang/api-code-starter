@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const { AuthenticateError } = require('../lib/app-error')
 /**
  * Return member info packaged at jwt sign
+ * @param {object} req - the request info
  */
 function getUserInfoFromToken (req) {
   const auth = req.get(config.jwt.headerName)
@@ -16,6 +17,7 @@ function getUserInfoFromToken (req) {
 
 /**
  * Get integer hash value for string
+ * @param {string} str - the string convert to hash number
  */
 function hashCode (str) {
   let hash = 0

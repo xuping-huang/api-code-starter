@@ -24,7 +24,8 @@ module.exports = morgan('combined', {
 {{#dependencies.logger.bunyan}}
 
 /**
- * @param {Object} config Logger configuration
+ * Return logger object
+ * @param {Object} config - Logger configuration
  */
 module.exports = (config) => {
   const bunyanConfig = []

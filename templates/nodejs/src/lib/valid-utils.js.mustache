@@ -32,7 +32,8 @@ const RegexDef = {
 
 /**
  * Validate the enum value
- * @param {*} value Which step is in the quote updating
+ * @param {string,number} value - the value to check
+ * @param {array} enums - list of valid enumeration values
  */
 const checkEnumValue = (value, enums) => {
   if (!value) return false
@@ -44,7 +45,8 @@ const checkEnumValue = (value, enums) => {
 
 /**
  * Validate Id property
- * @param {*} obj validate target object
+ * @param {object} obj - validate target object
+ * @param {string} idProp - the id property of the obj
  */
 const checkId = (obj, idProp) => {
   {{#dependencies.validate.joi}}
@@ -60,7 +62,8 @@ const checkId = (obj, idProp) => {
 }
 
 /**
- * validate role is admin
+ * Validate role is admin
+ * @param {string} role - the role name
  */
 const checkAdmin = (role) => {
   if (role !== 'admin') {
