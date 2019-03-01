@@ -88,6 +88,8 @@ defaults: &defaults # default use json-db,express,javascript
     secure:
       bcrypt-nodejs: false
       crypto: false
+      http: true
+      https: true
     db:
       json-file-db: false
       mongoose: false

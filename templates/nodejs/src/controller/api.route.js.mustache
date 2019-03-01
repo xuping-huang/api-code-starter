@@ -1,0 +1,30 @@
+const server = require('express')
+const jwt = require('jsonwebtoken')
+const expressJwt = require('express-jwt')
+
+const config = require('../config/config')
+
+const router = new server.Router()
+
+/**
+ * Return token for userid
+ */
+router.get('/auth/login/:userId', async (req, res, next) => {
+  /** ignore validate because this api just for test easily */
+  const { userId } = req.params
+  const { role } = req.query
+
+  const token = jwt.sign({
+    userId,
+    role
+  }, config.jwt.secretKey, {
+    expiresIn: config.jwt.expired
+  })
+  return res.json({
+    token,
+    userId,
+    role
+  })
+})
+
+module.exports = router

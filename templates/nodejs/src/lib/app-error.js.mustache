@@ -89,6 +89,26 @@ class BadRequestError extends ExtendableError {
 }
 
 /**
+ * Class representing a Joi validate error.
+ * @extends ExtendableError
+ */
+class JoiError extends ExtendableError {
+  /**
+   * Creates an bad request error.
+   * @param {string} message - error message
+   * @param {integer} status - error status http code
+   */
+  constructor (err) {
+    super(err.message, httpStatus.BAD_REQUEST)
+    {{#apiStyle.log.needLog}}
+    {{#dependencies.logger.bunyan}}
+    logger.error(message)
+    {{/dependencies.logger.bunyan}}
+    {{/apiStyle.log.needLog}}
+  }
+}
+
+/**
  * Class representing a object not found error.
  * @extends ExtendableError
  */
@@ -132,5 +152,6 @@ module.exports = {
   BadRequestError,
   InternalServerError,
   NotFoundError,
+  JoiError,
   EntityExistError
 }

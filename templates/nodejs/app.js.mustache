@@ -4,14 +4,14 @@ const debug = require('debug')('api:app')
 const mongoose = require('mongoose')
 const { inspect } = require('util')
 {{/dependencies.db.mongoose}}
-{{^dependencies.logger.bunyan}}
-const config = require('./src/config/config')
-{{/dependencies.logger.bunyan}}
 {{/projectStyle.db.isMongoDB}}
+const https = require('https')
+const http = require('http')
+const fs = require('fs')
 const { app } = require('./app-middleware')
+const config = require('./src/config/config')
 {{#apiStyle.log.needLog}}
 {{#dependencies.logger.bunyan}}
-const config = require('./src/config/config')
 const log = require('./src/lib/logger')
 
 const logger = log(config.logger)
@@ -49,18 +49,18 @@ if (config.isDebug) {
 }
 {{/dependencies.db.mongoose}}
 {{/projectStyle.db.isMongoDB}}
+const options = {
+  key: fs.readFileSync('cert/privatekey.pem'),
+  cert: fs.readFileSync('cert/certificate.pem')
+}
 /**
  * Start server.
  */
-app.listen(app.get('port'), () => {
-  {{#dependencies.logger.morgan}}
-  console.log('App is running at http://localhost:%d in %s mode', app.get('port'), app.get('env'))
-  console.log('  Press CTRL-C to stop\n')
-  {{/dependencies.logger.morgan}}
-  {{#dependencies.logger.bunyan}}
-  logger.info('App is running at http://localhost:%d in %s mode', app.get('port'), app.get('env'))
-  logger.info('  Press CTRL-C to stop\n')
-  {{/dependencies.logger.bunyan}}
-})
+http.createServer(app).listen(config.port)
+https.createServer(options, app).listen(config.securePort)
+console.log('App is running at http://localhost:%d in %s mode', config.port, config.env)
+console.log('Secure app is running at https://localhost:%d in %s mode', config.securePort, config.env)
+console.log('  Press CTRL-C to stop\n')
+
 
 module.exports = app
