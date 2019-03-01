@@ -34,6 +34,7 @@ const RegexDef = {
  * Validate the enum value
  * @param {string,number} value - the value to check
  * @param {array} enums - list of valid enumeration values
+ * @return {boolean} whether the value belongs to the enums list
  */
 const checkEnumValue = (value, enums) => {
   if (!value) return false
@@ -47,6 +48,7 @@ const checkEnumValue = (value, enums) => {
  * Validate Id property
  * @param {object} obj - validate target object
  * @param {string} idProp - the id property of the obj
+ * @return {boolean} whether the id format is ok
  */
 const checkId = (obj, idProp) => {
   {{#dependencies.validate.joi}}
@@ -64,6 +66,7 @@ const checkId = (obj, idProp) => {
 /**
  * Validate role is admin
  * @param {string} role - the role name
+ * @return {boolean} whether the user is an administrator role
  */
 const checkAdmin = (role) => {
   if (role !== 'admin') {

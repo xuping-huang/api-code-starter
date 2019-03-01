@@ -32,6 +32,7 @@ class DynamoItem {
   /**
    * Set dynamo db table name
    * @param {string} tableName - the table name
+   * @return {DynamoItem} a copy of an DynamoItem that combines the TableName property
    */
   table (tableName) {
     return new DynamoItem(merge(this.param, { TableName: tableName }))
@@ -41,6 +42,7 @@ class DynamoItem {
   /**
    * Set dynamo db table index name
    * @param {string} indexName - the index name
+   * @return {DynamoItem} a copy of an DynamoItem that combines IndexName property
    */
   index (indexName) {
     return new DynamoItem(merge(this.param, { IndexName: indexName }))
@@ -49,6 +51,7 @@ class DynamoItem {
   /**
    * Set count only condition with the specified field
    * @param {string} fieldName - the field name
+   * @return {DynamoItem} a copy of an DynamoItem that only return ScanCount
    */
   countOnly (fieldName) {
     return new DynamoItem(merge(this.param, {
@@ -66,6 +69,7 @@ class DynamoItem {
 
   /**
    * Add and conj for filter expression
+   * @return {DynamoItem} a copy of an DynamoItem that combines AND in filter expression
    * /
   and () {
     const orginFilter = this.param.FilterExpression
@@ -78,6 +82,7 @@ class DynamoItem {
 
   /**
    * Add or conj for filter expression
+   * @return {DynamoItem} a copy of an DynamoItem that combines OR in filter expression
    * /
   or () {
     const orginFilter = this.param.FilterExpression
@@ -92,6 +97,7 @@ class DynamoItem {
    * Add contains condition for filter expression
    * @param {string} fieldName - the field to use
    * @param {*} valueObj - the value to use
+   * @return {DynamoItem} a copy of an DynamoItem that combines the field contains filter
    */
   contains (fieldName, valueObj) {
     let filter = this.getFilter(`contains(#${fieldName}, :${fieldName}Value)`)
@@ -103,16 +109,19 @@ class DynamoItem {
    * Add equal condition for filter expression
    * @param {string} fieldName - the field to use
    * @param {*} valueObj - the value to use
+   * @return {DynamoItem} a copy of an DynamoItem that combines the field equal filter
    */
   equalFind (fieldName, valueObj) {
     let filter = this.getFilter(`#${fieldName} = :${fieldName}Value`)
     let opt = this.getFilterOpt(filter, fieldName, valueObj)
     return new DynamoItem(merge(this.param, opt))
   }
+
   /**
    * Add between condition for filter expression
    * @param {string} fieldName - the field to use
    * @param {*} valueObj - the value to use
+   * @return {DynamoItem} a copy of an DynamoItem that combines the field between two bound values
    */
   between (fieldName, startValue, endValue) {
     let filter = this.getFilter(`#${fieldName} between :${fieldName}StartValue and :${fieldName}EndValue`)
@@ -127,10 +136,12 @@ class DynamoItem {
     opt.ExpressionAttributeValues[`:${fieldName}EndValue`] = endValue
     return new DynamoItem(merge(this.param, opt))
   }
+
   /**
    * Add greater equal condition for filter expression
    * @param {string} fieldName - the field to use
    * @param {*} valueObj - the value to use
+   * @return {DynamoItem} a copy of an DynamoItem that combines the field greater and equal specify value filter
    */
   greaterEqual (fieldName, valueObj) {
     let filter = this.getFilter(`#${fieldName} >= :${fieldName}Value`)
@@ -141,15 +152,18 @@ class DynamoItem {
    * Add less equal condition for filter expression
    * @param {string} fieldName - the field to use
    * @param {*} valueObj - the value to use
+   * @return {DynamoItem} a copy of an DynamoItem that combines the field less and equal specify value filter
    */
   lessEqual (fieldName, valueObj) {
     let filter = this.getFilter(`#${fieldName} <= :${fieldName}Value`)
     let opt = this.getFilterOpt(filter, fieldName, valueObj)
     return new DynamoItem(merge(this.param, opt))
   }
+
   /**
    * Append filter expression
    * @param {string} filter - the filter expression to append
+   * @return {string} the filtler expression content
    */
   getFilter (filter) {
     if (this.param.FilterExpression) {
@@ -157,11 +171,13 @@ class DynamoItem {
     }
     return filter
   }
+
   /**
    * Get filter expression with specify field and value
    * @param {string} filter - the filter expression to set
    * @param {string} fieldName - the field name used in filter
    * @param {*} valueObj - the value used in filter
+   * @return {object} the filter object with attribute names and values
    */
   getFilterOpt (filter, fieldName, valueObj) {
     let opt = {
@@ -178,6 +194,7 @@ class DynamoItem {
   /**
    * Append fields need to be returned
    * @param {array} fields - the field name list
+   * @return {DynamoItem} a copy of an DynamoItem that appended the fields in the projection
    */
   projectionAppend (fields) {
     let proj = this.param.ProjectionExpression || ''
@@ -191,6 +208,7 @@ class DynamoItem {
 
   /**
    * Return all fields
+   * @return {DynamoItem} a copy of an DynamoItem that removed projection constraints
    */
   projectionAll () {
     let op = merge({}, this.param)
@@ -201,42 +219,51 @@ class DynamoItem {
   /**
    * Append dynamo operate item
    * @param {object} itemObj - the item to be appended
+   * @return {DynamoItem} a copy of an DynamoItem that combines the itemObj
    */
   item (itemObj) {
     return new DynamoItem(merge(this.param, {
       Item: itemObj
     }))
   }
+
   /**
    * Set key info for dynamo client item
    * @param {object} keyObj - the key obj
+   * @return {DynamoItem} a copy of an DynamoItem that combines the Key property
    */
   key (keyObj) {
     return new DynamoItem(merge(this.param, {
       Key: keyObj
     }))
   }
+
   /**
    * Set return records limit
    * @param {integer} max - the max number of return records
+   * @return {DynamoItem} a copy of an DynamoItem that limit the total number of return records
    */
   limit (max) {
     return new DynamoItem(merge(this.param, {
       Limit: max
     }))
   }
+
   /**
    * Set record search start key
    * @param {object} key - the search start position after the obj
+   * @return {DynamoItem} a copy of an DynamoItem that set ExclusiveStartKey value
    */
   startKey (key) {
     return new DynamoItem(merge(this.param, {
       ExclusiveStartKey: key
     }))
   }
+
   /**
    * Append update option for Transcation
    * @param {object} option - the option to update
+   * @return {DynamoItem} a copy of an DynamoItem that appended option to TransactItems
    */
   transcationUpdate (option) {
     if (!this.param.TransactItems) {
@@ -251,8 +278,10 @@ class DynamoItem {
       return new DynamoItem(newParam)
     }
   }
+
   /**
    * Whether there are filtering conditions
+   * @return {boolean} whether exist filter expression
    */
   hasFilter () {
     return !!this.param.FilterExpression
@@ -260,6 +289,7 @@ class DynamoItem {
 
   /**
    * Clean Limit info in dynamo client option
+   * @return {DynamoItem} a copy of an DynamoItem that remove the ExclusiveStartKey property
    */
   cleanLimit () {
     let data = merge({}, this.param)
@@ -270,6 +300,7 @@ class DynamoItem {
 
   /**
    * Return dynamo client option info
+   * @return {object} the param in DynamoItem
    */
   option () {
     return merge({}, this.param)

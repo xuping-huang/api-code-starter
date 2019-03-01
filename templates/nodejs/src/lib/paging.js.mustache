@@ -5,9 +5,10 @@ const pagination = require('pagination')
  * Format page link with the params
  * @param {object} req - the request object
  * @param {integer} page - the page number
- * @param {string} lastEvaluatedKey - returnned LastEvaluatedKey in search
+ * @param {string} lastEvaluatedKey - returned LastEvaluatedKey in search
+ * @return {string} formatted page link
  */
-function formatPageLink (req, page, lastEvaluatedKey) {
+const formatPageLink = (req, page, lastEvaluatedKey) => {
   let url = `${req.protocol}://${req.hostname}${req.originalUrl}`
   url = url.replace(/([^\w])page=\d+/gi, `$1page=${page}`)
   if (url.match(/([^\w])lastEvaluatedKey=[^&]*/gi)) {
@@ -29,8 +30,9 @@ function formatPageLink (req, page, lastEvaluatedKey) {
  * @param {string} lastEvaluatedKey - returnned LastEvaluatedKey in search
  * @param {integer} current - current page number
  * @param {integer} pageCount - total page number
+ * @return {string} formatted link info
  */
-function formatLink (req, lastEvaluatedKey, current, pageCount) {
+const formatLink = (req, lastEvaluatedKey, current, pageCount) => {
   let link = ''
   if (current === 1) {
     // first page
@@ -61,8 +63,9 @@ function formatLink (req, lastEvaluatedKey, current, pageCount) {
  * Format page info for pagination headers
  * @param {object} req - the request object
  * @param {object} data - the data object to handle
+ * @return {object} formatted page object
  */
-exports.formatPagingData = function (req, data) {
+exports.formatPagingData = (req, data) => {
   let page = data.Page
   if ((page - 1) * data.PerPage >= data.Total) {
     page = 1

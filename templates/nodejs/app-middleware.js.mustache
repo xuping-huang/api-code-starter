@@ -60,16 +60,7 @@ app.use(helmet())
 {{/dependencies.express.helmet}}
 {{#dependencies.express.express-validator}}
 
-/**
- * When validate fail, error response will like below:
-  {
-    "errors": [{
-      "location": "body",
-      "msg": "Invalid value",
-      "param": "username"
-    }]
-  }
- */
+// express validate
 app.use(expressValidator())
 {{/dependencies.express.express-validator}}
 {{#dependencies.express.cors}}
@@ -88,7 +79,7 @@ app.use(morgan('combined', { stream: logger.stream }))
 {{/apiStyle.log.needLog}}
 
 // Mount all routes on a root path
-app.use('', router)
+app.use('{{{project.basePath}}}', router)
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -106,7 +97,7 @@ if (config.isDebug) {
     logger.error(`${status} - ${err.code} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
     logger.error(req)
     logger.debug(err.stack)
-    res.status(status).send(err.message)
+    res.status(status).send({ message: err.message })
   })
 } else {
   app.use(async (err, req, res, next) => {
@@ -116,7 +107,7 @@ if (config.isDebug) {
     const status = err.status || httpStatus.INTERNAL_SERVER_ERROR
     logger.error(`${status} - ${err.code} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
     logger.error(req)
-    res.status(status).send(err.message)
+    res.status(status).send({ message: err.message })
   })
 }
 
