@@ -1,11 +1,7 @@
 {{#dependencies.other.http-status}}
 const httpStatus = require('http-status')
 {{/dependencies.other.http-status}}
-{{#apiStyle.log.needLog}}
-{{#dependencies.logger.bunyan}}
-const logger = require('../lib/logger')
-{{/dependencies.logger.bunyan}}
-{{/apiStyle.log.needLog}}
+
 const config = require('../config/config')
 
 /**
@@ -40,11 +36,6 @@ class InternalServerError extends ExtendableError {
   constructor (message = config.response.err.internalServerError,
     httpCode = httpStatus.INTERNAL_SERVER_ERROR) {
     super(message, httpCode)
-    {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.bunyan}}
-    logger.error(message)
-    {{/dependencies.logger.bunyan}}
-    {{/apiStyle.log.needLog}}
   }
 }
 
@@ -60,11 +51,6 @@ class AuthenticateError extends ExtendableError {
    */
   constructor (message = config.response.err.unauthenticated, httpCode = httpStatus.UNAUTHORIZED) {
     super(message, httpCode)
-    {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.bunyan}}
-    logger.error(message)
-    {{/dependencies.logger.bunyan}}
-    {{/apiStyle.log.needLog}}
   }
 }
 
@@ -80,11 +66,6 @@ class BadRequestError extends ExtendableError {
    */
   constructor (message = config.response.err.badRequest, httpCode = httpStatus.BAD_REQUEST) {
     super(message, httpCode)
-    {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.bunyan}}
-    logger.error(message)
-    {{/dependencies.logger.bunyan}}
-    {{/apiStyle.log.needLog}}
   }
 }
 
@@ -100,11 +81,6 @@ class JoiError extends ExtendableError {
    */
   constructor (err) {
     super(err.message, httpStatus.BAD_REQUEST)
-    {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.bunyan}}
-    logger.error(message)
-    {{/dependencies.logger.bunyan}}
-    {{/apiStyle.log.needLog}}
   }
 }
 
@@ -120,11 +96,6 @@ class NotFoundError extends ExtendableError {
    */
   constructor (message = config.response.err.notFound, httpCode = httpStatus.NOT_FOUND) {
     super(message, httpCode)
-    {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.bunyan}}
-    logger.error(message)
-    {{/dependencies.logger.bunyan}}
-    {{/apiStyle.log.needLog}}
   }
 }
 /**
@@ -139,11 +110,6 @@ class EntityExistError extends ExtendableError {
    */
   constructor (message) {
     super(message, httpStatus.BAD_REQUEST)
-    {{#apiStyle.log.needLog}}
-    {{#dependencies.logger.bunyan}}
-    logger.error(message)
-    {{/dependencies.logger.bunyan}}
-    {{/apiStyle.log.needLog}}
   }
 }
 
