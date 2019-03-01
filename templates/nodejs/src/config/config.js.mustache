@@ -45,6 +45,7 @@ const envVarsSchema = Joi.object({
   {{#dependencies.logger.morgan}}
   LOGGER_DIR: JStrOptional.default('log'),
   LOGGER_FILE: JStrOptional.default('access.log'),
+  LOGGER_ERR_FILE: JStrOptional.default('error.log'),
   LOGGER_INTERVAL: Joi.string().default('10d'),
   LOGGER_SIZE: Joi.string().default('100M'),
   LOGGER_COMPRESS_FORMAT: Joi.string().default('gzip'),
@@ -115,7 +116,9 @@ const config = {
     interval: envVars.LOGGER_INTERVAL,
     size: envVars.LOGGER_SIZE,
     compressFormat: envVars.LOGGER_COMPRESS_FORMAT,
-    filename: envVars.LOGGER_FILE
+    filename: envVars.LOGGER_FILE,
+    errorFile: envVars.LOGGER_ERR_FILE,
+    level: envVars.IS_DEBUG ? 'debug' : 'info'
   },
   {{/dependencies.logger.morgan}}
   {{#dependencies.logger.bunyan}}

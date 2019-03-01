@@ -21,15 +21,13 @@ const httpStatus = require('http-status')
 {{#dependencies.express.helmet}}
 const helmet = require('helmet')
 {{/dependencies.express.helmet}}
-{{#dependencies.other.error-handle}}
-const devErrorHandler = require('errorhandler')
-{{/dependencies.other.error-handle}}
 
 const config = require('./src/config/config')
 {{#apiStyle.log.needLog}}
 {{#dependencies.logger.morgan}}
-const logger = require('./src/lib/logger')
+const morgan = require('morgan')
 {{/dependencies.logger.morgan}}
+const logger = require('./src/lib/logger')
 {{/apiStyle.log.needLog}}
 const { NotFoundError } = require('./src/lib/app-error')
 {{#apiStyle.other.needErrorEmail}}
@@ -85,7 +83,7 @@ app.disable('x-powered-by')
 {{#apiStyle.log.needLog}}
 
 {{#dependencies.logger.morgan}}
-app.use(logger)
+app.use(morgan('combined', { stream: logger.stream }))
 {{/dependencies.logger.morgan}}
 {{/apiStyle.log.needLog}}
 
@@ -98,29 +96,27 @@ app.use((req, res, next) => {
   return next(err)
 })
 
-{{#dependencies.other.error-handle}}
 // Error Handler.
 if (config.isDebug) {
-  app.use(devErrorHandler())
+  app.use(async (err, req, res, next) => {
+    {{#apiStyle.other.errorHandler}}
+    errorHandler.handleError(err)
+    {{/apiStyle.other.errorHandler}}
+    const status = err.status || httpStatus.INTERNAL_SERVER_ERROR
+    logger.error(`${status} - ${err.code} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
+    logger.debug(err.stack)
+    res.status(status).send(err.message)
+  })
 } else {
   app.use(async (err, req, res, next) => {
     {{#apiStyle.other.errorHandler}}
-    await errorHandler.handleError(err)
+    errorHandler.handleError(err)
     {{/apiStyle.other.errorHandler}}
     const status = err.status || httpStatus.INTERNAL_SERVER_ERROR
+    logger.error(`${status} - ${err.code} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
     res.status(status).send(err.message)
   })
 }
-{{/dependencies.other.error-handle}}
-{{^dependencies.other.error-handle}}
-app.use(async (err, req, res, next) => {
-  {{#apiStyle.other.errorHandler}}
-  await errorHandler.handleError(err)
-  {{/apiStyle.other.errorHandler}}
-  const status = err.status || httpStatus.INTERNAL_SERVER_ERROR
-  res.status(status).send(err.message)
-})
-{{/dependencies.other.error-handle}}
 
 exports.app = app
 {{/projectStyle.server.isExpress}}

@@ -1,26 +1,46 @@
-const path = require('path')
-const fs = require('fs')
-{{#dependencies.logger.morgan}}
-const morgan = require('morgan')
-{{/dependencies.logger.morgan}}
+{{#dependencies.logger.winston}}
+const { createLogger, transports } = require('winston')
+{{/dependencies.logger.winston}}
 {{#dependencies.logger.bunyan}}
 const bunyan = require('bunyan')
 {{/dependencies.logger.bunyan}}
-
 const config = require('../config/config')
-/**
- * create logger direcotory
- */
-const logDirectory = path.join(__dirname, '../../', config.logger.dirname)
-if (!fs.existsSync(logDirectory)) fs.mkdirSync(logDirectory)
-{{#dependencies.logger.morgan}}
+{{#dependencies.logger.winston}}
 
-module.exports = morgan('combined', {
-  stream: fs.createWriteStream(path.join(logDirectory, config.logger.filename), {
-    flags: 'a'
-  })
+const logger = createLogger({
+  transports: [
+    new transports.Console({
+      timestamp: true,
+      level: config.logger.level,
+      handleExceptions: true,
+      json: true,
+      colorize: true
+    }),
+    new transports.File({
+      filename: config.logger.errorFile,
+      dirname: config.logger.dirname,
+      level: 'error',
+      timestamp: true
+    }),
+    new transports.File({
+      level: config.logger.level,
+      filename: config.logger.filename,
+      dirname: config.logger.dirname,
+      maxsize: config.logger.size,
+      timestamp: true
+    })
+  ],
+  exitOnError: false
 })
-{{/dependencies.logger.morgan}}
+
+logger.stream = {
+  write: function (message, encoding) {
+    logger.info(message)
+  }
+}
+
+module.exports = logger
+{{/dependencies.logger.winston}}
 {{#dependencies.logger.bunyan}}
 
 /**
