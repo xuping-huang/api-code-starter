@@ -1,7 +1,10 @@
-{{#dependencies.express.express-jwt}}
-const config = require('../config/config')
+{{#apiStyle.other.needJwt}}
 const jwt = require('jsonwebtoken')
+{{/apiStyle.other.needJwt}}
 const { AuthenticateError } = require('../lib/app-error')
+const config = require('../config/config')
+{{#apiStyle.other.needJwt}}
+
 /**
  * Return member info packaged at jwt sign
  * @param {object} req - the request info
@@ -14,7 +17,7 @@ const getUserInfoFromToken = (req) => {
   const jwtObj = jwt.verify(auth.substr(7), config.jwt.secretKey)
   return Promise.resolve(jwtObj)
 }
-{{/dependencies.express.express-jwt}}
+{{/apiStyle.other.needJwt}}
 
 /**
  * Get integer hash value for string
@@ -33,8 +36,8 @@ const hashCode = (str) => {
 }
 
 module.exports = {
-  {{#dependencies.express.express-jwt}}
+  {{#apiStyle.other.needJwt}}
   getUserInfoFromToken,
-  {{/dependencies.express.express-jwt}}
+  {{/apiStyle.other.needJwt}}
   hashCode
 }

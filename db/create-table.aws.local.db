@@ -1,0 +1,7 @@
+aws dynamodb create-table ^
+	--table-name Setting ^
+	--attribute-definitions AttributeName=id,AttributeType=S AttributeName=lowerName,AttributeType=S ^
+	--key-schema AttributeName=id,KeyType=HASH ^
+	--provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 ^
+  --global-secondary-indexes IndexName=lowerNameIndex,KeySchema=[{AttributeName=lowerName,KeyType=HASH}],Projection={ProjectionType=INCLUDE,NonKeyAttributes=[name]},ProvisionedThroughput={ReadCapacityUnits=5,WriteCapacityUnits=5} ^
+	--endpoint-url http://localhost:8000

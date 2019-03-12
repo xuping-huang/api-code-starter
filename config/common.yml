@@ -38,6 +38,7 @@ defaults: &defaults # default use json-db,express,javascript
       needHealthCheck: false
       needOpt: false
       needJwt: false
+      needM2M: false
       needPasswordBcrypt: false
       needTwilio: false
       needAws: false
@@ -91,6 +92,9 @@ defaults: &defaults # default use json-db,express,javascript
       crypto: false
       http: true
       https: true
+      jwks-rsa: false
+      express-jwt-authz: false
+      jsonwebtoken: false
     db:
       json-file-db: false
       mongoose: false
@@ -181,6 +185,18 @@ jwt:
   dependencies:
     express:
       express-jwt: true
+    secure:
+      jsonwebtoken: true
+m2m:
+  apiStyle:
+    other:
+      needM2M: true
+  dependencies:
+    express:
+      express-jwt: true
+    secure:
+      express-jwt-authz: true
+      jwks-rsa: true
 secure:
   apiStyle:
     needPasswordBcrypt: true

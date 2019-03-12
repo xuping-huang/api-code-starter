@@ -116,8 +116,16 @@
     {{#projectStyle.server.isExpress}}
     {{#dependencies.express.express-jwt}}
     "express-jwt": "^5.3.1",
-    "jsonwebtoken": "^8.4.0",
     {{/dependencies.express.express-jwt}}
+    {{#dependencies.secure.jsonwebtoken}}
+    "jsonwebtoken": "^8.4.0",
+    {{/dependencies.secure.jsonwebtoken}}
+    {{#dependencies.secure.express-jwt-authz}}
+    "express-jwt-authz": "^2.1.1",
+    {{/dependencies.secure.express-jwt-authz}}
+    {{#dependencies.secure.jwks-rsa}}
+    "jwks-rsa": "^1.4.0",
+    {{/dependencies.secure.jwks-rsa}}
     {{/projectStyle.server.isExpress}}
     {{/apiStyle.other.needJwt}}
     {{#projectStyle.db.isMongoDB}}

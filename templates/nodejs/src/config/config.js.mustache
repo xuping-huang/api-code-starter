@@ -41,6 +41,10 @@ const envVarsSchema = Joi.object({
   JWT_HEADER_NAME: JStrOptional.default('Authorization'),
   JWT_EXPIRED: JStrOptional.default('10d'),
   {{/apiStyle.other.needJwt}}
+  {{#apiStyle.other.needM2M}}
+  AUTH0_DOMAIN: JStrRequired,
+  AUTH0_AUDIENCE: JStrRequired,
+  {{/apiStyle.other.needM2M}}
   {{#apiStyle.log.needLog}}
   {{#dependencies.logger.morgan}}
   LOGGER_DIR: JStrOptional.default('log'),
@@ -102,13 +106,17 @@ const config = {
   port: envVars.PORT,
   securePort: envVars.SECURE_PORT,
   isDebug: envVars.IS_DEBUG,
-  {{#apiStyle.other.needJwt}}
   jwt: {
+  {{#apiStyle.other.needJwt}}
     secretKey: envVars.JWT_SECRET_KEY,
     headerName: envVars.JWT_HEADER_NAME,
     expired: envVars.JWT_EXPIRED
-  },
   {{/apiStyle.other.needJwt}}
+  {{#apiStyle.other.needM2M}}
+    auth0Domain: envVars.AUTH0_DOMAIN,
+    auth0Audience: envVars.AUTH0_AUDIENCE
+  {{/apiStyle.other.needM2M}}
+  },
   {{#apiStyle.log.needLog}}
   {{#dependencies.logger.morgan}}
   logger: {
