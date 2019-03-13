@@ -1,7 +1,7 @@
-{{^apiStyle.other.needJwt}}
+{{^projectStyle.auth.needJwt}}
 // not implement, remove need
-{{/apiStyle.other.needJwt}}
-{{#apiStyle.other.needJwt}}
+{{/projectStyle.auth.needJwt}}
+{{#projectStyle.auth.needJwt}}
 package com.{{project.name}}.app.lib.security;
 
 import com.{{project.name}}.app.model.db.User;
@@ -38,4 +38,4 @@ public final class JwtUserFactory {
     }
 }
 
-{{/apiStyle.other.needJwt}}
+{{/projectStyle.auth.needJwt}}

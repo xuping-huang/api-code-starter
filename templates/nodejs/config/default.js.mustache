@@ -1,0 +1,32 @@
+/**
+ * The configuration file.
+ */
+
+module.exports = {
+  LOG_LEVEL: process.env.LOG_LEVEL || 'debug',
+  PORT: process.env.PORT || 3000,
+  SECURE_PORT: process.env.SECURE_PORT || 443,
+  {{#projectStyle.auth.needJwt}}
+  AUTH_SECRET: process.env.AUTH_SECRET || 'This_value_should_be_changed_in_product_environment',
+  VALID_ISSUERS: process.env.VALID_ISSUERS || '["https://api.topcoder-dev.com", "https://api.topcoder.com", "https://topcoder-dev.auth0.com/"]',
+  {{/projectStyle.auth.needJwt}}
+  {{#projectStyle.auth.needM2M}}
+  {{/projectStyle.auth.needM2M}}
+  {{#projectStyle.db.isDynamoDB}}
+  DYNAMODB: {
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || 'FAKE_ACCESS_KEY',
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || 'FAKE_SECRET_ACCESS_KEY',
+    AWS_REGION: process.env.AWS_REGION || 'ap-southeast-1',
+    IS_LOCAL: process.env.IS_LOCAL || true,
+    AWS_DYNAMODB_ENDPOINT: process.env.AWS_DYNAMODB_ENDPOINT || 'http://localhost:8000'
+  },
+  {{/projectStyle.db.isDynamoDB}}
+  PAGE: {
+    PERPAGE_DEFAULT: process.env.PERPAGE_DEFAULT || 20,
+    PER_PAGE_MAX: process.env.PERPAGE_MAX || 200
+  },
+  LOG: {
+    LOGGER_DIR: process.env.LOGGER_DIR || 'log',
+    LOGGER_FILE: process.env.LOGGER_FILE || 'access.log'
+  }
+}

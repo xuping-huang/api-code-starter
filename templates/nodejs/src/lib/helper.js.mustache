@@ -1,0 +1,206 @@
+/**
+ * This file defines helper methods
+ */
+
+const _ = require('lodash')
+const pagination = require('pagination')
+
+/**
+ * Wrap all functions of object to express middleware
+ * @param {Object|Function|Array} obj the object to be wrapped
+ * @returns {Object|Array} the wrapped object
+ */
+const wrapMiddleware = (obj) => {
+  if (_.isArray(obj)) {
+    return obj.map(wrapMiddleware)
+  }
+  if (_.isFunction(obj)) {
+    if (obj.constructor.name === 'AsyncFunction') {
+      return function (req, res, next) {
+        obj(req, res, next).catch(next)
+      }
+    }
+    return obj
+  }
+  _.each(obj, (value, key) => {
+    obj[key] = wrapMiddleware(value)
+  })
+  return obj
+}
+module.exports.wrapMiddleware = wrapMiddleware
+
+/**
+ * Check if exists.
+ * @param {Array} source the array in which to search for the term
+ * @param {Array | String} term the term to search
+ * @returns {Boolean} the check result
+ */
+module.exports.checkIfExists = (source, term) => {
+    let terms
+
+  if (!_.isArray(source)) {
+    throw new Error('Source argument should be an array')
+  }
+
+  source = source.map(s => s.toLowerCase())
+
+  if (_.isString(term)) {
+    terms = term.toLowerCase().split(' ')
+  } else if (_.isArray(term)) {
+    terms = term.map(t => t.toLowerCase())
+  } else {
+    throw new Error('Term argument should be either a string or an array')
+  }
+
+  const intersection = source.filter(v => terms.includes(v))
+  if (intersection && intersection.length > 0){
+    return true
+  }
+
+  return false
+}
+
+/**
+ * Check if the user has admin role
+ * @param {Object} authUser the user
+ * @returns {Boolean} check result
+ */
+module.exports.hasAdminRole = (authUser) => {
+  for (let i = 0; i < authUser.roles.length; i++) {
+    if (authUser.roles[i].toLowerCase() === constants.UserRoles.Admin.toLowerCase()) {
+      return true
+    }
+  }
+  return false
+}
+
+/**
+ * Get link for a given page.
+ * @param {Object} req the HTTP request
+ * @param {Number} page the page number
+ * @returns {String} link for the page
+ */
+module.exports.getPageLink = (req, page) => {
+  const q = _.assignIn({}, req.query, { page })
+  return `${req.protocol}://${req.get('Host')}${req.baseUrl}${req.path}?${querystring.stringify(q)}`
+}
+
+/**
+ * Set HTTP response headers from result.
+ * @param {Object} req the HTTP request
+ * @param {Object} res the HTTP response
+ * @param {Object} result the operation result
+ */
+module.exports.setResHeaders = (req, res, result) => {
+  const totalPages = Math.ceil(result.total / result.perPage)
+  if (result.page < totalPages) {
+    res.set('X-Next-Page', result.page + 1)
+  }
+  res.set('X-Page', result.page)
+  res.set('X-Per-Page', result.perPage)
+  res.set('X-Total', result.total)
+  res.set('X-Total-Pages', totalPages)
+  // set Link header
+  if (totalPages > 0) {
+    let link = `<${getPageLink(req, 1)}>; rel="first", <${getPageLink(req, totalPages)}>; rel="last"`
+    if (result.page > 1) {
+      link += `, <${getPageLink(req, result.page - 1)}>; rel="prev"`
+    }
+    if (result.page < totalPages) {
+      link += `, <${getPageLink(req, result.page + 1)}>; rel="next"`
+    }
+    res.set('Link', link)
+  }
+}
+
+/**
+ * Format page link with the params
+ * @param {object} req - the request object
+ * @param {integer} page - the page number
+ * @param {string} lastEvaluatedKey - returned LastEvaluatedKey in search
+ * @return {string} formatted page link
+ */
+const formatPageLink = (req, page, lastEvaluatedKey) => {
+  let url = `${req.protocol}://${req.hostname}${req.originalUrl}`
+  url = url.replace(/([^\w])page=\d+/gi, `$1page=${page}`)
+  if (url.match(/([^\w])lastEvaluatedKey=[^&]*/gi)) {
+    url = url.replace(/([^\w])lastEvaluatedKey=[^&]*/gi, '')
+  }
+  if (lastEvaluatedKey) {
+    if (url.match(/\?/gi)) {
+      url = url + `&lastEvaluatedKey=${JSON.stringify(lastEvaluatedKey)}`
+    } else {
+      url = url + `lastEvaluatedKey=${JSON.stringify(lastEvaluatedKey)}`
+    }
+  }
+  return url
+}
+
+/**
+ * Return Link info in pagination headers
+ * @param {object} req - the request object
+ * @param {string} lastEvaluatedKey - returnned LastEvaluatedKey in search
+ * @param {integer} current - current page number
+ * @param {integer} pageCount - total page number
+ * @return {string} formatted link info
+ */
+const formatLink = (req, lastEvaluatedKey, current, pageCount) => {
+  let link = ''
+  if (current === 1) {
+    // first page
+    if (current === pageCount) {
+      // only one page
+      link = ''
+    } else {
+      if (pageCount === 2) {
+        link = `<${formatPageLink(req, current + 1, lastEvaluatedKey)}>; rel="next"`
+      } else {
+        link = `<${formatPageLink(req, current + 1, lastEvaluatedKey)}>; rel="next", <${formatPageLink(req, pageCount)}>; rel="last"`
+      }
+    }
+  } else {
+    if (current === pageCount) {
+      // last page
+      link = `<${formatPageLink(req, 1)}>; rel="first", <${formatPageLink(req, current - 1)}>; rel="prev"`
+    } else {
+      // mid page
+      link = `<${formatPageLink(req, 1)}>; rel="first", <${formatPageLink(req, current - 1)}>; rel="prev", <${formatPageLink(req, current + 1, lastEvaluatedKey)}>; rel="next", <${formatPageLink(req, pageCount)}>; rel="last"`
+    }
+  }
+
+  return link
+}
+
+/**
+ * Format page info for pagination headers
+ * @param {object} req - the request object
+ * @param {object} data - the data object to handle
+ * @return {object} formatted page object
+ */
+exports.formatPagingData = (req, data) => {
+  let page = data.Page
+  if ((page - 1) * data.PerPage >= data.Total) {
+    page = 1
+  }
+  const paginator = new pagination.SearchPaginator({
+    prelink: '/',
+    current: page,
+    rowsPerPage: data.PerPage,
+    totalResult: data.Total
+  })
+
+  const pageData = paginator.getPaginationData()
+
+  return {
+    Items: data.Items,
+    Headers: {
+      'X-Next-Page': pageData.next,
+      'X-Page': pageData.current,
+      'X-Per-Page': data.PerPage,
+      'X-Prev-Page': pageData.previous,
+      'X-Total': pageData.totalResult,
+      'X-Total-Pages': pageData.pageCount,
+      'Link': formatLink(req, data.LastEvaluatedKey, pageData.current, pageData.pageCount)
+    }
+  }
+}

@@ -24,38 +24,42 @@ defaults: &defaults # default use json-db,express,javascript
       isNeo4j: false
       isMysql: false
       isDynamoDB: false
-    deploy:
-      useDocker: true
-      useHeroku: false
-    maven:
-      groupId: ''
-  apiStyle:
     log:
       needLog: true
-      needTest: false
+    test:
+      unitTest: false
+      e2eTest: false
       needCoverage: false
-    other:
-      needHealthCheck: false
-      needOpt: false
+    auth:
       needJwt: false
       needM2M: false
       needPasswordBcrypt: false
-      needTwilio: false
-      needAws: false
-      needGootleText2Speech: false
-      needErrorEmail: false
     lint:
       isAribnbBase: false
       isESlingStandard: false
       isESlintRecommended: false
+    deploy:
+      useDocker: true
+      useHeroku: false
     doc:
+      needOpt: false
       isSwaggerDoc: false
+    maven:
+      groupId: ''
+    other:
+      needHealthCheck: false
+      needTwilio: false
+      needAws: false
+      needGootleText2Speech: false
+      needErrorEmail: false
+      needHttps: false
     date:
       isThreeTenbp: false
       isJava8: false
       isJoda: false
   devDependencies:
     codeStyle:
+      standard: true
       tslint: false
       eslint: false
       eslint-config-airbnb-base: false
@@ -69,25 +73,33 @@ defaults: &defaults # default use json-db,express,javascript
     test:
       chai: false
       mocha: false
+      mocha-prepare: false
+      nock: false
       sinon: false
-      supertest: false
+      sinon-chai: false
       sinon-mongoose: false
+      supertest: false
       jest: false
+      aws-sdk-mock: false
+      chai-as-promised: false
+      chai-http: false
     coverage:
       nyc: false # Istanbul's state of the art command line interface
     other:
       nodemon: true # if false, becareful devDependencies has a extend comma
   dependencies:
     config:
-      dotenv: true # load .env
+      config: true # load .env
     logger:
       winston: true
       morgan: true # logger
       bunyan: false
+      get-parameter-names: true
     validate:
       joi: true
       validator: false
     secure:
+      auth0-js: true
       bcrypt-nodejs: false
       crypto: false
       http: true
@@ -95,63 +107,75 @@ defaults: &defaults # default use json-db,express,javascript
       jwks-rsa: false
       express-jwt-authz: false
       jsonwebtoken: false
+      express-jwt: false
+      tc-core-library-js: true
     db:
       json-file-db: false
       mongoose: false
       neo4j-driver: false
       aws-sdk: false
     express:
+      express: true
       express-status-monitor: false # monitor express status
       compression: true # compress http response & request
       body-parser: true
-      express-validator: true
+      express-validator: false
       cors: true # enable CORS with various options.
       helmet: true # secure Express/Connect apps with various HTTP headers
-      lusca: true # Web application security middleware.
-      express-jwt: false
       multer: true # Middleware for handling `multipart/form-data
+      express-fileupload: false
+      express-interceptor: true
     other:
       http-status: true
       uuid: true
       swagger-jsdoc: false
       debug: true
-      bluebird: false
+      bluebird: true
       merge-deep: true
       pagination: true
-      hasha: true
+      lodash: true
+      config: true
     spring:
       spring-fox: false
       otp-aerogera: false
 test:
-  apiStyle:
-    log:
-      needTest: true
+  projectStyle:
+    test:
+      unitTest: false
+      e2eTest: false
   devDependencies:
     test:
       chai: true
       mocha: true
+      mocha-prepare: true
+      nock: true
       sinon: true
+      sinon-chai: true
+      sinon-mongoose: true
       supertest: true
-      sinon-mongoose: false
-      jest: true
+      aws-sdk-mock: true
+      chai-as-promised: true
+      chai-http: true
 cov:
-  apiStyle:
-    log:
-      needCoverage: false
+  projectStyle:
+    test:
+      needCoverage: true
   devDependencies:
     coverage:
       nyc: true
 eslint:
-  apiStyle:
+  projectStyle:
     lint:
       isESlingStandard: true
   devDependencies:
     codeStyle:
       eslint: true
+      eslint-config-airbnb-base: true
+      eslint-chai-friendly: true
       babel-eslint: true
       eslint-config-standard: true
-      eslint-plugin-import: true
       eslint-plugin-node: true
+      eslint-plugin-import: true
       eslint-plugin-promise: true
       eslint-plugin-standard: true
 tslint:
@@ -166,7 +190,7 @@ heroku:
       useDocker: false
       useHeroku: true
 swgdoc:
-  apiStyle:
+  projectStyle:
     doc:
       isSwaggerDoc: true
   dependencies:
@@ -179,17 +203,16 @@ koa:
       isExpress: false
       isKoa: true
 jwt:
-  apiStyle:
-    other:
+  projectStyle:
+    auth:
       needJwt: true
   dependencies:
-    express:
-      express-jwt: true
     secure:
+      express-jwt: true
       jsonwebtoken: true
 m2m:
-  apiStyle:
-    other:
+  projectStyle:
+    auth:
       needM2M: true
   dependencies:
     express:
@@ -198,26 +221,30 @@ m2m:
       express-jwt-authz: true
       jwks-rsa: true
 secure:
-  apiStyle:
+  projectStyle:
     needPasswordBcrypt: true
   dependencies:
     secure:
       bcrypt-nodejs: true
       crypto: true
 aws:
-  apiStyle:
+  projectStyle:
     other:
       needAws: true
   dependencies:
-    other:
+    db:
       aws-sdk: true
 twilio:
-  apiStyle:
+  projectStyle:
     other:
       needTwilio: true
   dependencies:
     other:
       twilio: true
+https:
+  projectStyle:
+    other:
+      needHttps: true
 #### DB
 jsondb:
   projectStyle:
@@ -282,9 +309,13 @@ spring:
       isJava: true
     maven:
       groupId: com.autocognita
-  apiStyle:
     log:
       needLog: true
-    other:
+    auth:
       needJwt: true
       needPasswordBcrypt: true
+## other
+file:
+  dependencies:
+    express:
+      express-fileupload: true

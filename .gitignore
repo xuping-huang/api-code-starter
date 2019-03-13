@@ -10,3 +10,4 @@ coverage
 *.log
 
 yarn.lock
+0001-fix-swagger-doc.patch

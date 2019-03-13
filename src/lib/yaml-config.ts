@@ -4,10 +4,11 @@ import merge from 'merge-deep';
 import Debug from 'debug';
 import {nameMatchs} from './param-match';
 
-const debug = Debug('code:config');
+const debug = Debug('code:generator');
 
 function read(filename: fs.PathLike): any {
   const buffer = fs.readFileSync(filename);
+  debug(`config file: ${buffer.toString()}`)
   const data = yaml.load(buffer.toString());
 
   return data;

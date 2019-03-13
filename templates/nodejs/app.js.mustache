@@ -1,22 +1,25 @@
+/**
+ * The application entry point
+ */
+
+require('./src/bootstrap')
+const http = require('http')
+const config = require('config')
+{{#dependencies.secure.https}}
+const https = require('https')
+const fs = require('fs')
+const options = {
+  key: fs.readFileSync('cert/privatekey.pem'),
+  cert: fs.readFileSync('cert/certificate.pem')
+}
+{{/dependencies.secure.https}}
 {{#projectStyle.db.isMongoDB}}
-const debug = require('debug')('api:app')
 {{#dependencies.db.mongoose}}
 const mongoose = require('mongoose')
 const { inspect } = require('util')
 {{/dependencies.db.mongoose}}
 {{/projectStyle.db.isMongoDB}}
-const https = require('https')
-const http = require('http')
-const fs = require('fs')
 const { app } = require('./app-middleware')
-const config = require('./src/config/config')
-{{#apiStyle.log.needLog}}
-{{#dependencies.logger.bunyan}}
-const log = require('./src/lib/logger')
-
-const logger = log(config.logger)
-{{/dependencies.logger.bunyan}}
-{{/apiStyle.log.needLog}}
 {{#projectStyle.db.isMongoDB}}
 {{#dependencies.db.mongoose}}
 
@@ -30,14 +33,8 @@ mongoose.connect(config.db.url, {
   keepAlive: 120
 })
 mongoose.connection.on('error', (err) => {
-  {{#dependencies.logger.morgan}}
   console.error(err)
   console.log('MongoDB connection error. Please make sure MongoDB is running.')
-  {{/dependencies.logger.morgan}}
-  {{#dependencies.logger.bunyan}}
-  logger.error(err)
-  logger.info('MongoDB connection error. Please make sure MongoDB is running.')
-  {{/dependencies.logger.bunyan}}
   process.exit()
 })
 
@@ -49,18 +46,16 @@ if (config.isDebug) {
 }
 {{/dependencies.db.mongoose}}
 {{/projectStyle.db.isMongoDB}}
-const options = {
-  key: fs.readFileSync('cert/privatekey.pem'),
-  cert: fs.readFileSync('cert/certificate.pem')
-}
+
 /**
  * Start server.
  */
-http.createServer(app).listen(config.port)
-https.createServer(options, app).listen(config.securePort)
-console.log('App is running at http://localhost:%d in %s mode', config.port, config.env)
-console.log('Secure app is running at https://localhost:%d in %s mode', config.securePort, config.env)
+http.createServer(app).listen(config.get('PORT'))
+console.log(`Server running on http://localhost:${config.get('PORT')}`)
+{{#dependencies.secure.https}}
+https.createServer(options, app).listen(config.get('SECURE_PORT'))
+console.log(`Secure server running on https://localhost:${config.get('SECURE_PORT')}`)
+{{/dependencies.secure.https}}
 console.log('  Press CTRL-C to stop\n')
-
 
 module.exports = app

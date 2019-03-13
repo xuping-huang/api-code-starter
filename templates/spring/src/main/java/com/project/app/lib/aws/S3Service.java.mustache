@@ -1,7 +1,7 @@
-{{^apiStyle.other.needAws}}
+{{^projectStyle.other.needAws}}
 // not implement, remove need
-{{/apiStyle.other.needAws}}
-{{#apiStyle.other.needAws}}
+{{/projectStyle.other.needAws}}
+{{#projectStyle.other.needAws}}
 package com.{{project.name}}.app.lib.aws;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -17,4 +17,4 @@ public interface S3Service {
     ObjectMetadata getObjectMetadata(String keyName);
 }
 
-{{/apiStyle.other.needAws}}
+{{/projectStyle.other.needAws}}

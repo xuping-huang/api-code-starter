@@ -1,5 +1,5 @@
 {
-  "extends": [{{#apiStyle.lint.isAribnbBase}}"airbnb-base"{{/apiStyle.lint.isAribnbBase}}{{#apiStyle.lint.isESlintRecommended}}"eslint:recommended"{{/apiStyle.lint.isESlintRecommended}}{{#apiStyle.lint.isESlingStandard}}"standard"{{/apiStyle.lint.isESlingStandard}}],
+  "extends": [{{#projectStyle.lint.isAribnbBase}}"airbnb-base"{{/projectStyle.lint.isAribnbBase}}{{#projectStyle.lint.isESlintRecommended}}"eslint:recommended"{{/projectStyle.lint.isESlintRecommended}}{{#projectStyle.lint.isESlingStandard}}"standard"{{/projectStyle.lint.isESlingStandard}}],
   "env": {
     "node": true,
     {{#devDependencies.test.mocha}}

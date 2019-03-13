@@ -1,12 +1,23 @@
-const express = require('express')
-const config = require('./src/config/config')
-const jwt = require('jsonwebtoken')
-const expressJwt = require('express-jwt')
-{{#dependencies.other.swagger-jsdoc}}
-const swaggerJSDoc = require('swagger-jsdoc')
-{{/dependencies.other.swagger-jsdoc}}
+/**
+ * Configure all routes for express app
+ */
 
-const router = express.Router() // eslint-disable-line new-cap
+{{#dependencies.other.lodash}}
+const _ = require('lodash')
+{{/dependencies.other.lodash}}
+{{#dependencies.other.config}}
+const config = require('config')
+{{/dependencies.other.config}}
+{{#dependencies.other.http-status}}
+const httpStatus = require('http-status')
+{{/dependencies.other.http-status}}
+{{#dependencies.secure.tc-core-library-js}}
+const authenticator = require('tc-core-library-js').middleware.jwtAuthenticator
+{{/dependencies.secure.tc-core-library-js}}
+
+const helper = require('./src/lib/helper')
+const error = require('./src/lib/app-error')
+const routes = require('./src/routes')
 {{#dependencies.other.swagger-jsdoc}}
 
 /**
@@ -30,7 +41,7 @@ const options = {
   // Path to the API docs
   // Note that this path is relative to the current directory from which the Node.js is ran,
   // not the application itself.
-  apis: ['./app-route.js', './src/controllers/*.js', './src/models/*.js'],
+  apis: ['./src/route.js', './src/controller/*.js', './src/model/*.js'],
 }
 
 /**
@@ -44,34 +55,76 @@ const options = {
 
 // Initialize swagger-jsdoc -> returns validated swagger spec in json format
 const swaggerSpec = swaggerJSDoc(options)
-
-// Serve swagger docs the way you like (Recommendation: swagger-tools)
-router.get('/swagger', (req, res) => {
-  res.setHeader('Content-Type', 'application/json')
-  res.send(swaggerSpec)
-})
 {{/dependencies.other.swagger-jsdoc}}
 
-
 /**
- * Return token for userid
+ * Configure all route for express app
+ * @param {Object} app - the express app
  */
-router.get('/auth/login/:userId', async (req, res, next) => {
-  /** ignore validate because this api just for test easily */
-  const { userId } = req.params
-  const { role } = req.query
+module.exports = (app) => {
+  _.each(routes, (verbs, path) => {
+    _.each(verbs, (params, verb) => {
+      const method = require(`./src/controller/${params.controller}`)[params.operation]; // eslint-disable-line
+      if (!method) {
+        throw new error.InternalServerError(`${params.operation} is undefined, for controller ${params.controller}`)
+      }
 
-  const token = jwt.sign({
-    userId,
-    role
-  }, config.jwt.secretKey, {
-    expiresIn: config.jwt.expired
-  })
-  return res.json({
-    token,
-    userId,
-    role
-  })
-})
+      const actions = [ (req, res, next) => {
+        req.signature = `${params.controller}#${params.operation}`
+        next()
+      }]
 
-module.exports = router
+      // add authenticator check if route has auth
+      if (params.auth) {
+        actions.push((req, res, next) => {
+          authenticator(_.pick(config, ['AUTH_SECRET', 'VALID_ISSUERS']))(req, res, next)
+        })
+        actions.push((req, res, next) => { // eslint-disable-line
+          if (req.authUser.isMachine) {
+            // M2M Token
+            if (!helper.checkIfExists(params.scopes, req.authUser.scopes)) {
+              next(new error.ForbiddenError())
+            } else {
+              next()
+            }
+          } else {
+            // User Token
+            if (req.authUser.roles) {
+              if (!helper.checkIfExists(params.roles, req.authUser.roles)) {
+                next(new error.ForbiddenError())
+              } else {
+                next()
+              }
+            } else {
+              next(new error.AuthenticateError())
+            }
+          }
+        })
+      }
+
+      actions.push(method)
+      app[verb](path, helper.wrapMiddleware(actions))
+    })
+  })
+  {{#dependencies.other.swagger-jsdoc}}
+
+  // Serve swagger docs the way you like (Recommendation: swagger-tools)
+  app.get('/swagger', (req, res) => {
+    res.setHeader('Content-Type', 'application/json')
+    res.send(swaggerSpec)
+  })
+  {{/dependencies.other.swagger-jsdoc}}
+
+  // Check if the route is not found or HTTP method is not supported
+  app.use('*', (req, res) => {
+    if (routes[req.baseUrl]) {
+      res.status(httpStatus.METHOD_NOT_ALLOWED).json({
+        message: 'The requested HTTP method is not supported.'
+      })
+    } else {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: 'The requested resource cannot be found.'
+      })
+    }
+  })
+}

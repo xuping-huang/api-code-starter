@@ -4,13 +4,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "{{project.name}}")
 public class AppConfiguration {
-    {{#apiStyle.other.needOpt}}
+    {{#projectStyle.doc.needOpt}}
     // otp code expired interval
     private int otpIntervalSeconds;
     // otp token secret
     private String otpSecret;
-    {{/apiStyle.other.needOpt}}
-    {{#apiStyle.other.needJwt}}
+    {{/projectStyle.doc.needOpt}}
+    {{#projectStyle.auth.needJwt}}
     // request token expired interval
     private int tokenIntervalMinutes;
     // request token secret
@@ -19,9 +19,9 @@ public class AppConfiguration {
     private String authHeader;
     // jwt header
     private String jwtHeader;
-    {{/apiStyle.other.needJwt}}
+    {{/projectStyle.auth.needJwt}}
 
-    {{#apiStyle.other.needOpt}}
+    {{#projectStyle.doc.needOpt}}
     public int getOtpIntervalSeconds() {
         return otpIntervalSeconds;
     }
@@ -37,9 +37,9 @@ public class AppConfiguration {
     public void setOtpSecret(String otpSecret) {
         this.otpSecret = otpSecret;
     }
-    {{/apiStyle.other.needOpt}}
+    {{/projectStyle.doc.needOpt}}
 
-    {{#apiStyle.other.needJwt}}
+    {{#projectStyle.auth.needJwt}}
     public int getTokenIntervalMinutes() {
         return tokenIntervalMinutes;
     }
@@ -71,5 +71,5 @@ public class AppConfiguration {
     public void setJwtHeader(String jwtHeader) {
         this.jwtHeader = jwtHeader;
     }
-    {{/apiStyle.other.needJwt}}
+    {{/projectStyle.auth.needJwt}}
 }

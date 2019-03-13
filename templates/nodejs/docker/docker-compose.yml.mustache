@@ -7,24 +7,32 @@ services:
     - "27017:27017"
     environment:
     - MONGO_INITDB_DATABASE=apiKitDb
-  mongo_seed:
+  mongo_cli:
     image: mongo:4.0
     links:
       - mongo
-    volumes:
-    - ./db:/mongo-seed
-    # use to import init data for mongo db
-    command:
-      /mongo-seed/import.sh
+    build:
+      context: ./
+      dockerfile: ./Mongo.Cli.Dockerfile
+    container_name: dynamodb-cli
   {{/projectStyle.db.isMongoDB}}
   {{#projectStyle.db.isDynamoDB}}
   dynamodb:
     image: amazon/dynamodb-local
     ports:
     - "8000:8000"
+  dynamodb_cli:
+    build:
+      context: ./
+      dockerfile: ./DynamoDB.Cli.Dockerfile
+    container_name: dynamodb-cli
+    links:
+      - dynamodb
   {{/projectStyle.db.isDynamoDB}}
   web:
-    build: .
+    build:
+      context: ./
+      dockerfile: ./Server.Dockerfile
     ports:
     - "3000:3000"
     environment:
@@ -43,8 +51,7 @@ services:
     - dynamodb
     {{/projectStyle.db.isDynamoDB}}
     volumes:
-    # map current dir to docker machine dir: /starter
-    - .:/starter
+    # map parent dir to docker machine dir: /starter
+    - ../:/starter
     # create a volumes /starter/node_modules in docker machine only
     - /starter/node_modules
-version: '3'

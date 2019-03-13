@@ -1,32 +1,30 @@
-{{#dependencies.logger.winston}}
-const { createLogger, transports } = require('winston')
-{{/dependencies.logger.winston}}
-{{#dependencies.logger.bunyan}}
-const bunyan = require('bunyan')
-{{/dependencies.logger.bunyan}}
-const config = require('../config/config')
-{{#dependencies.logger.winston}}
+/**
+ * This module contains the logger configuration.
+ */
+
+const _ = require('lodash')
+const Joi = require('joi')
+const config = require('config')
+const util = require('util')
+const getParams = require('get-parameter-names')
+const { createLogger, format, transports } = require('winston')
 
 const logger = createLogger({
   transports: [
     new transports.Console({
       timestamp: true,
-      level: config.logger.level,
+      level: config.LOG_LEVEL,
       handleExceptions: true,
       json: true,
-      colorize: true
+      format: format.combine(
+        format.colorize(),
+        format.simple()
+      )
     }),
     new transports.File({
-      filename: config.logger.errorFile,
-      dirname: config.logger.dirname,
-      level: 'error',
-      timestamp: true
-    }),
-    new transports.File({
-      level: config.logger.level,
-      filename: config.logger.filename,
-      dirname: config.logger.dirname,
-      maxsize: config.logger.size,
+      level: config.LOG_LEVEL,
+      filename: config.LOG.LOGGER_FILE,
+      dirname: config.LOG.LOGGER_DIR,
       timestamp: true
     })
   ],
@@ -34,44 +32,131 @@ const logger = createLogger({
 })
 
 logger.stream = {
-  write: (message, encoding) => {
+  write: (message) => {
     logger.info(message)
   }
 }
 
-module.exports = logger
-{{/dependencies.logger.winston}}
-{{#dependencies.logger.bunyan}}
+/**
+ * Log error details with signature
+ * @param err the error
+ * @param signature the signature
+ */
+logger.logFullError = (err, signature) => {
+  if (!err) {
+    return
+  }
+  if (signature) {
+    logger.error(`Error happened in ${signature}`)
+  }
+  logger.error(util.inspect(err))
+  if (!err.logged) {
+    logger.error(err.stack)
+    err.logged = true
+  }
+}
 
 /**
- * Return logger object
- * @param {Object} config - Logger configuration
+ * Remove invalid properties from the object and hide long arrays
+ * @param {Object} obj the object
+ * @returns {Object} the new object with removed properties
+ * @private
  */
-module.exports = (config) => {
-  const bunyanConfig = []
-  const levels = Object.keys(config.levels)
+const _sanitizeObject = (obj) => {
+  try {
+    return JSON.parse(JSON.stringify(obj, (name, value) => {
+      if (_.isArray(value) && value.length > 30) {
+        return `Array(${value.length})`
+      }
+      return value
+    }))
+  } catch (e) {
+    return obj
+  }
+}
 
-  levels.forEach((level) => {
-    const bunyanLevel = config.levels[level]
-    if (!bunyanLevel) return
+/**
+ * Convert array with arguments to object
+ * @param {Array} params the name of parameters
+ * @param {Array} arr the array with values
+ * @private
+ */
+const _combineObject = (params, arr) => {
+  const ret = {}
+  _.each(arr, (arg, i) => {
+    ret[params[i]] = arg
+  })
+  return ret
+}
 
-    if (level === 'debug' && config.level !== 'debug') return
+/**
+ * Decorate all functions of a service and log debug information if DEBUG is enabled
+ * @param {Object} service the service
+ */
+logger.decorateWithLogging = (service) => {
+  if (config.LOG_LEVEL !== 'debug') {
+    return
+  }
+  _.each(service, (method, name) => {
+    const params = method.params || getParams(method)
+    service[name] = async function () {
+      logger.debug(`ENTER ${name}`)
+      logger.debug('input arguments')
+      const args = Array.prototype.slice.call(arguments)
+      logger.debug(util.inspect(_sanitizeObject(_combineObject(params, args))))
+      try {
+        const result = await method.apply(this, arguments)
+        logger.debug(`EXIT ${name}`)
+        logger.debug('output arguments')
+        if (result !== null && result !== undefined) {
+          logger.debug(util.inspect(_sanitizeObject(result)))
+        }
+        return result
+      } catch (e) {
+        logger.logFullError(e, name)
+        throw e
+      }
+    }
+  })
+}
 
-    const logger = { level }
-
-    if (bunyanLevel === 'STDOUT') {
-      logger.stream = process.stdout
-    } else if (bunyanLevel === 'STDERR') {
-      logger.stream = process.stderr
-    } else if (bunyanLevel) {
-      logger.path = bunyanLevel
-    } else {
+/**
+ * Decorate all functions of a service and validate input values
+ * and replace input arguments with sanitized result form Joi
+ * Service method must have a `schema` property with Joi schema
+ * @param {Object} service the service
+ */
+logger.decorateWithValidators = function (service) {
+  _.each(service, (method, name) => {
+    if (!method.schema) {
       return
     }
+    const params = getParams(method)
+    service[name] = async function () {
+      const args = Array.prototype.slice.call(arguments)
+      const value = _combineObject(params, args)
+      const normalized = Joi.attempt(value, method.schema)
 
-    bunyanConfig.push(logger)
+      const newArgs = []
+      // Joi will normalize values
+      // for example string number '1' to 1
+      // if schema type is number
+      _.each(params, (param) => {
+        newArgs.push(normalized[param])
+      })
+      return method.apply(this, newArgs)
+    }
+    service[name].params = params
   })
-
-  return bunyan.createLogger({ name: config.name, streams: bunyanConfig })
 }
-{{/dependencies.logger.bunyan}}
+
+/**
+ * Apply logger and validation decorators
+ * @param {Object} service the service to wrap
+ */
+logger.buildService = (service) => {
+  logger.decorateWithValidators(service)
+  logger.decorateWithLogging(service)
+}
+
+module.exports = logger

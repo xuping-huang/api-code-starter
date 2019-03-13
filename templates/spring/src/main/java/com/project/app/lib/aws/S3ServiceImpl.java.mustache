@@ -1,7 +1,7 @@
-{{^apiStyle.other.needAws}}
+{{^projectStyle.other.needAws}}
 // not implement, remove need
-{{/apiStyle.other.needAws}}
-{{#apiStyle.other.needAws}}
+{{/projectStyle.other.needAws}}
+{{#projectStyle.other.needAws}}
 package com.{{project.name}}.app.lib.aws;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -72,4 +72,4 @@ public class S3ServiceImpl implements S3Service {
         return meta;
     }
 }
-{{/apiStyle.other.needAws}}
+{{/projectStyle.other.needAws}}

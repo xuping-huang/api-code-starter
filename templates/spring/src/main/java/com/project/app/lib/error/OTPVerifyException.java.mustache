@@ -1,7 +1,7 @@
-{{^apiStyle.other.needOpt}}
+{{^projectStyle.doc.needOpt}}
 // not implement, remove need
-{{/apiStyle.other.needOpt}}
-{{#apiStyle.other.needOpt}}
+{{/projectStyle.doc.needOpt}}
+{{#projectStyle.doc.needOpt}}
 package com.{{project.name}}.app.lib.error;
 
 import org.springframework.http.HttpStatus;
@@ -13,4 +13,4 @@ public class OTPVerifyException extends ExtensibleException {
     }
 }
 
-{{/apiStyle.other.needOpt}}
+{{/projectStyle.doc.needOpt}}

@@ -1,21 +1,21 @@
 package com.{{project.name}}.app;
 
 import com.{{project.name}}.app.config.AppConfiguration;
-{{#apiStyle.other.needAws}}
+{{#projectStyle.other.needAws}}
 import com.{{project.name}}.app.config.S3Config;
-{{/apiStyle.other.needAws}}
-{{#apiStyle.other.needGootleText2Speech}}
+{{/projectStyle.other.needAws}}
+{{#projectStyle.other.needGootleText2Speech}}
 import com.{{project.name}}.app.config.Text2SpeechConfig;
-{{/apiStyle.other.needGootleText2Speech}}
-{{#apiStyle.other.needTwilio}}
+{{/projectStyle.other.needGootleText2Speech}}
+{{#projectStyle.other.needTwilio}}
 import com.{{project.name}}.app.config.TwilioConfig;
-{{/apiStyle.other.needTwilio}}
+{{/projectStyle.other.needTwilio}}
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({AppConfiguration.class{{#apiStyle.other.needTwilio}}, TwilioConfig.class{{/apiStyle.other.needTwilio}}{{#apiStyle.other.needAws}}, S3Config.class{{/apiStyle.other.needAws}}{{#apiStyle.other.needGootleText2Speech}}, Text2SpeechConfig.class{{/apiStyle.other.needGootleText2Speech}}})
+@EnableConfigurationProperties({AppConfiguration.class{{#projectStyle.other.needTwilio}}, TwilioConfig.class{{/projectStyle.other.needTwilio}}{{#projectStyle.other.needAws}}, S3Config.class{{/projectStyle.other.needAws}}{{#projectStyle.other.needGootleText2Speech}}, Text2SpeechConfig.class{{/projectStyle.other.needGootleText2Speech}}})
 public class AppApplication {
 
 	public static void main(String[] args) {

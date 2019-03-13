@@ -15,7 +15,7 @@ import javax.validation.Valid;
 @Api(value = "security", description = "the security API")
 public interface SecurityApi {
 
-    {{#apiStyle.other.needOpt}}
+    {{#projectStyle.doc.needOpt}}
     @ApiOperation(value = "Verify OTP", nickname = "verifyOTPPost", notes = "This endpoint will be used to verify OTP ", response = OTPVerifyResponse.class, tags={  })
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Authentication/OTP verification response. ", response = OTPVerifyResponse.class),
@@ -29,7 +29,7 @@ public interface SecurityApi {
         method = RequestMethod.POST)
     ResponseEntity<OTPVerifyResponse> verifyOTP(@ApiParam(value = "An OTP verification request"  )  @Valid @RequestBody OTPVerifyBody body,
                                                 BindingResult bindingResult);
-    {{/apiStyle.other.needOpt}}
+    {{/projectStyle.doc.needOpt}}
 
     @ApiOperation(value = "Login", nickname = "loginPost", notes = "This endpoint will be used to perform login.the otpToken will be returned and the otpCode will send to user mobile by SMS (https://www.twilio.com/sms).  - if user not exist, backend should create new user - otpCode(4 digits string) and otpToken(uuid is fine) has the same expired time. ", response = LoginResponse.class, tags={  })
     @ApiResponses(value = {

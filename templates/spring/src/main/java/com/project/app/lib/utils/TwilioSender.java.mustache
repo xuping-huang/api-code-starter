@@ -1,7 +1,7 @@
-{{^apiStyle.other.needTwilio}}
+{{^projectStyle.other.needTwilio}}
 // not implement, remove need
-{{/apiStyle.other.needTwilio}}
-{{#apiStyle.other.needTwilio}}
+{{/projectStyle.other.needTwilio}}
+{{#projectStyle.other.needTwilio}}
 package com.{{project.name}}.app.lib.utils;
 
 
@@ -37,4 +37,4 @@ public class TwilioSender implements Runnable {
     }
 }
 
-{{/apiStyle.other.needTwilio}}
+{{/projectStyle.other.needTwilio}}

@@ -1,123 +1,43 @@
-{{#dependencies.other.http-status}}
+/**
+ * This file defines application errors
+ */
+
 const httpStatus = require('http-status')
-{{/dependencies.other.http-status}}
-
-const config = require('../config/config')
-
-/**
- * Parent class for error
- * @extends Error
- */
-class ExtendableError extends Error {
-  /**
-   * Init error
-   * @param {string} message - error message
-   * @param {integer} status - error status http code
-   */
-  constructor (message, status) {
-    super(message)
-    this.error = message
-    this.name = this.constructor.name
-    this.status = status
-    Error.captureStackTrace(this, this.constructor.name)
-  }
-}
+const { Response } = require('../constants')
+const util = require('util')
 
 /**
- * Class representing an Internal Server error.
- * @extends ExtendableError
+ * Helper function to create generic error object with http status code
+ * @param {String} name the error name
+ * @param {String} message the default error message
+ * @param {Number} statusCode the http status code
+ * @returns {Function} the error constructor
+ * @private
  */
-class InternalServerError extends ExtendableError {
+function createError (name, message, statusCode) {
   /**
-   * Creates an Internal Server error.
-   * @param {string} message - error message
-   * @param {integer} status - error status http code
+   * The error constructor
+   * @param {String} message the error message
+   * @param {String} [cause] the error cause
+   * @constructor
    */
-  constructor (message = config.response.err.internalServerError,
-    httpCode = httpStatus.INTERNAL_SERVER_ERROR) {
-    super(message, httpCode)
+  function ErrorCtor (msg) {
+    Error.call(this)
+    Error.captureStackTrace(this)
+    this.message = msg || message
+    this.httpStatus = statusCode
   }
-}
 
-/**
- * Class representing an authenticate error.
- * @extends ExtendableError
- */
-class AuthenticateError extends ExtendableError {
-  /**
-   * Creates an authenticate fail error.
-   * @param {string} message - error message
-   * @param {integer} status - error status http code
-   */
-  constructor (message = config.response.err.unauthenticated, httpCode = httpStatus.UNAUTHORIZED) {
-    super(message, httpCode)
-  }
-}
-
-/**
- * Class representing a bad request error.
- * @extends ExtendableError
- */
-class BadRequestError extends ExtendableError {
-  /**
-   * Creates an bad request error.
-   * @param {string} message - error message
-   * @param {integer} status - error status http code
-   */
-  constructor (message = config.response.err.badRequest, httpCode = httpStatus.BAD_REQUEST) {
-    super(message, httpCode)
-  }
-}
-
-/**
- * Class representing a Joi validate error.
- * @extends ExtendableError
- */
-class JoiError extends ExtendableError {
-  /**
-   * Creates an bad request error.
-   * @param {string} message - error message
-   * @param {integer} status - error status http code
-   */
-  constructor (err) {
-    super(err.message, httpStatus.BAD_REQUEST)
-  }
-}
-
-/**
- * Class representing a object not found error.
- * @extends ExtendableError
- */
-class NotFoundError extends ExtendableError {
-  /**
-   * Creates an bad request error.
-   * @param {string} message - error message
-   * @param {integer} status - error status http code
-   */
-  constructor (message = config.response.err.notFound, httpCode = httpStatus.NOT_FOUND) {
-    super(message, httpCode)
-  }
-}
-/**
- * Class representing a entity had exist error.
- * @extends ExtendableError
- */
-class EntityExistError extends ExtendableError {
-  /**
-   * Creates an bad request error.
-   * @param {string} message - error message
-   * @param {integer} status - error status http code
-   */
-  constructor (message) {
-    super(message, httpStatus.BAD_REQUEST)
-  }
+  util.inherits(ErrorCtor, Error)
+  ErrorCtor.prototype.name = name
+  return ErrorCtor
 }
 
 module.exports = {
-  AuthenticateError,
-  BadRequestError,
-  InternalServerError,
-  NotFoundError,
-  JoiError,
-  EntityExistError
+  UnauthorizedError: createError('UnauthorizedError', Response.NotAuthorized, httpStatus.UNAUTHORIZED),
+  ForbiddenError: createError('ForbiddenError', Response.Forbidden, httpStatus.FORBIDDEN),
+  BadRequestError: createError('BadRequestError', Response.BadRequest, httpStatus.BAD_REQUEST),
+  InternalServerError: createError('InternalServerError', Response.InternalServerError, httpStatus.INTERNAL_SERVER_ERROR),
+  NotFoundError: createError('NotFoundError', Response.NotFound, httpStatus.NOT_FOUND),
+  ConflictError: createError('ConflictError', Response.Conflict, httpStatus.CONFLICT)
 }

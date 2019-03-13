@@ -1,7 +1,7 @@
-{{^apiStyle.other.needJwt}}
+{{^projectStyle.auth.needJwt}}
 // not implement, remove need
-{{/apiStyle.other.needJwt}}
-{{#apiStyle.other.needJwt}}
+{{/projectStyle.auth.needJwt}}
+{{#projectStyle.auth.needJwt}}
 package com.{{project.name}}.app.lib.utils;
 
 import com.auth0.jwt.JWT;
@@ -36,7 +36,7 @@ public class JwtHelper {
             return false;
         }
     }
-    {{#apiStyle.other.needOpt}}
+    {{#projectStyle.doc.needOpt}}
 
     /**
      * Validate otp token
@@ -54,7 +54,7 @@ public class JwtHelper {
             return false;
         }
     }
-    {{/apiStyle.other.needOpt}}
+    {{/projectStyle.doc.needOpt}}
 
     /**
      * Get seed from token
@@ -95,7 +95,7 @@ public class JwtHelper {
                 .withExpiresAt(date)
                 .sign(algorithm);
     }
-    {{#apiStyle.other.needOpt}}
+    {{#projectStyle.doc.needOpt}}
 
     /**
      * Generate otp token
@@ -111,7 +111,7 @@ public class JwtHelper {
                 .withExpiresAt(date)
                 .sign(algorithm);
     }
-    {{/apiStyle.other.needOpt}}
+    {{/projectStyle.doc.needOpt}}
 
     public static String interceptToken(String tokenHeader, String token) {
         if (token != null && token.startsWith(tokenHeader))
@@ -119,4 +119,4 @@ public class JwtHelper {
         return token;
     }
 }
-{{/apiStyle.other.needJwt}}
+{{/projectStyle.auth.needJwt}}

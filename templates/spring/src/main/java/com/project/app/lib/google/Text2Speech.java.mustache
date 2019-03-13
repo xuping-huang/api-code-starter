@@ -1,7 +1,7 @@
-{{^apiStyle.other.needGootleText2Speech}}
+{{^projectStyle.other.needGootleText2Speech}}
 // not implement, remove need
-{{/apiStyle.other.needGootleText2Speech}}
-{{#apiStyle.other.needGootleText2Speech}}
+{{/projectStyle.other.needGootleText2Speech}}
+{{#projectStyle.other.needGootleText2Speech}}
 package com.{{project.name}}.app.lib.google;
 
 import com.google.protobuf.ByteString;
@@ -12,4 +12,4 @@ public interface Text2Speech {
     ByteString text2mp3(String text) throws IOException;
 }
 
-{{/apiStyle.other.needGootleText2Speech}}
+{{/projectStyle.other.needGootleText2Speech}}

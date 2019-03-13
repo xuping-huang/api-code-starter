@@ -1,115 +1,125 @@
-{{#projectStyle.server.isExpress}}
+/**
+ * Configure all middleware for express app
+ */
+
+{{#dependencies.other.lodash}}
+const _ = require('lodash')
+{{/dependencies.other.lodash}}
+{{#dependencies.express.cors}}
+const cors = require('cors')
+{{/dependencies.express.cors}}
+{{#dependencies.logger.morgan}}
+const morgan = require('morgan')
+{{/dependencies.logger.morgan}}
+{{#dependencies.express.helmet}}
+const helmet = require('helmet')
+{{/dependencies.express.helmet}}
+{{#dependencies.express.express}}
 const express = require('express')
-{{#dependencies.express.express-status-monitor}}
-const expressStatusMonitor = require('express-status-monitor')
-{{/dependencies.express.express-status-monitor}}
+{{/dependencies.express.express}}
 {{#dependencies.express.compression}}
 const compression = require('compression')
 {{/dependencies.express.compression}}
 {{#dependencies.express.body-parser}}
 const bodyParser = require('body-parser')
 {{/dependencies.express.body-parser}}
-{{#dependencies.express.cors}}
-const cors = require('cors')
-{{/dependencies.express.cors}}
-{{#dependencies.express.express-validator}}
-const expressValidator = require('express-validator')
-{{/dependencies.express.express-validator}}
 {{#dependencies.other.http-status}}
 const httpStatus = require('http-status')
 {{/dependencies.other.http-status}}
-{{#dependencies.express.helmet}}
-const helmet = require('helmet')
-{{/dependencies.express.helmet}}
+{{#dependencies.express.express-fileupload}}
+const fileUpload = require('express-fileupload')
+{{/dependencies.express.express-fileupload}}
+{{#dependencies.express.express-interceptor}}
+const interceptor = require('express-interceptor')
+{{/dependencies.express.express-interceptor}}
+{{#dependencies.express.express-validator}}
+const expressValidator = require('express-validator')
+{{/dependencies.express.express-validator}}
+{{#dependencies.express.express-status-monitor}}
+const expressStatusMonitor = require('express-status-monitor')
+{{/dependencies.express.express-status-monitor}}
 
-const config = require('./src/config/config')
-{{#apiStyle.log.needLog}}
-{{#dependencies.logger.morgan}}
-const morgan = require('morgan')
-{{/dependencies.logger.morgan}}
 const logger = require('./src/lib/logger')
-{{/apiStyle.log.needLog}}
-const { NotFoundError } = require('./src/lib/app-error')
-{{#apiStyle.other.needErrorEmail}}
-const errorHandler = require('./src/lib/error-handler')
-{{/apiStyle.other.needErrorEmail}}
-const router = require('./app-route')
+const { Response } = require('./src/constants')
 
 const app = express()
-{{#dependencies.express.express-status-monitor}}
-// Monitor express running at http://host:port/status
-app.use(expressStatusMonitor())
-{{/dependencies.express.express-status-monitor}}
-{{#dependencies.express.compression}}
 
-// Comment it if choose ngnix to compress response.
+{{#dependencies.express.compression}}
 app.use(compression())
 {{/dependencies.express.compression}}
-{{#dependencies.express.body-parser}}
-
-// Create req.body in request object.
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-  extended: true
-}))
-{{/dependencies.express.body-parser}}
 {{#dependencies.express.helmet}}
-
-// secure apps by setting various HTTP headers
 app.use(helmet())
 {{/dependencies.express.helmet}}
-{{#dependencies.express.express-validator}}
-
-// express validate
-app.use(expressValidator())
-{{/dependencies.express.express-validator}}
 {{#dependencies.express.cors}}
-
-// enable CORS - Cross Origin Resource Sharing
 app.use(cors())
 {{/dependencies.express.cors}}
-
-// Hide the technical details of the site implementation.
+{{#dependencies.express.express-fileupload}}
+app.use(fileUpload())
+{{/dependencies.express.express-fileupload}}
+{{#dependencies.express.body-parser}}
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+{{/dependencies.express.body-parser}}
 app.disable('x-powered-by')
-{{#apiStyle.log.needLog}}
-
 {{#dependencies.logger.morgan}}
 app.use(morgan('combined', { stream: logger.stream }))
 {{/dependencies.logger.morgan}}
-{{/apiStyle.log.needLog}}
 
-// Mount all routes on a root path
-app.use('{{{project.basePath}}}', router)
+const router = require('./app-route')(app)
 
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
-  const err = new NotFoundError('API not found')
-  return next(err)
+// intercept the response body from jwtAuthenticator
+app.use(interceptor((req, res) => {
+  return {
+    isInterceptable: () => {
+      return res.statusCode === httpStatus.FORBIDDEN
+    },
+
+    intercept: (body, send) => {
+      let obj
+      try {
+        obj = JSON.parse(body)
+      } catch (e) {
+        logger.error(Response.InvalidResponseBody)
+      }
+      if (obj && obj.result && obj.result.content && obj.result.content.message) {
+        const ret = { message: obj.result.content.message }
+        send(JSON.stringify(ret))
+      } else {
+        send(body)
+      }
+    }
+  }
+}))
+
+// The error handler
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  logger.logFullError(err, req.signature || `${req.method} ${req.url}`)
+  const errorResponse = {}
+  const status = err.isJoi ? httpStatus.BAD_REQUEST : (err.httpStatus || httpStatus.INTERNAL_SERVER_ERROR)
+
+  if (_.isArray(err.details)) {
+    if (err.isJoi) {
+      _.map(err.details, (e) => {
+        if (e.message) {
+          if (_.isUndefined(errorResponse.message)) {
+            errorResponse.message = e.message
+          } else {
+            errorResponse.message += `, ${e.message}`
+          }
+        }
+      })
+    }
+  }
+  if (_.isUndefined(errorResponse.message)) {
+    if (err.message && status !== httpStatus.INTERNAL_SERVER_ERROR) {
+      errorResponse.message = err.message
+    } else {
+      errorResponse.message = Response.InternalServerError
+    }
+  }
+
+  res.status(status).json(errorResponse)
 })
 
-// Error Handler.
-if (config.isDebug) {
-  app.use(async (err, req, res, next) => {
-    {{#apiStyle.other.errorHandler}}
-    errorHandler.handleError(err)
-    {{/apiStyle.other.errorHandler}}
-    const status = err.status || httpStatus.INTERNAL_SERVER_ERROR
-    logger.error(`${status} - ${err.code} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
-    logger.error(req)
-    logger.debug(err.stack)
-    res.status(status).send({ message: err.message })
-  })
-} else {
-  app.use(async (err, req, res, next) => {
-    {{#apiStyle.other.errorHandler}}
-    errorHandler.handleError(err)
-    {{/apiStyle.other.errorHandler}}
-    const status = err.status || httpStatus.INTERNAL_SERVER_ERROR
-    logger.error(`${status} - ${err.code} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
-    logger.error(req)
-    res.status(status).send({ message: err.message })
-  })
-}
-
-exports.app = app
-{{/projectStyle.server.isExpress}}
+module.exports.app = app

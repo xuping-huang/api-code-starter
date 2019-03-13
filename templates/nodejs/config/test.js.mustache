@@ -1,0 +1,13 @@
+/**
+ * Configuration file to be used while running tests
+ */
+
+module.exports = {
+  LOG_LEVEL: 'info',
+  {{#projectStyle.auth.needJwt}}
+  AUTH_SECRET: 'This_value_should_be_changed_in_product_environment',
+  {{/projectStyle.auth.needJwt}}
+  USER_TOKEN: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0MDY4NTY4OSIsInJvbGVzIjpbIlRvcGNvZGVyIFVzZXIiXSwiaGFuZGxlIjoibnF2MjAxOCIsImlzcyI6Imh0dHBzOi8vYXBpLnRvcGNvZGVyLWRldi5jb20iLCJpYXQiOjE1NTIzNzMyNzcsImV4cCI6MTU1NDk2NTI3N30.lnkk7sa9gwAP278SlDaJ5YyBh5Q8eCcEelOtJz60kSA',
+  COPILOT_TOKEN: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMDA5NTgxNiIsInJvbGVzIjpbIkNvcGlsb3QiXSwiaGFuZGxlIjoiY2h1YmJjaHViYnMiLCJpc3MiOiJodHRwczovL2FwaS50b3Bjb2Rlci1kZXYuY29tIiwiaWF0IjoxNTUyMzY5NDg3LCJleHAiOjE1NTQ5NjE0ODd9.XRkNR9htI-tPmujozykToAwILgj5iew6YC7W1hU5Du4',
+  ADMIN_TOKEN: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0MDMwOTI0NiIsInJvbGVzIjpbIkFkbWluaXN0cmF0b3IiXSwiaGFuZGxlIjoidGhvbWFza3Jhbml0c2FzIiwiaXNzIjoiaHR0cHM6Ly9hcGkudG9wY29kZXItZGV2LmNvbSIsImlhdCI6MTU1MjM2OTg3NCwiZXhwIjoxNTU0OTYxODc0fQ.HA2xsz7KMiN00cjhhW2LfxZTSWpOHHqLijMQSzgKbGg'
+}
