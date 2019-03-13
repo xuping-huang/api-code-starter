@@ -42,24 +42,23 @@ Just run `docker-compose up` in docker folder. When Docker startup is complete, 
 
 If you have already installed aws-cli in your local machine, you can use following command to verify. If not you can still verify table created following `Verify Table via awscli in Docker`.
 ```
-aws dynamodb scan --table-name Challenge --endpoint-url http://localhost:8000
-aws dynamodb scan --table-name ChallengeType --endpoint-url http://localhost:8000
+aws dynamodb list-tables --endpoint-url http://localhost:8000
 ```
-{{/projectStyle.db.isDynamoDB}}
 
 ## Verify Table via awscli in Docker
 1. Make sure DynamoDB are running as per instructions above.
 
 2. Run the following commands
 ```
-docker exec -ti dynamodb sh
+docker exec -ti dynamodb-cli sh
 ```
 Next
 ```
-aws dynamodb scan --table-name Challenge --endpoint-url http://localhost:8000
-aws dynamodb scan --table-name ChallengeType --endpoint-url http://localhost:8000
+aws dynamodb list-tables --endpoint-url http://dynamodb:8000
 ```
+**Note:** The `endpoint-url` should be `http://dynamodb:8000`.
 
+{{/projectStyle.db.isDynamoDB}}
 ## Local Deployment
 
 - Install dependencies `npm install`

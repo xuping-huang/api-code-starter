@@ -21,6 +21,7 @@ services:
     image: amazon/dynamodb-local
     ports:
     - "8000:8000"
+    container_name: dynamodb
   dynamodb_cli:
     build:
       context: ./

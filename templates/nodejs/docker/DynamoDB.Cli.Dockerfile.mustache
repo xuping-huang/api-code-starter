@@ -4,7 +4,7 @@ FROM garland/aws-cli-docker
 COPY ./init-dynamodb.sh .
 COPY ./config /root/.aws/
 COPY ./credentials /root/.aws/
-RUN chmod +x ./init-dynamodb.sh
+RUN chmod +x ./init-db.sh
 
-CMD ./init-dynamodb.sh
+CMD ./init-db.sh
 {{/projectStyle.db.isDynamoDB}}
