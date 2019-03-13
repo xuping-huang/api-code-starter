@@ -1,0 +1,96 @@
+const merge = require('merge-deep')
+
+class BaseModel {
+
+  {{#projectStyle.db.isDynamoDB}}
+  /**
+   * Calculate page search times.
+   * @param {Number} page - the page number
+   * @param {Number} perPage - the page size
+   * @param {Number} total - total record numbers
+   * @returns {Number} the search times
+   */
+  getSearchTimes (page, perPage, total) {
+    let start = 0
+    for (; start < page; start++) {
+      if (start * perPage >= total) break
+    }
+    return start
+  }
+
+  /**
+   * Search for items by paging.
+   * @param {Object} DynamoDb - the dynamo database client
+   * @param {Number} page - the page number
+   * @param {Number} perPage - the page size
+   * @param {Number} total - total record numbers
+   * @param {Object} options - the dynamo database search operates option
+   * @returns {Array} the collection of data in the page.
+   */
+  async pageSearch (DynamoDb, page, perPage, total, options) {
+    const searchTimes = this.getSearchTimes(page, perPage, total)
+    let data = {}
+    for (let i = 0; i < searchTimes; i++) {
+      let searchOptions = options
+      if (data.LastEvaluatedKey) {
+        searchOptions = merge(options, { ExclusiveStartKey: data.LastEvaluatedKey })
+      }
+      data = await DynamoDb.scan(searchOptions).promise()
+    }
+    return Promise.resolve(data)
+  }
+
+  /**
+   * Gets the total number of items in the table.
+   * @param {Object} dynamoDb - the dynamo database client
+   * @param {DynamoItem} dyTable - the dynamo item for table
+   * @param {String} fieldName - the search field name
+   * @param {Object} dynamoOption - the dynamo database operates option
+   * @returns {Number} the total number of items
+   */
+  async getTotal (dynamoDb, dyTable, fieldName, dynamoOption) {
+    let data = {}
+    let total = 0
+
+    if (!dynamoOption.hasFilter()) {
+      const option = dyTable.countOnly(fieldName).option()
+      data = await dynamoDb.scan(option).promise()
+      total = data.ScannedCount
+    } else {
+      let lastKey
+      do {
+        if (lastKey) { // 1M return data size limit
+          dynamoOption = dynamoOption.startkey(lastKey)
+        }
+        data = await dynamoDb.scan(dynamoOption.cleanLimit().option()).promise()
+        total = total + data.Count
+        lastKey = data.LastEvaluatedKey
+      } while (lastKey)
+    }
+    return Promise.resolve(total)
+  }
+
+  /**
+   * Returns all data up to the last page.
+   * @param {Object} dynamoDb - the dynamo database client
+   * @param {Object} dynamoOption - the dynamo database operate option
+   * @returns {Array} a collection of all data
+   */
+  async searchToEnd (dynamoDb, dynamoOption) {
+    let retData = []
+    let lastKey
+    do {
+      if (lastKey) { // 1M return data size limit
+        dynamoOption = dynamoOption.startKey(lastKey)
+      }
+      let data = await dynamoDb.scan(dynamoOption.option()).promise()
+      if (data && data.Items) retData.push.apply(retData, data.Items)
+      lastKey = data.LastEvaluatedKey
+    } while (lastKey)
+
+    return Promise.resolve(retData)
+  }
+  {{/projectStyle.db.isDynamoDB}}
+}
+
+module.exports = BaseModel

@@ -319,3 +319,7 @@ file:
   dependencies:
     express:
       express-fileupload: true
+name:
+  project:
+    name: Challenge Resource API
+    description: Challenge Resource API
