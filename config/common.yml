@@ -30,6 +30,7 @@ defaults: &defaults # default use json-db,express,javascript
       unitTest: false
       e2eTest: false
       needCoverage: false
+      needMockApi: false
     auth:
       needJwt: false
       needM2M: false
@@ -323,3 +324,7 @@ name:
   project:
     name: Challenge Resource API
     description: Challenge Resource API
+mockapi:
+  projectStyle:
+    test:
+      needMockApi: true
