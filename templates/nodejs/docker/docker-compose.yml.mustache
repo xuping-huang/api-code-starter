@@ -1,5 +1,11 @@
 version: '3'
 services:
+  {{#projectStyle.auth.needJwt}}
+  token_service:
+    image: xupinghuang/token-tc-service
+    ports:
+      - "3333:3333"
+  {{/projectStyle.auth.needJwt}}
   {{#projectStyle.db.isMongoDB}}
   mongo:
     image: mongo:4.0
