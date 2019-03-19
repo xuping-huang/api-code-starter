@@ -96,7 +96,7 @@ module.exports = (app) => {
                 next()
               }
             } else {
-              next(new error.AuthenticateError())
+              next(new error.UnauthorizedError())
             }
           }
         })

@@ -1,0 +1,11 @@
+/**
+ * Environment for production
+ */
+export const environment = {
+  production: true,
+  {{#projectStyle.i18n.needi18n}}
+  defaultLanguage: '{{projectStyle.i18n.default}}',
+  supportedLanguages: [{{#projectStyle.i18n.supported}}{{#lang}}'{{.}}',{{/lang}}{{/projectStyle.i18n.supported}}],
+  {{/projectStyle.i18n.needi18n}}
+  apiURL: '{{{project.apiUrl}}}'
+};

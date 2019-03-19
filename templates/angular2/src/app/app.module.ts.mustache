@@ -1,0 +1,44 @@
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+{{#dependencies.i18n.ngx-translate/core}}
+import { TranslateModule } from '@ngx-translate/core';
+{{/dependencies.i18n.ngx-translate/core}}
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+{{#projectStyle.widget.material}}
+import { MaterialModule } from './material.module';
+{{/projectStyle.widget.material}}
+{{#projectStyle.widget.bootstrap}}
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+{{/projectStyle.widget.bootstrap}}
+
+import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
+
+import { CoreModule } from './core';
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpClientModule,
+    {{#dependencies.i18n.ngx-translate/core}}
+    TranslateModule.forRoot(),
+    {{/dependencies.i18n.ngx-translate/core}}
+    BrowserAnimationsModule,
+    {{#projectStyle.widget.material}}
+    MaterialModule,
+    {{/projectStyle.widget.material}}
+    CoreModule,
+    {{#projectStyle.widget.bootstrap}}
+    NgbModule,
+    {{/projectStyle.widget.bootstrap}}
+    AppRoutingModule // must be imported as the last module as it contains the fallback route
+  ],
+  declarations: [AppComponent],
+  providers: [ // Fake back end api
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }

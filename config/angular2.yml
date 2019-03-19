@@ -1,0 +1,152 @@
+defaults: &defaults # default use json-db,express,javascript
+  project:
+    name: project-name
+    version: 0.0.1
+    description: Project Name
+    port: 4200
+    apiUrl: '/api'
+    templateSwitch: angular2
+  projectStyle:
+    language:
+      name: TypeScript
+      isJavaScript: false
+      isTypeScript: true
+    server:
+      name: Express
+      isExpress: true
+      isKoa: false
+    log:
+      needLog: true
+    test:
+      unitTest: false
+      e2eTest: false
+      needCoverage: false
+      needMockApi: false
+    auth:
+      needJwt: false
+    lint:
+      isTslint: true
+    deploy:
+      useDocker: true
+      useHeroku: false
+    i18n:
+      needi18n: false
+    doc:
+      needOpt: false
+    widget:
+      material: false
+      bootstrap: false
+    other:
+      needHttps: false
+  devDependencies:
+    codeStyle:
+      tslint: true
+    test:
+    coverage:
+    other:
+      nodemon: true # if false, becareful devDependencies has a extend comma
+  dependencies:
+    logger:
+    validate:
+    secure:
+      http: true
+      https: true
+    i18n:
+      ngx-translate/core: false
+    widget:
+      angular/cdk: false
+      angular/material: false
+      angular/flex-layout: false
+      material-design-icons-iconfont: false
+      ng-bootstrap/ng-bootstrap: false
+      bootstrap: false
+    polyfill:
+      core-js: true
+    css:
+      normalize-css: true
+    other:
+      express: true
+      http-status: true
+      bluebird: true
+      merge-deep: true
+      lodash: true
+      d3: true
+      tslib: false
+      xlsx: false
+test:
+  projectStyle:
+    test:
+      unitTest: false
+      e2eTest: false
+  devDependencies:
+    test:
+      chai-http: true
+tslint:
+  devDependencies:
+    codeStyle:
+      tslint: true
+      tslint-config-prettier: true
+      tslint-immutable: true
+heroku:
+  projectStyle:
+    deploy:
+      useDocker: false
+      useHeroku: true
+jwt:
+  projectStyle:
+    auth:
+      needJwt: true
+  dependencies:
+    secure:
+      express-jwt: true
+      jsonwebtoken: true
+secure:
+  projectStyle:
+    needPasswordBcrypt: true
+  dependencies:
+    secure:
+      bcrypt-nodejs: true
+      crypto: true
+https:
+  projectStyle:
+    other:
+      needHttps: true
+## other
+file:
+  dependencies:
+    express:
+      express-fileupload: true
+bootstrap:
+  projectStyle:
+    widget:
+      bootstrap: true
+  dependencies:
+    widget:
+      ng-bootstrap/ng-bootstrap: true
+      bootstrap: true
+material:
+  projectStyle:
+    widget:
+      material: true
+  dependencies:
+    widget:
+      angular/cdk: true
+      angular/material: true
+      angular/flex-layout: true
+      material-design-icons-iconfont: true
+i18n:
+  projectStyle:
+    i18n:
+      needi18n: true
+      default: en-US
+      supported:
+        - lang: fr-FR
+        - lang: zh-CN
+  dependencies:
+    i18n:
+      ngx-translate/core: true
+name:
+  project:
+    name: test-resource-ui
+    description: Challenge Resource API
+    apiUrl: https://test-resource-ui.herokuapp.com

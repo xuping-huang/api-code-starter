@@ -1,0 +1,111 @@
+{
+  "name": "{{project.name}}",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "ng": "ng",
+    "build": "ng build",
+    "start": "ng serve",
+    "lint": "ng lint",
+    "test": "ng test",
+    "e2e": "ng e2e",
+    "prod-build": "ng build --prod",
+    "preinstall": "npm install -g @angular/cli @angular/compiler-cli typescript"
+  },
+  "dependencies": {
+    "@angular/animations": "^7.0.0",
+    "@angular/common": "^7.0.0",
+    "@angular/compiler": "^7.0.0",
+    "@angular/core": "^7.0.0",
+    "@angular/forms": "^7.0.0",
+    "@angular/http": "^7.0.0",
+    "@angular/platform-browser": "^7.0.0",
+    "@angular/platform-browser-dynamic": "^7.0.0",
+    "@angular/router": "^7.0.0",
+    {{#dependencies.i18n.ngx-translate/core}}
+    "@ngx-translate/core": "^10.0.1",
+    {{/dependencies.i18n.ngx-translate/core}}
+    {{#dependencies.widget.angular/cdk}}
+    "@angular/cdk": "^7.0.1",
+    {{/dependencies.widget.angular/cdk}}
+    {{#dependencies.widget.angular/material}}
+    "@angular/material": "^7.0.1",
+    {{/dependencies.widget.angular/material}}
+    {{#dependencies.widget.angular/flex-layout}}
+    "@angular/flex-layout": "7.0.0-beta.19",
+    {{/dependencies.widget.angular/flex-layout}}
+    {{#dependencies.widget.ng-bootstrap/ng-bootstrap}}
+    "@ng-bootstrap/ng-bootstrap": "^4.1.0",
+    {{/dependencies.widget.ng-bootstrap/ng-bootstrap}}
+    {{#dependencies.widget.bootstrap}}
+    "bootstrap": "^4.3.1",
+    {{/dependencies.widget.bootstrap}}
+    {{#dependencies.widget.material-design-icons-iconfont}}
+    "material-design-icons-iconfont": "^3.0.3",
+    {{/dependencies.widget.material-design-icons-iconfont}}
+    {{#dependencies.polyfill.core-js}}
+    "core-js": "^2.5.6",
+    {{/dependencies.polyfill.core-js}}
+    {{#dependencies.other.d3}}
+    "d3": "^5.7.0",
+    {{/dependencies.other.d3}}
+    {{#dependencies.other.express}}
+    "express": "^4.16.4",
+    {{/dependencies.other.express}}
+    {{#dependencies.css.normalize-css}}
+    "normalize.css": "^8.0.1",
+    {{/dependencies.css.normalize-css}}
+    {{#dependencies.other.lodash}}
+    "lodash": "^4.17.10",
+    {{/dependencies.other.lodash}}
+    "path": "^0.12.7",
+    "rxjs": "^6.3.1",
+    "rxjs-compat": "^6.0.0",
+    {{#dependencies.other.tslib}}
+    "tslib": "^1.9.0",
+    {{/dependencies.other.tslib}}
+    {{#dependencies.other.xlsx}}
+    "xlsx": "^0.14.1",
+    {{/dependencies.other.xlsx}}
+    "zone.js": "^0.8.26"
+  },
+  "devDependencies": {
+    "@angular/cli": "~7.0.2",
+    "@angular/compiler-cli": "^7.0.0",
+    "@angular/language-service": "^7.0.0",
+    "@angular-devkit/build-angular": "^0.10.2",
+    {{#dependencies.i18n.ngx-translate/core}}
+    "@biesbjerg/ngx-translate-extract": "^2.3.4",
+    "@ngx-rocket/scripts": "^3.0.0",
+    {{/dependencies.i18n.ngx-translate/core}}
+    "@types/jasmine": "^2.8.7",
+    "@types/jasminewd2": "^2.0.2",
+    {{#dependencies.other.lodash}}
+    "@types/lodash": "^4.14.108",
+    {{/dependencies.other.lodash}}
+    "@types/node": "^8.10.13",
+    "codelyzer": "^4.4.4",
+    "hads": "^1.7.0",
+    "htmlhint": "^0.10.0",
+    "https-proxy-agent": "^2.0.0",
+    "jasmine-core": "~2.99.1",
+    "jasmine-spec-reporter": "^4.1.0",
+    "karma": "~3.0.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-cli": "~1.0.1",
+    "karma-coverage-istanbul-reporter": "^2.0.2",
+    "karma-jasmine": "^1.1.2",
+    "karma-junit-reporter": "^1.2.0",
+    "karma-jasmine-html-reporter": "^1.4.0",
+    "husky": "^0.14.3",
+    "protractor": "~5.4.0",
+    "puppeteer": "^1.4.0",
+    "stylelint": "~9.6.0",
+    "stylelint-config-recommended-scss": "~3.2.0",
+    "stylelint-config-standard": "~18.2.0",
+    "stylelint-scss": "~3.3.0",
+    "ts-node": "~7.0.1",
+    "tslint": "~5.11.0",
+    "typescript": "~3.1.3"
+  }
+}
