@@ -13,7 +13,6 @@ const debug = Debug('code:param');
 const DATE_PARAM = {
   type: "string",
   format: "date-time",
-  description: "date-time",
   example: "\'2019-01-10T07:10:34.623Z\'",
   hasFormat: true,
   isDate: true
@@ -21,21 +20,18 @@ const DATE_PARAM = {
 
 const BOOL_PARAM = {
   type: "boolean",
-  description: "boolean",
   example: false,
   isBool: true
 }
 
 const STR_PARAM = {
   type: "string",
-  description: "string",
   example: 'str'
 }
 
 const INT_PARAM = {
   type: "integer",
   format: "int32",
-  description: "int32",
   example: 10,
   isInt: true,
   hasFormat: true
@@ -44,7 +40,6 @@ const INT_PARAM = {
 const LONG_PARAM = {
   type: "integer",
   format: "int64",
-  description: "int64",
   example: 100,
   isLong: true,
   hasFormat: true
@@ -53,7 +48,6 @@ const LONG_PARAM = {
 const FLOAT_PARAM = {
   type: "number",
   format: "float",
-  description: "float",
   example: 1.01,
   isFloat: true,
   hasFormat: true
@@ -61,14 +55,12 @@ const FLOAT_PARAM = {
 
 const OTHERWISE_PARAM = {
   type: "string",
-  description: "",
   example: ""
 }
 
 const ID_PARAM = {
   $ref: "#/components/schemas/Id",
   $ref2: "#/definitions/Id",
-  description: "id",
   isRef: true,
   isId: true,
   type: "string"
@@ -82,24 +74,22 @@ const REF_PARAM = {
 
 const ENUM_PARAM = {
   type: "string",
-  enum: '["one", "two"]',
-  description: "onetwo",
-  isEnum: true,
+  isRef: true,
+  $ref: "#/components/schemas/",
+  $ref2: "#/definitions/",
   example: 'one'
 }
 
 const BOOL_ENUM_PARAM = {
   type: "string",
-  enum: '["Y", "N"]',
-  description: "yes or no",
-  isEnum: true,
-  example: '\"N\"'
+  isRef: true,
+  $ref: "#/components/schemas/",
+  $ref2: "#/definitions/"
 }
 
 const STR_ARRAY_PARAM = {
   type: "array",
   itemType: "string",
-  description: "array of ",
   isArray: true,
   example: "['a','b']"
 }
@@ -107,7 +97,6 @@ const STR_ARRAY_PARAM = {
 const NUM_ARRAY_PARAM = {
   type: "array",
   itemType: "number",
-  description: "array of ",
   isArray: true,
   example: '[1.01,2.02,3.03]'
 }
@@ -115,7 +104,6 @@ const NUM_ARRAY_PARAM = {
 const INT_ARRAY_PARAM = {
   type: "array",
   itemType: "integer",
-  description: "array of ",
   isArray: true,
   isIntArray: true,
   example: '[1,2,3]'
@@ -124,7 +112,6 @@ const INT_ARRAY_PARAM = {
 const LONG_ARRAY_PARAM = {
   type: "array",
   itemType: "integer",
-  description: "array of ",
   isArray: true,
   isLongArray: true,
   example: '[1,2,3]'
@@ -134,7 +121,6 @@ const REF_ARRAY_PARAM = {
   type: "array",
   $ref: "#/components/schemas/",
   $ref2: "#/definitions/",
-  description: "array of ",
   isArray: true,
   isRefArray: true
 }
@@ -142,14 +128,12 @@ const REF_ARRAY_PARAM = {
 const OBJ_ARRAY_PARAM = {
   type: "array",
   itemType: "object",
-  description: "array of ",
   isArray: true,
   isObjectArray: true
 }
 
 const OBJ_PARAM = {
   type: "object",
-  description: "object",
   isObject: true
 }
 
@@ -171,8 +155,7 @@ interface ParsedName {
   underSuffix: string,
   purePrefix: string,
   pureSuffix: string,
-  beforeSuffix: string,
-  description: string
+  beforeSuffix: string
 }
 
 function parseName(name: string) : ParsedName {
@@ -195,7 +178,6 @@ function parseName(name: string) : ParsedName {
   let lowerWords = nameWords.map(word => word.toLowerCase().trim()); // lowerWords = ['challenge', 'type']
   let purePrefix = lowerWords[0];  // challenge
   let pureSuffix = lowerWords[lowerWords.length-1]; // type
-  let description = lowerWords.join(' ');
   let beforeSuffix = pureNameCamel.substr(0, pureNameCamel.length - lowerWords[lowerWords.length-1].length)
   return {
     lowerName,
@@ -204,8 +186,7 @@ function parseName(name: string) : ParsedName {
     underSuffix,
     purePrefix,
     pureSuffix,
-    beforeSuffix,
-    description
+    beforeSuffix
   }
 }
 
@@ -232,7 +213,7 @@ const lookupMatch = matchWrap({}, (word: ParsedName) => {
 
 const arrayMatch = (lookElm: string, word: ParsedName, matches: Array<string>, paramEx) =>{
   if ( matches.find(elm => elm === lookElm) ){
-    return merge(paramEx, { beforeSuffix: word.beforeSuffix, description: word.description, pureName: word.pureName });
+    return merge(paramEx, { beforeSuffix: word.beforeSuffix, pureName: word.pureName });
   }
   return undefined;
 }
@@ -286,18 +267,25 @@ const floatUnderMatch = matchWrap(FLOAT_PARAM, (word: ParsedName, paramEx)=>{
 });
 
 const enumUnderMatch = matchWrap(ENUM_PARAM, (word: ParsedName, paramEx)=>{
-  return underMatch( word, ['_enum'], paramEx);
+  const param = underMatch( word, ['_enum'], paramEx);
+  if ( param ) {
+    param.$ref = param.$ref + word.pureNameCamel;
+    param.$ref2 = param.$ref2 + word.pureNameCamel;
+  }
+  return param;
 });
 
 const boolEnumUnderMatch = matchWrap(BOOL_ENUM_PARAM, (word: ParsedName, paramEx)=>{
-  return underMatch( word, ['_bool_enum', '_enum_bool'], paramEx);
+  const param = underMatch( word, ['_bool_enum', '_enum_bool'], paramEx);
+  if ( param ) {
+    param.$ref = param.$ref + 'TrueFalseSign';
+    param.$ref2 = param.$ref2 + 'TrueFalseSign';
+  }
+  return param;
 });
 
 const arrayUnderMatch = (word, matches, paramEx) => {
   const param = underMatch( word, matches, paramEx);
-  if ( param ) {
-    param.description = "array of " + word.description;
-  }
   return param;
 }
 
@@ -312,7 +300,6 @@ const numberArrayUnderMatch = matchWrap(NUM_ARRAY_PARAM, (word: ParsedName, para
 const refArrayUnderMatch = matchWrap(REF_ARRAY_PARAM, (word: ParsedName, paramEx)=>{
   const param = underMatch( word, ['_array_ref','_ref_array'], paramEx);
   if ( param ) {
-    param.description = "array of " + word.description;
     param.$ref = param.$ref + word.pureNameCamel;
     param.$ref2 = param.$ref2 + word.pureNameCamel;
   }
@@ -352,7 +339,7 @@ const idEndMatch = matchWrap(ID_PARAM, (word: ParsedName, paramEx)=>{
 
 // otherwise
 const otherwiseMatch = matchWrap(OTHERWISE_PARAM, (word: ParsedName, paramEx)=>{
-  return merge(paramEx, { description: word.description, example: word.description, pureName: word.pureName});
+  return merge(paramEx, { pureName: word.pureName});
 });
 
 function dispatch(...funs){

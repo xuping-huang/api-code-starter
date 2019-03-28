@@ -2,7 +2,8 @@
         - name: {{name}}
           in: {{#isQueryParam}}query{{/isQueryParam}}{{#isPathParam}}path{{/isPathParam}}
           required: {{#isQueryParam}}false{{/isQueryParam}}{{#isPathParam}}true{{/isPathParam}}
-          type: {{ex.type}}
+          schema:
+            type: {{ex.type}}
           {{^ex.isRef}}
           {{^ex.isRefArray}}
           {{^ex.isObject}}
@@ -23,6 +24,7 @@
         - name: {{name}}
           in: {{#isPathParam}}path{{/isPathParam}}{{#isQueryParam}}query{{/isQueryParam}}
           required: {{#isQueryParam}}false{{/isQueryParam}}{{#isPathParam}}true{{/isPathParam}}
-          type: {{ex.type}}
+          schema:
+            type: {{ex.type}}
         {{/ex.isId}}
         {{/ex.isRef}}

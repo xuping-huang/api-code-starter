@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: {{project.name}} API
+  title: {{project.name}}
   description: >
     ## Pagination
 
@@ -21,7 +21,6 @@ info:
     ## Access levels
 
     - Admin
-host: {{project.host}}
 basePath: {{{project.basePath}}}
 schemes:
   - http
@@ -32,10 +31,12 @@ securityDefinitions:
     name: Authorization
     in: header
 tags:
-  -Add New Tags
+  {{#tags}}
+  - name: {{name}}
+  {{/tags}}
 paths:
   {{#paths}}
-  {{{path}}}:
+  {{#isColonPath}}'{{/isColonPath}}{{{path}}}{{#isColonPath}}'{{/isColonPath}}:
     {{#ops}}
     {{method}}:
       summary: {{summary}}
@@ -43,25 +44,24 @@ paths:
         - {{tag}}
       description: >
         {{#isPatch}}
-        Partially update the {{refResponseEntity}} with the provided id.  Only the fields
-        that are provided in the body will be changed.
+        Only the fields that are provided in the body will be changed.
         {{/isPatch}}
         {{#isPut}}
-        Update the {{refResponseEntity}} with the provided id.
+        {{summary}}
         {{/isPut}}
         {{#isGet}}
         {{#isList}}
-        Retrieve {{refResponseEntity}}s in the system.
+        {{summary}}
         {{/isList}}
         {{^isList}}
-        Retrieve the {{refResponseEntity}} with provided id.
+        {{summary}}
         {{/isList}}
         {{/isGet}}
         {{#isPost}}
-        Create a new {{refResponseEntity}} in the system.
+        {{summary}}
         {{/isPost}}
         {{#isDelete}}
-        Delete the {{tag}} with the provided id.
+        {{summary}}
         {{/isDelete}}
       {{#noSecurity}}
       security: []
@@ -72,7 +72,7 @@ paths:
       {{/noSecurity}}
       produces:
         - application/json
-      parameters:
+      {{#hasMethodParameters}}parameters:{{/hasMethodParameters}}
       {{#needNavPage}}
         - $ref: '#/parameters/page'
         - $ref: '#/parameters/perPage'
@@ -89,10 +89,16 @@ paths:
           required: true
           {{#needReqBodyRef}}
           schema:
+            {{#isArrayRefReqEntity}}
+            type: array
+            items:
+              $ref: {{#refReqEntity}}'#/definitions/{{refReqEntity}}'{{/refReqEntity}}
+            {{/isArrayRefReqEntity}}
+            {{^isArrayRefReqEntity}}
             $ref: {{#refReqEntity}}'#/definitions/{{refReqEntity}}'{{/refReqEntity}}
+            {{/isArrayRefReqEntity}}
           {{/needReqBodyRef}}
           {{^needReqBodyRef}}
-          description: {{operationId}} request
           schema:
             type: object
             required:
@@ -181,6 +187,10 @@ paths:
         404:
           $ref: '#/responses/NotFound'
         {{/needFound}}
+        {{#needConflict}}
+        409:
+          $ref: '#/responses/Conflict'
+        {{/needConflict}}
         500:
           $ref: '#/responses/InternalServerError'
     {{/ops}}
@@ -207,6 +217,10 @@ responses:
     description: INTERNAL SERVER ERROR - if the request was properly formatted, but the operation failed on the server side
     schema:
       $ref: '#/definitions/Error'
+  Conflict:
+    description: CONFLICT - if the entity to be created conflicts with the uniqueness property of an entity that already exists in the table
+    schema:
+      $ref: "#/definitions/Error"
 
 parameters:
   page:
@@ -214,28 +228,45 @@ parameters:
     in: query
     description: The page number.
     required: false
-    schema:
-      type: integer
-      default: 1
-    example: 1
-
+    type: integer
+    format: int32
   perPage:
     name: {{api.navigation.perPage}}
     in: query
     description: The number of items to list per page.
     required: false
-    schema:
-      type: integer
-      default: 20
-      maximum: 100
-    example: 20
+    type: integer
+    format: int32
 
 definitions:
+  {{#api.entity.needId}}
   Id:
     type: string
     description: The id.
     example: 564935d6-16d5-4410-b415-55d369b90327
-
+  {{/api.entity.needId}}
+  TrueFalseSign:
+    type: string
+    enum: ['Y', 'N']
+  {{#api.entity.needRecord}}
+  Record:
+    type: object
+    properties:
+      createdOn:
+        type: string
+        description: Date Created, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
+        format: date-time
+      createdBy:
+        type: string
+        description: User ID of the creator
+      updatedOn:
+        type: string
+        description: Last Update date, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
+        format: date-time
+      updatedBy:
+        type: string
+        description: User ID of the last update
+  {{/api.entity.needRecord}}
   Error:
     description: |
       An error entity.
@@ -243,26 +274,37 @@ definitions:
       message:
         type: string
         description: The error message.
-
   {{#schemas}}
   {{entity}}:
-    {{^isGetReturn}}
+    {{^isRecord}}
+    {{#isEnum}}
+    type: string
+    {{#description}}description: {{description}}{{/description}}
+    enum: [{{#enums}}'{{value}}',{{/enums}}]
+    {{/isEnum}}
+    {{^isEnum}}
     type: object
     required:
       {{#entityParams}}
+      {{^notRequired}}
       - {{name}}
+      {{/notRequired}}
       {{/entityParams}}
     properties:
       {{#entityParams}}{{> prop}}{{/entityParams}}
-    {{/isGetReturn}}
-    {{#isGetReturn}}
+    {{/isEnum}}
+    {{/isRecord}}
+    {{#isRecord}}
     type: object
     allOf:
       - type: object
         properties:
-          id:
-            type: string
-            description: The id.
+                                  id:
+                                    $ref: '#/definitions/Id'
+          {{#entityParams}}{{> prop}}{{/entityParams}}
+      {{#api.entity.needRecord}}
+      - $ref: '#/definitions/Record'
+      {{/api.entity.needRecord}}
       - $ref: '#/definitions/{{returnRef}}'
-    {{/isGetReturn}}
+    {{/isRecord}}
   {{/schemas}}

@@ -1,49 +1,47 @@
-                                  {{name}}:
-                                    {{^ex.isRef}}
-                                    type: {{ex.type}}
-                                    description: {{ex.description}}
-                                    {{/ex.isRef}}
-                                    {{#ex.hasFormat}}
-                                    format: {{ex.format}}
-                                    {{/ex.hasFormat}}
-                                    {{#ex.isRef}}
-                                    $ref: '{{{ex.$ref}}}'
-                                    {{/ex.isRef}}
-                                    {{#ex.isEnum}}
-                                    enum: {{{ex.enum}}}
-                                    {{/ex.isEnum}}
-                                    {{#ex.isArray}}
-                                    {{^ex.isRefArray}}
-                                    items:
-                                      type: {{ex.itemType}}
-                                    {{/ex.isRefArray}}
-                                    {{/ex.isArray}}
-                                    {{^ex.isRef}}
-                                    {{^ex.isRefArray}}
-                                    {{^ex.isObject}}
-                                    {{^ex.isObjectArray}}
-                                    example: {{{ex.example}}}
-                                    {{/ex.isObjectArray}}
-                                    {{/ex.isObject}}
-                                    {{/ex.isRefArray}}
-                                    {{/ex.isRef}}
-                                    {{#ex.isObject}}
-                                    properties:
-                                      name:
-                                        type: string
-                                        description: name
-                                        example: name
-                                    {{/ex.isObject}}
-                                    {{#ex.isRefArray}}
-                                    items:
+                                    {{name}}:
+                                      {{^ex.isRef}}
+                                      type: {{ex.type}}
+                                      {{#ex.description}}
+                                      description: {{ex.description}}
+                                      {{/ex.description}}
+                                      {{/ex.isRef}}
+                                      {{#ex.hasFormat}}
+                                      format: {{ex.format}}
+                                      {{/ex.hasFormat}}
+                                      {{#ex.isRef}}
                                       $ref: '{{{ex.$ref}}}'
-                                    {{/ex.isRefArray}}
-                                    {{#ex.isObjectArray}}
-                                    items:
-                                      type: object
+                                      {{/ex.isRef}}
+                                      {{#ex.isEnum}}
+                                      enum: {{{ex.enum}}}
+                                      {{/ex.isEnum}}
+                                      {{#ex.isArray}}
+                                      {{^ex.isRefArray}}
+                                      items:
+                                        type: {{ex.itemType}}
+                                      {{/ex.isRefArray}}
+                                      {{/ex.isArray}}
+                                      {{^ex.isRef}}
+                                      {{^ex.isRefArray}}
+                                      {{^ex.isObject}}
+                                      {{^ex.isObjectArray}}
+                                      example: {{{ex.example}}}
+                                      {{/ex.isObjectArray}}
+                                      {{/ex.isObject}}
+                                      {{/ex.isRefArray}}
+                                      {{/ex.isRef}}
+                                      {{#ex.isObject}}
                                       properties:
                                         name:
                                           type: string
-                                          description: name
-                                          example: name
-                                    {{/ex.isObjectArray}}
+                                      {{/ex.isObject}}
+                                      {{#ex.isRefArray}}
+                                      items:
+                                        $ref: '{{{ex.$ref}}}'
+                                      {{/ex.isRefArray}}
+                                      {{#ex.isObjectArray}}
+                                      items:
+                                        type: object
+                                        properties:
+                                          name:
+                                            type: string
+                                      {{/ex.isObjectArray}}

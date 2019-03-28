@@ -1,8 +1,13 @@
 - name: email
   ex:
     type: string
-    description: the email address
+    description: Email address
     example: admin@company.com
+- name: username
+  ex:
+    type: string
+    description: User Login account Name
+    example: jason
 - name: password
   ex:
     type: string
@@ -14,12 +19,12 @@
 - name: hours
   ex:
     type: number
-    description: the used hours
+    description: Number of hours
     example: 0.3
 - name: phone
   ex:
     type: string
-    description: the phone number
+    description: Phone number
     example: 1862928839
 - name: id
   ex:
@@ -30,7 +35,7 @@
   ex:
     type: string
     format: date-time
-    description: the created on date
+    description: Date Created, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
     example: "'2019-01-10T07:10:34.623Z'"
     isDate: true
     hasFormat: true
@@ -38,7 +43,7 @@
   ex:
     type: string
     format: date-time
-    description: the created on date
+    description: Last Update date, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
     example: "'2019-01-10T07:10:34.623Z'"
     isDate: true
     hasFormat: true
@@ -46,7 +51,7 @@
   ex:
     type: string
     format: date-time
-    description: the created on date
+    description: Date Created, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
     example: "'2019-01-10T07:10:34.623Z'"
     isDate: true
     hasFormat: true
@@ -54,7 +59,7 @@
   ex:
     type: string
     format: date-time
-    description: the created on date
+    description: Last Update date, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
     example: "'2019-01-10T07:10:34.623Z'"
     isDate: true
     hasFormat: true
@@ -62,7 +67,7 @@
   ex:
     type: string
     format: date-time
-    description: the created on date
+    description: Last Login time, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
     example: "'2019-01-10T07:10:34.623Z'"
     isDate: true
     hasFormat: true
@@ -70,7 +75,7 @@
   ex:
     type: string
     format: date-time
-    description: the created on date
+    description: End time, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
     example: "'2019-01-11T07:10:34.623Z'"
     isDate: true
     hasFormat: true
@@ -78,165 +83,151 @@
   ex:
     type: string
     format: date-time
-    description: the created on date
+    description: Start time, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
     example: "'2019-01-11T07:10:34.623Z'"
     isDate: true
     hasFormat: true
 - name: description
   ex:
     type: string
-    description: the description
-    example: description
+    example: Some to-do items
 - name: level
   ex:
     type: number
-    description: the level number
     example: 1
 - name: lesson
   ex:
     type: number
-    description: the lesson number
     example: 1
 - name: score
   ex:
     type: integer
-    description: the score
     example: 100
     format: int32
     hasFormat: true
 - name: comments
   ex:
     type: string
-    description: the comments
     example: comments
 - name: imagefile
   ex:
     type: string
-    description: the image file name
-    example: 'look.png'
+    format: byte
+    description: Image file Contents
+    hasFormat: true
+- name: file
+  ex:
+    type: string
+    format: byte
+    description: File Contents
+    hasFormat: true
+- name: fileContent
+  ex:
+    type: string
+    format: byte
+    description: File Contents
+    hasFormat: true
 - name: majorversion
   ex:
     type: integer
     format: int32
-    description: the version code
     example: 1
     hasFormat: true
 - name: minorversion
   ex:
     type: integer
     format: int32
-    description: the version code
     example: 1
     hasFormat: true
 - name: status
   ex:
     type: string
-    description: the master status
     example: Draft
 - name: createdby
   ex:
     type: string
-    description: the create user id
+    description: User ID of the creator
     example: 'admin01'
 - name: updatedby
   ex:
     type: string
-    description: the last update user id
+    description: User ID of the last update
     example: 'admin01'
 - name: audiofile
   ex:
     type: string
-    description: the audio file name
     example: 'unit.mp3'
 - name: unitname
   ex:
     type: string
-    description: the unit name
     example: 'Lesson 1'
 - name: question
   ex:
     type: string
-    description: the question
     example: 'What is your name'
 - name: answer
   ex:
     type: string
-    description: the answer
     example: 'My name is John.'
 - name: weight
   ex:
     type: number
-    description: the weight for
     example: 1.05
 - name: height
   ex:
     type: number
-    description: the height for
     example: 12.5
 - name: type
   ex:
     type: string
-    description: the type of
-    enum: [OK,FAILED]
     example: OK
-    isEnum: true
 - name: url
   ex:
     type: string
-    description: the url
     example: https://site.com
 - name: address
   ex:
     type: string
-    description: the address
     example: the street number
 - name: code
   ex:
     type: string
-    description: the code of
     example: AS
 - name: year
   ex:
     type: integer
     format: int32
-    description: the year
     example: 2019
     hasFormat: true
 - name: title
   ex:
     type: string
-    description: the title of
     example: title
 - name: firstname
   ex:
     type: string
-    description: the first name
     example: Nancy
 - name: lastname
   ex:
     type: string
-    description: the last name
     example: John
 - name: fullname
   ex:
     type: string
-    description: the full name
     example: Hanks John
 - name: mobile
   ex:
     type: string
-    description: the phone number
     example: 82772938
 - name: note
   ex:
     type: string
-    description: the note
     example: note
 - name: creationtime
   ex:
     type: string
     format: date-time
-    description: the created on time
+    description: Date Created, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
     example: "'2019-01-10T07:10:34.623Z'"
     hasFormat: true
     isDate: true
@@ -244,7 +235,7 @@
   ex:
     type: string
     format: date-time
-    description: the created on time
+    description: Last Update date, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
     example: "'2019-01-10T07:10:34.623Z'"
     hasFormat: true
     isDate: true
@@ -252,11 +243,9 @@
   ex:
     type: integer
     format: int32
-    description: the month
     example: 12
     hasFormat: true
 - name: message
   ex:
     type: string
-    description: the message info
     example: message info

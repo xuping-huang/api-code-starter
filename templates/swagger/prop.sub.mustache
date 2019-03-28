@@ -1,7 +1,9 @@
                                   {{name}}:
                                     {{^ex.isRef}}
                                     type: {{ex.type}}
+                                    {{#ex.description}}
                                     description: {{ex.description}}
+                                    {{/ex.description}}
                                     {{/ex.isRef}}
                                     {{#ex.hasFormat}}
                                     format: {{ex.format}}
@@ -33,8 +35,6 @@
                                     properties:
                                       name:
                                         type: string
-                                        description: name
-                                        example: name
                                     {{/ex.isObject}}
                                     {{#ex.isRefArray}}
                                     items:
@@ -46,6 +46,4 @@
                                       properties:
                                         name:
                                           type: string
-                                          description: name
-                                          example: name
                                     {{/ex.isObjectArray}}

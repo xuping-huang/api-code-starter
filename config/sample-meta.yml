@@ -1,0 +1,240 @@
+defaults: &defaults
+  project:
+    name: ddmt-api
+    basePath: /
+    templateSwitch: swagger
+  api:
+    security:
+      isJwt: true
+    navigation:
+      page: page
+      perPage: perPage
+      sortOrder: sortOrder
+    entity:
+      needRecord: true
+      needId: true
+  paths:
+    - path: /admin/login
+      ops:
+      # 登录样例
+      - method: post
+        summary: admin login
+        tag: Security
+        noSecurity: true
+        needReqBody: true
+        reqBodyParams:
+          - name: username
+          - name: password
+        responseParams:
+          - name: accessToken
+          - name: accessTokenExpiredOn
+    - path: /resources
+      ops:
+      # 无分页列表
+      - method: get
+        summary: Retrieve resources in the system.
+        tag: Resource
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        isList: true
+        needResponseRef: true
+        refResponseEntity: Resource
+      # 单个创建
+      - method: post
+        summary: Create a new resource in system.
+        tag: Resource
+        noSecurity: false
+        needAuth: true
+        needFound: false
+        needConflict: true
+        needPermission: true
+        needReqBody: true
+        queryParams:
+          - name: startdate
+        needReqBodyRef: true
+        reqBodyParams:
+          - name: other
+        refReqEntity: ResourceData
+        needResponseRef: true
+        refResponseEntity: Resource
+    - path: /resources/batch
+      ops:
+      # 批量创建
+      - method: post
+        summary: Create resources in system.
+        tag: Resource
+        noSecurity: false
+        needAuth: true
+        needFound: false
+        needPermission: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: ResourceData_array
+        responseParams:
+          - name: createdCount
+      # 批量修改
+      - method: put
+        summary: Update resources in system.
+        tag: Resource
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: Resource_array
+        responseParams:
+          - name: updatedCount
+      # 批量部分修改
+      - method: patch
+        summary: Partially update resources in system.
+        tag: Resource
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: Resource_array
+        responseParams:
+          - name: updatedCount
+
+    - path: '/resources/:resourceId/:projectId'
+      ops:
+      # 按Id检索
+      - method: get
+        summary: Retrieve resource using the provided id.
+        tag: Resource
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: false
+        needResponseRef: true
+        refResponseEntity: Resource
+      # 按Id修改
+      - method: put
+        summary: Update resource using the provided id.
+        tag: Resource
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: Resource
+        needResponseRef: true
+        refResponseEntity: Resource
+      # 按Id部分修改
+      - method: patch
+        summary: Partially update resource using the provided id.
+        tag: Resource
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: Resource
+        needResponseRef: true
+        refResponseEntity: Resource
+      # 按Id删除
+      - method: delete
+        summary: Delete resource using the provided id.
+        tag: Resource
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        noResponseContent: true
+    - path: '/emailLogs/project/:projectId'
+      ops:
+      # 含路径参数的分页列表
+      - method: get
+        summary: Retrieve email log using the provided id.
+        tag: Project
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        queryParams:
+          - name: startdate
+        isList: true
+        needNavPage: true
+        needResponseRef: true
+        refResponseEntity: EmailLog
+        needResponsePageHeader: true
+
+    - path: '/projects'
+      ops:
+      # 无路径参数的分页列表
+      - method: get
+        summary: Retrieve projects in the system.
+        tag: Project
+        noSecurity: false
+        needAuth: true
+        needFound: false
+        needPermission: true
+        queryParams:
+          - name: startdate
+        isList: true
+        needNavPage: true
+        needResponseRef: true
+        refResponseEntity: Project
+        needResponsePageHeader: true
+
+    # Lookup
+    - path: '/lookup/:typeCode'
+      ops:
+      - method: get
+        summary: find lookup data by type code
+        tag: Lookup
+        noSecurity: false
+        needAuth: true
+        needFound: false
+        needPermission: true
+        isList: true
+        needResponseRef: true
+        refResponseEntity: LookupData
+
+  schemas:
+    - entity: ProductType
+      isEnum: true
+      description: Product type
+      enums:
+        - value: Video
+        - value: Car
+        - value: Computer
+    - entity: Project
+      isRecord: true
+      returnRef: ProjectData
+      entityParams:
+        # id已经默认加入
+        - name: home
+        - name: width
+    - entity: ProjectData
+      entityParams:
+        - name: name
+        - name: testEmail
+    - entity: Resource
+      isRecord: true
+      returnRef: ResourceData
+    - entity: ResourceData
+      entityParams:
+        - name: name
+        - name: vipFlag_bool_enum
+        - name: supportLanguage
+        - name: site
+        - name: createdat
+        - name: productType_enum
+        - name: productId
+        - name: currentComputerId
+    - entity: LookupData
+      entityParams:
+        - name: name
+        - name: code
+        - name: value
+    - entity: EmailLog
+      entityParams:
+        - name: body
+        - name: subject

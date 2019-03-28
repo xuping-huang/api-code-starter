@@ -16,10 +16,20 @@ function read(filename: fs.PathLike): any {
 
 function handleYamlConfig(config) {
   if ( !config.paths ) return config;
-
+  let pathParams
+  let tags = []
   for (const path of config.paths) {
+    // 判断path是否具有':',如果有生成的路径要加上单引号
+    if (path.path && path.path.includes(':')) {
+      path.isColonPath = true
+      // 提取路径中的参数
+      pathParams = path.path.match(/\:\w+/gi)
+    }
     for ( const method of path.ops ) {
       debug( `method: ${method.operationId}`);
+      if(method.tag && !tags.includes(method.tag)) {
+        tags.push(method.tag)
+      }
       if(method.method) {
         switch(method.method){
           case "get":
@@ -39,9 +49,17 @@ function handleYamlConfig(config) {
             break;
         }
       }
-      if(method.operationId) {
-        method.summary = method.operationId.match(/[A-Z]*[^A-Z]+/g).map(word => word.toLowerCase().trim()).join(' ');
-        method.operationName = method.operationId[0].toUpperCase() + method.operationId.substr(1, method.operationId.length - 1);
+      // if(method.operationId) {
+      //   method.summary = method.operationId.match(/[A-Z]*[^A-Z]+/g).map(word => word.toLowerCase().trim()).join(' ');
+      //   method.operationName = method.operationId[0].toUpperCase() + method.operationId.substr(1, method.operationId.length - 1);
+      // }
+      if (pathParams) {
+        method.needFound = true
+        // 将路径中的参数加入列表
+        if (!method.pathParams) method.pathParams = []
+        for( const parm of pathParams ){
+          method.pathParams.push({ name: parm.substr(1)})
+        }
       }
       if (method.pathParams){
         for(let pathParam of method.pathParams){
@@ -72,9 +90,29 @@ function handleYamlConfig(config) {
         }
         debug( method.responseParams );
       }
+      if ( method.refReqEntity ){
+        let ext = nameMatchs(method.refReqEntity)
+        if (ext.isArray) {
+          method.refReqEntity = ext.pureName
+          method.isArrayRefReqEntity = true
+        }
+      }
+
+      // 判断方法是否有任何参数定义
+      if (method.needNavPage || method.queryParams || method.pathParams || method.reqBodyParams ) {
+        method.hasMethodParameters = true
+      }
+      // OPEN API 3.0 reqBodyParams参数不再位于parameters中
+      if (method.needNavPage || method.queryParams || method.pathParams ) {
+        method.hasMethodParametersFor30 = true
+      }
     }
   }
 
+  config.tags = []
+  for ( const tag of tags ) {
+    config.tags.push({name: tag})
+  }
   if ( config.responses ){
     for ( const entity of config.responses){
       if ( entity.entityParams ){
@@ -100,14 +138,26 @@ function handleYamlConfig(config) {
       debug( entity.entityParams );
     }
   }
+  const debug2 = Debug('code:name');
 
   if ( config.schemas ){
     for ( const entity of config.schemas){
+      let nameParams = []
       if ( entity.entityParams ){
         for(let entityParam of entity.entityParams){
           entityParam.ex = nameMatchs(entityParam.name);
           entityParam.name = entityParam.ex.pureName;
+
+          // 判断属性名称是否有Id结尾并有前缀，增加以Name结尾的属性
+          if (entityParam.name.endsWith('Id') && entityParam.name.length > 2) {
+            debug2(entityParam.name)
+            nameParams.push(entityParam.name.substr(0, entityParam.name.length - 2) +'Name')
+          }
         }
+      }
+      // 将Name属性加入实体属性列表
+      for (const param of nameParams) {
+        entity.entityParams.push({ name: param, notRequired: true, ex: { type: 'string' } })
       }
       debug('config.schemas.entityParams');
       debug( entity.entityParams );

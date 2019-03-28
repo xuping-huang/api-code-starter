@@ -1,56 +1,59 @@
 openapi: "3.0.0"
 info:
-  title: {{project.name}} backend rest API
-  description: |
-    <b>Note</b>: please note.
+  title: {{project.name}}
   version: "1.0"
 servers:
 - url: {{{project.basePath}}}
-  variables:
-    apiVersion:
-      default: '{{project.version}}'
-      description: The REST API version
 security:
 {{#api.security.isJwt}}
 - bearerAuth: []
 {{/api.security.isJwt}}
-
+tags:
+  {{#tags}}
+  - name: {{name}}
+  {{/tags}}
 paths:
   {{#paths}}
-  {{{path}}}:
-    parameters:
-      - $ref: '#/components/parameters/id'
+  {{#isColonPath}}'{{/isColonPath}}{{{path}}}{{#isColonPath}}'{{/isColonPath}}:
     {{#ops}}
     {{method}}:
-      summary: {{operationId}} {{method}}
-      description: |
-        {{operationId}} {{method}}
+      summary: {{summary}}
       tags:
         - {{tag}}
+      description: >
+        {{#isPatch}}
+        Only the fields that are provided in the body will be changed.
+        {{/isPatch}}
+        {{#isPut}}
+        Update the {{refResponseEntity}} with the provided id.
+        {{/isPut}}
+        {{#isGet}}
+        {{#isList}}
+        Retrieve {{refResponseEntity}}s in the system.
+        {{/isList}}
+        {{^isList}}
+        Retrieve the {{refResponseEntity}} with provided id.
+        {{/isList}}
+        {{/isGet}}
+        {{#isPost}}
+        Create a new {{refResponseEntity}} in the system.
+        {{/isPost}}
+        {{#isDelete}}
+        Delete the {{tag}} with the provided id.
+        {{/isDelete}}
       {{#noSecurity}}
       security: []
       {{/noSecurity}}
-      parameters:
+      {{#hasMethodParametersFor30}}parameters:{{/hasMethodParametersFor30}}
       {{#needNavPage}}
         - $ref: '#/components/parameters/page'
         - $ref: '#/components/parameters/perPage'
-        - $ref: '#/components/parameters/sortOrder'
-        - name: sortBy
-          in: query
-          description: The sort order
-          required: false
-          schema:
-            type: string
-            enum: [createdAt,updatedAt]
       {{/needNavPage}}
+      {{#pathParams}}
+        {{> urlparam}}
+      {{/pathParams}}
       {{#queryParams}}
-        - name: {{name}}
-          in: query
-          description: {{name}}
-          required: true
-          example: {{name}}
-          schema:
-            type: string
+        {{> urlparam}}
       {{/queryParams}}
       {{#needReqBody}}
       requestBody:
@@ -58,10 +61,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: {{#refReqEntity}}'#/components/schemas/{{refReqEntity}}'{{/refReqEntity}}{{^refReqEntity}}'#/components/requestBodies/{{opreationName}}Body'{{/refReqEntity}}
+              {{#isArrayRefReqEntity}}
+              type: array
+              items:
+                $ref: {{#refReqEntity}}'#/components/schemas/{{refReqEntity}}'{{/refReqEntity}}
+              {{/isArrayRefReqEntity}}
+              {{^isArrayRefReqEntity}}
+              $ref: {{#refReqEntity}}'#/components/schemas/{{refReqEntity}}'{{/refReqEntity}}
+              {{/isArrayRefReqEntity}}
         {{/needReqBodyRef}}
         {{^needReqBodyRef}}
-        description: {{operationId}} request
         content:
           application/json:
             schema:
@@ -82,9 +91,9 @@ paths:
           description: Successfully {{operationName}}.
         {{/noResponseContent}}
         {{^noResponseContent}}
-        200:
-          {{#needResponseRef}}
+        {{#isPost}}201{{/isPost}}{{^isPost}}200{{/isPost}}:
           description: The operation succeeded.
+          {{#needResponseRef}}
           content:
             application/json:
               schema:
@@ -92,33 +101,12 @@ paths:
                 $ref: {{#refResponseEntity}}'#/components/schemas/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/components/responses/{{opreationName}}Response'{{/refResponseEntity}}
                 {{/isList}}
                 {{#isList}}
-                {{^needNavPage}}
                 type: array
                 items:
                   $ref: {{#refResponseEntity}}'#/components/schemas/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/components/responses/{{opreationName}}Response'{{/refResponseEntity}}
-                {{/needNavPage}}
-                {{#needNavPage}}
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: {{#refResponseEntity}}'#/components/schemas/{{refResponseEntity}}'{{/refResponseEntity}}{{^refResponseEntity}}'#/components/responses/{{opreationName}}Response'{{/refResponseEntity}}
-                  total:
-                    type: integer
-                    description: the total of count
-                    example: 35
-                  page:
-                    type: integer
-                    example: 1
-                  perPage:
-                    type: integer
-                    example: 20
-                {{/needNavPage}}
                 {{/isList}}
           {{/needResponseRef}}
           {{^needResponseRef}}
-          description: The operation succeeded.
           content:
             application/json:
               schema:
@@ -134,31 +122,9 @@ paths:
                 items:
                   type: object
                   properties:
-                    {{^needNavPage}}
                     {{#responseParams}}
                     {{> param}}
                     {{/responseParams}}
-                    {{/needNavPage}}
-                    {{#needNavPage}}
-                    items:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          {{#responseParams}}
-                          {{> param}}
-                          {{/responseParams}}
-                    total:
-                      type: integer
-                      description: the total of count
-                      example: 35
-                    page:
-                      type: integer
-                      example: 1
-                    perPage:
-                      type: integer
-                      example: 20
-                    {{/needNavPage}}
                 {{/isList}}
           {{#needResponsePageHeader}}
           headers:
@@ -203,6 +169,10 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
         {{/needFound}}
+        {{#needConflict}}
+        409:
+          $ref: '#/components/responses/Conflict'
+        {{/needConflict}}
         500:
           $ref: '#/components/responses/InternalServerError'
     {{/ops}}
@@ -232,8 +202,6 @@ components:
       schema:
         type: integer
         default: 1
-      example: 1
-
     perPage:
       name: {{api.navigation.perPage}}
       in: query
@@ -243,27 +211,6 @@ components:
         type: integer
         default: 20
         maximum: 100
-      example: 20
-
-    sortOrder:
-      name: {{api.navigation.sortOrder}}
-      in: query
-      description: The sort order.
-      required: false
-      schema:
-        type: string
-        enum: [asc, desc]
-        default: desc
-      example: asc
-
-    id:
-      name: id
-      in: path
-      description: The entity id.
-      required: true
-      schema:
-        type: string
-      example: 564935d6-16d5-4410-b415-55d369b90327
 
   #-------------------------------
   # Responses
@@ -299,7 +246,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-
+    Conflict:
+      description: CONFLICT - if the entity to be created conflicts with the uniqueness property of an entity that already exists in the table
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     {{#responses}}
     {{entity}}:
       description: {{entity}} response
@@ -342,7 +294,7 @@ components:
   #-------------------------------
   # Request Bodies
   #-------------------------------
-  requestBodies:
+  {{#requestBodies}}requestBodies:{{/requestBodies}}
     {{#requestBodies}}
     {{entity}}:
       description: {{entity}} request body
@@ -363,11 +315,34 @@ components:
   # Entities
   #-------------------------------
   schemas:
+    {{#api.entity.needId}}
     Id:
       type: string
       description: The id.
       example: 564935d6-16d5-4410-b415-55d369b90327
-
+    {{/api.entity.needId}}
+    TrueFalseSign:
+      type: string
+      enum: ['Y', 'N']
+    {{#api.entity.needRecord}}
+    Record:
+      type: object
+      properties:
+        createdOn:
+          type: string
+          description: Date Created, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
+          format: date-time
+        createdBy:
+          type: string
+          description: User ID of the creator
+        updatedOn:
+          type: string
+          description: Last Update date, ISO-8601 formatted date times (YYYY-MM-DDTHH:mm:ss.sssZ).
+          format: date-time
+        updatedBy:
+          type: string
+          description: User ID of the last update
+    {{/api.entity.needRecord}}
     Error:
       description: |
         An error entity.
@@ -375,15 +350,37 @@ components:
         message:
           type: string
           description: The error message.
-
     {{#schemas}}
     {{entity}}:
-      description: |
-        The {{entity}} entity.
+      {{^isRecord}}
+      {{#isEnum}}
+      type: string
+      {{#description}}description: {{description}}{{/description}}
+      enum: [{{#enums}}'{{value}}',{{/enums}}]
+      {{/isEnum}}
+      {{^isEnum}}
+      type: object
       required:
         {{#entityParams}}
+        {{^notRequired}}
         - {{name}}
+        {{/notRequired}}
         {{/entityParams}}
       properties:
         {{#entityParams}}{{> param}}{{/entityParams}}
+      {{/isEnum}}
+      {{/isRecord}}
+      {{#isRecord}}
+      type: object
+      allOf:
+        - type: object
+          properties:
+                                    id:
+                                      $ref: '#/components/schemas/Id'
+            {{#entityParams}}{{> param}}{{/entityParams}}
+        {{#api.entity.needRecord}}
+        - $ref: '#/components/schemas/Record'
+        {{/api.entity.needRecord}}
+        - $ref: '#/components/schemas/{{returnRef}}'
+      {{/isRecord}}
     {{/schemas}}
