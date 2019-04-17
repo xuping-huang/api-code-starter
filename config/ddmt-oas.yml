@@ -533,6 +533,7 @@ defaults: &defaults
     - entity: User
       isGetReturn: true
       returnRef: UserData
+      x-table-model: true
     - entity: UserData
       entityParams:
         - name: name
@@ -553,6 +554,7 @@ defaults: &defaults
     - entity: Application
       isGetReturn: true
       returnRef: ApplicationData
+      x-table-model: true
     - entity: ApplicationData
       entityParams:
         - name: name
@@ -572,6 +574,7 @@ defaults: &defaults
     - entity: Computer
       isGetReturn: true
       returnRef: ComputerData
+      x-table-model: true
     - entity: ComputerData
       entityParams:
         - name: name

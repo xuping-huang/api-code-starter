@@ -23,6 +23,7 @@ defaults: &defaults # default use json-db,express,javascript
       isMongoDB: false
       isNeo4j: false
       isMysql: false
+      isSqlite: false
       isDynamoDB: false
     log:
       needLog: true
@@ -100,9 +101,8 @@ defaults: &defaults # default use json-db,express,javascript
       joi: true
       validator: false
     secure:
-      auth0-js: true
+      auth0-js: false
       bcrypt-nodejs: false
-      crypto: false
       http: true
       https: true
       jwks-rsa: false
@@ -115,6 +115,8 @@ defaults: &defaults # default use json-db,express,javascript
       mongoose: false
       neo4j-driver: false
       aws-sdk: false
+      sequelize: false
+      sqlite3: false
     express:
       express: true
       express-status-monitor: false # monitor express status
@@ -136,6 +138,9 @@ defaults: &defaults # default use json-db,express,javascript
       pagination: true
       lodash: true
       config: true
+      nodemailer: false
+      moment: true
+      superagent: false
     spring:
       spring-fox: false
       otp-aerogera: false
@@ -144,6 +149,9 @@ test:
     test:
       unitTest: false
       e2eTest: false
+  dependencies:
+    other:
+      superagent: true
   devDependencies:
     test:
       chai: true
@@ -219,6 +227,7 @@ m2m:
     express:
       express-jwt: true
     secure:
+      auth0-js: true
       express-jwt-authz: true
       jwks-rsa: true
 secure:
@@ -290,6 +299,15 @@ mysql:
     db:
       name: Mysql
       isMysql: true
+sqlite:
+  projectStyle:
+    db:
+      name: SQLite
+      isSqlite: true
+  dependencies:
+    db:
+      sequelize: true
+      sqlite3: true
 ## Language
 typescript:
   projectStyle:
@@ -320,10 +338,18 @@ file:
   dependencies:
     express:
       express-fileupload: true
+xlsx:
+  dependencies:
+    other:
+      xlsx: true
+email:
+  dependencies:
+    other:
+      nodemailer: true
 name:
   project:
-    name: Challenge Resource API
-    description: Challenge Resource API
+    name: ddmt-api
+    description: DDMT API
 mockapi:
   projectStyle:
     test:

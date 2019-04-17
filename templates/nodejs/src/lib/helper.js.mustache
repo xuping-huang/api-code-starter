@@ -3,7 +3,15 @@
  */
 
 const _ = require('lodash')
+const Joi = require('joi')
+const querystring = require('querystring')
+const { Role } = require('../constants')
+{{#dependencies.other.pagination}}
 const pagination = require('pagination')
+{{/dependencies.other.pagination}}
+{{#projectStyle.db.isSqlite}}
+const Model = require('../model/index')
+{{/projectStyle.db.isSqlite}}
 
 /**
  * Wrap all functions of object to express middleware
@@ -75,6 +83,18 @@ module.exports.hasAdminRole = (authUser) => {
 }
 
 /**
+ * Determines whether the text form of two parameters is equal when the case and the first and last spaces are ignored.
+ * @param {String} valueA the first value
+ * @param {String} valueB the second value
+ * @return {Boolean} Comparison result of whether two parameters are equal
+ */
+module.exports.equalIgnoreCase = (valueA, valueB) => {
+  if (!valueA || !valueB) return false
+  return String(valueA).trim().toLowerCase() === String(valueB).trim().toLowerCase()
+}
+{{#dependencies.other.pagination}}
+
+/**
  * Get link for a given page.
  * @param {Object} req the HTTP request
  * @param {Number} page the page number
@@ -115,10 +135,10 @@ module.exports.setResHeaders = (req, res, result) => {
 
 /**
  * Format page link with the params
- * @param {object} req - the request object
- * @param {integer} page - the page number
- * @param {string} lastEvaluatedKey - returned LastEvaluatedKey in search
- * @return {string} formatted page link
+ * @param {Object} req - the request object
+ * @param {Integer} page - the page number
+ * @param {String} lastEvaluatedKey - returned LastEvaluatedKey in search
+ * @return {String} formatted page link
  */
 const formatPageLink = (req, page, lastEvaluatedKey) => {
   let url = `${req.protocol}://${req.hostname}${req.originalUrl}`
@@ -138,11 +158,11 @@ const formatPageLink = (req, page, lastEvaluatedKey) => {
 
 /**
  * Return Link info in pagination headers
- * @param {object} req - the request object
- * @param {string} lastEvaluatedKey - returnned LastEvaluatedKey in search
- * @param {integer} current - current page number
- * @param {integer} pageCount - total page number
- * @return {string} formatted link info
+ * @param {Object} req - the request object
+ * @param {String} lastEvaluatedKey - returnned LastEvaluatedKey in search
+ * @param {Integer} current - current page number
+ * @param {Integer} pageCount - total page number
+ * @return {String} formatted link info
  */
 const formatLink = (req, lastEvaluatedKey, current, pageCount) => {
   let link = ''
@@ -173,11 +193,11 @@ const formatLink = (req, lastEvaluatedKey, current, pageCount) => {
 
 /**
  * Format page info for pagination headers
- * @param {object} req - the request object
- * @param {object} data - the data object to handle
- * @return {object} formatted page object
+ * @param {Object} req - the request object
+ * @param {Object} data - the data object to handle
+ * @return {Object} formatted page object
  */
-exports.formatPagingData = (req, data) => {
+module.exports.formatPagingData = (req, data) => {
   let page = data.Page
   if ((page - 1) * data.PerPage >= data.Total) {
     page = 1
@@ -204,3 +224,68 @@ exports.formatPagingData = (req, data) => {
     }
   }
 }
+{{/dependencies.other.pagination}}
+
+
+/**
+ * Verify IP address validity
+ * @param {String} ipAddress IP address
+ * @return {Boolean} IP Address Validation Result
+ */
+module.exports.validIpAddress = (ipAddress) => {
+  const schema = Joi.object({
+    ipAddress: Joi.string().ip({ version: ['ipv4', 'ipv6'] }).required()
+  })
+  const { error } = Joi.validate({ ipAddress }, schema)
+  if (error) {
+    return false
+  }
+  return true
+}
+
+/**
+ * Verify the validity of type of install
+ * @param {String} typeOfEnum a enum type
+ * @return {Boolean} Type validation result
+ */
+module.exports.validEnumType = (typeOfEnum) => {
+  const schema = Joi.object({
+    typeOfEnum: Joi.string().trim().lowercase().valid(['manual', 'packaged']).required()
+  })
+  const { error } = Joi.validate({ typeOfEnum }, schema)
+  if (error) {
+    return false
+  }
+  return true
+}
+
+/**
+ * Verify the validity of email address
+ * @param {String} emailAddress email address
+ * @return {Boolean} Email address validation result
+ */
+module.exports.validEmail = (emailAddress) => {
+  const schema = Joi.object({
+    emailAddress: Joi.string().trim().email().required()
+  })
+  const { error } = Joi.validate({ emailAddress }, schema)
+  if (error) {
+    return false
+  }
+  return true
+}
+{{#projectStyle.db.isSqlite}}
+
+/**
+ * Check to see if the user ID exists in the table.
+ * @param {Uuid} userId the user id
+ * @return {Object} When the user ID exists, it returns the user data for it, otherwise null is returned.
+ */
+module.exports.checkUserExist = async (userId) => {
+  const user = await Model.UserModel.findByPk(userId, { raw: true })
+  if (!user) {
+    return Promise.reject(new error.NotFoundError(`User id '${userId}' not found.`))
+  }
+  return Promise.resolve(user)
+}
+{{/projectStyle.db.isSqlite}}
