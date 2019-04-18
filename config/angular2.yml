@@ -102,7 +102,7 @@ jwt:
       jsonwebtoken: true
 secure:
   projectStyle:
-    needPasswordBcrypt: true
+    needPassword: true
   dependencies:
     secure:
       bcrypt-nodejs: true

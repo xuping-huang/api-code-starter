@@ -35,7 +35,7 @@ defaults: &defaults # default use json-db,express,javascript
     auth:
       needJwt: false
       needM2M: false
-      needPasswordBcrypt: false
+      needPassword: false
     lint:
       isAribnbBase: false
       isESlingStandard: false
@@ -102,14 +102,14 @@ defaults: &defaults # default use json-db,express,javascript
       validator: false
     secure:
       auth0-js: false
-      bcrypt-nodejs: false
+      bcryptjs: false
       http: true
-      https: true
+      https: false
       jwks-rsa: false
       express-jwt-authz: false
       jsonwebtoken: false
       express-jwt: false
-      tc-core-library-js: true
+      tc-core-library-js: false
     db:
       json-file-db: false
       mongoose: false
@@ -147,8 +147,8 @@ defaults: &defaults # default use json-db,express,javascript
 test:
   projectStyle:
     test:
-      unitTest: false
-      e2eTest: false
+      unitTest: true
+      e2eTest: true
   dependencies:
     other:
       superagent: true
@@ -219,6 +219,15 @@ jwt:
     secure:
       express-jwt: true
       jsonwebtoken: true
+tcjwt:
+  projectStyle:
+    auth:
+      needJwt: true
+  dependencies:
+    secure:
+      express-jwt: true
+      jsonwebtoken: true
+      tc-core-library-js: true
 m2m:
   projectStyle:
     auth:
@@ -230,13 +239,16 @@ m2m:
       auth0-js: true
       express-jwt-authz: true
       jwks-rsa: true
-secure:
+pwd:
   projectStyle:
-    needPasswordBcrypt: true
+    needPassword: true
+salt:
+  projectStyle:
+    auth:
+      needPassword: true
   dependencies:
     secure:
-      bcrypt-nodejs: true
-      crypto: true
+      bcryptjs: true
 aws:
   projectStyle:
     other:
@@ -330,9 +342,6 @@ spring:
       groupId: com.autocognita
     log:
       needLog: true
-    auth:
-      needJwt: true
-      needPasswordBcrypt: true
 ## other
 file:
   dependencies:
@@ -346,11 +355,16 @@ email:
   dependencies:
     other:
       nodemailer: true
-name:
-  project:
-    name: ddmt-api
-    description: DDMT API
+nopage:
+  dependencies:
+    other:
+      pagination: false
 mockapi:
   projectStyle:
     test:
       needMockApi: true
+## Required
+name:
+  project:
+    name: ddmt-api
+    description: DDMT API

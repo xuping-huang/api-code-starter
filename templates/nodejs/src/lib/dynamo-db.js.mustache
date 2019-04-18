@@ -1,3 +1,4 @@
+{{#projectStyle.db.isDynamoDB}}
 /**
  * DynamoDB Helper
  */
@@ -216,3 +217,8 @@ class DynamoItem {
 module.exports.DynamoItem = DynamoItem
 
 module.exports.DynamoDb = new AWS.DynamoDB.DocumentClient()
+
+{{/projectStyle.db.isDynamoDB}}
+{{^projectStyle.db.isDynamoDB}}
+// TODO: Remove this file
+{{/projectStyle.db.isDynamoDB}}

@@ -17,10 +17,15 @@ The following parameters can be set in config files or in env variables:
 - LOG.LOGGER_DIR: the directory stored in logs
 - LOG.LOGGER_FILE: the log file name
 - PORT: the server port, default is 3000
+  {{#projectStyle.other.needHttps}}
 - SECURE_PORT: the secure server port, default is 443
+  {{/projectStyle.other.needHttps}}
   {{#projectStyle.auth.needJwt}}
 - AUTH_SECRET: The authorization secret used during token verification.
+- JWT_KEY_CACHE_TIME: The token expired time.
+  {{#dependencies.secure.tc-core-library-js}}
 - VALID_ISSUERS: The valid issuer of tokens.
+  {{/dependencies.secure.tc-core-library-js}}
   {{/projectStyle.auth.needJwt}}
   {{#projectStyle.auth.needM2M}}
   {{/projectStyle.auth.needM2M}}
@@ -31,8 +36,18 @@ The following parameters can be set in config files or in env variables:
 - DYNAMODB.IS_LOCAL: Use Amazon DynamoDB Local or server.
 - DYNAMODB.AWS_DYNAMODB_ENDPOINT: The local url if using Amazon DynamoDB Local
   {{/projectStyle.db.isDynamoDB}}
+  {{#projectStyle.db.isSqlite}}
+- DATABASE_USERNAME: The Sqlite3 database username.
+- DATABASE_PASSWORD: The Sqlite3 database password.
+- DATABASE_POOL_MAX: The database connection pool max size.
+  {{/projectStyle.db.isSqlite}}
+  {{#dependencies.other.pagination}}
 - PAGE.PERPAGE_DEFAULT: the default page size
 - PAGE.PER_PAGE_MAX: the max page size
+  {{/dependencies.other.pagination}}
+  {{#projectStyle.auth.needPassword}}
+- PRIVATE_KEY: Private key certificate for decrypting passwords.
+  {{/projectStyle.auth.needPassword}}
 
 {{#projectStyle.db.isDynamoDB}}
 ## DynamoDB Setup with Docker
@@ -65,13 +80,28 @@ aws dynamodb list-tables --endpoint-url http://dynamodb:8000
 - Run lint `npm run lint`
 - Run lint fix `npm run lint:fix`
 - Start app `npm start`
-- App is running at `http://localhost:3000`
+  - App is running at `http://localhost:3000`
+- Start app in debug mode `npm run debug`
 - Clear and init db `npm run cleanData`
 - Insert test data `npm run initData`
+  {{#projectStyle.test.unitTest}}
 - Run unit test `npm run test`
+  {{/projectStyle.test.unitTest}}
+  {{#projectStyle.test.e2eTest}}
 - Run e2e test `npm run e2e`
+  {{/projectStyle.test.e2eTest}}
+  {{#projectStyle.test.needCoverage}}
 - Generate coverage report for unit test `npm run cov`
+  {{#projectStyle.test.e2eTest}}
 - Generate coverage report for e2e test `npm run cov-e2e`
+  {{/projectStyle.test.e2eTest}}
+  {{/projectStyle.test.needCoverage}}
+
+  {{#projectStyle.test.unitTest}}
+## Testing
+- Run `npm run test` to execute unit tests.
+- RUN `npm run e2e` to execute e2e tests.
+  {{/projectStyle.test.unitTest}}
 
 ## Verification
 Refer to the verification document `Verification.md`

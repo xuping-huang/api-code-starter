@@ -1,0 +1,26 @@
+{{#projectStyle.db.isSqlite}}
+/**
+ * Define database connection
+ */
+const config = require('config')
+const Sequelize = require('sequelize')
+const sequelize = new Sequelize('database', config.get('DATABASE_USERNAME'), config.get('DATABASE_PASSWORD'), {
+  // sqlite! now!
+  dialect: 'sqlite',
+
+  // the storage engine for sqlite
+  // - default ':memory:'
+  storage: './db/database.db',
+  pool: {
+    max: config.get('DATABASE_POOL_MAX'),
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
+})
+
+module.exports.sequelize = sequelize
+{{/projectStyle.db.isSqlite}}
+{{^projectStyle.db.isSqlite}}
+// TODO: Remove this file
+{{/projectStyle.db.isSqlite}}

@@ -65,6 +65,7 @@ app.disable('x-powered-by')
 app.use(morgan('combined', { stream: logger.stream }))
 {{/dependencies.logger.morgan}}
 
+// eslint-disable-next-line
 const router = require('./app-route')(app)
 
 // intercept the response body from jwtAuthenticator

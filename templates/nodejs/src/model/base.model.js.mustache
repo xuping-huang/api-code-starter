@@ -91,6 +91,9 @@ class BaseModel {
     return Promise.resolve(retData)
   }
   {{/projectStyle.db.isDynamoDB}}
+  {{^projectStyle.db.isDynamoDB}}
+  // TODO: Remove this file
+  {{/projectStyle.db.isDynamoDB}}
 }
 
 module.exports = BaseModel

@@ -4,7 +4,9 @@
 
 const _ = require('lodash')
 const Joi = require('joi')
+{{#dependencies.other.pagination}}
 const querystring = require('querystring')
+{{/dependencies.other.pagination}}
 const { Role } = require('../constants')
 {{#dependencies.other.pagination}}
 const pagination = require('pagination')
@@ -75,7 +77,7 @@ module.exports.checkIfExists = (source, term) => {
  */
 module.exports.hasAdminRole = (authUser) => {
   for (let i = 0; i < authUser.roles.length; i++) {
-    if (authUser.roles[i].toLowerCase() === constants.UserRoles.Admin.toLowerCase()) {
+    if (authUser.roles[i].toLowerCase() ===Role.Admin.toLowerCase()) {
       return true
     }
   }

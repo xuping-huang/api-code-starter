@@ -11,10 +11,14 @@ const config = require('config')
 {{#dependencies.other.http-status}}
 const httpStatus = require('http-status')
 {{/dependencies.other.http-status}}
+{{#projectStyle.auth.needJwt}}
 {{#dependencies.secure.tc-core-library-js}}
 const authenticator = require('tc-core-library-js').middleware.jwtAuthenticator
 {{/dependencies.secure.tc-core-library-js}}
-
+{{^dependencies.secure.tc-core-library-js}}
+const jwt = require('jsonwebtoken')
+{{/dependencies.secure.tc-core-library-js}}
+{{/projectStyle.auth.needJwt}}
 const helper = require('./src/lib/helper')
 const error = require('./src/lib/app-error')
 const routes = require('./src/routes')
@@ -56,6 +60,41 @@ const options = {
 // Initialize swagger-jsdoc -> returns validated swagger spec in json format
 const swaggerSpec = swaggerJSDoc(options)
 {{/dependencies.other.swagger-jsdoc}}
+{{#projectStyle.auth.needJwt}}
+{{^dependencies.secure.tc-core-library-js}}
+
+const authVerifier = (jwtKeyCacheTime) => {
+  return {
+    /**
+     * Verify jwt token
+     * @param  token  the token to verify
+     * @param  secret  secret code (Optional), should be provided if alg is HS256
+     * @param  callback  callback to pass responses
+     */
+    validateToken: (token, secret, callback) => {
+      // Decode it first
+      let decodedToken = jwt.decode(token, { complete: true })
+
+      if (decodedToken) {
+        jwtVerify(token, secret, callback)
+      } else {
+        callback(new error.UnauthorizedError('Invalid Token.'))
+      }
+    }
+  }
+
+  function jwtVerify (token, secretOrCert, callback) {
+    jwt.verify(token, secretOrCert, (err, decoded) => {
+      if (err) {
+        callback(new error.UnauthorizedError('Failed to authenticate token.'))
+      } else {
+        callback(undefined, decoded)
+      }
+    })
+  }
+}
+{{/dependencies.secure.tc-core-library-js}}
+{{/projectStyle.auth.needJwt}}
 
 /**
  * Configure all route for express app
@@ -77,7 +116,53 @@ module.exports = (app) => {
       // add authenticator check if route has auth
       if (params.auth) {
         actions.push((req, res, next) => {
+          {{#projectStyle.auth.needJwt}}
+          {{#dependencies.secure.tc-core-library-js}}
           authenticator(_.pick(config, ['AUTH_SECRET', 'VALID_ISSUERS']))(req, res, next)
+          {{/dependencies.secure.tc-core-library-js}}
+          {{^dependencies.secure.tc-core-library-js}}
+          const secret = config.get('AUTH_SECRET') || ''
+          const jwtKeyCacheTime = config.get('JWT_KEY_CACHE_TIME', '24h')
+          if (!secret || secret.length === 0) {
+            throw new error.InternalServerError('Auth secret not provided')
+          }
+
+          const verifier = authVerifier(jwtKeyCacheTime)
+
+          var token
+          if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+            token = req.headers.authorization.split(' ')[1]
+          }
+          // decode token
+          if (token) {
+            verifier.validateToken(token, secret, (err, decoded) => {
+              if (err) {
+                next(err)
+              } else {
+                // if everything is good, save to request for use in other routes
+                req.authUser = decoded
+                req.authUser.userId = _.parseInt(_.find(req.authUser, (value, key) => {
+                  return (key.indexOf('userId') !== -1)
+                }))
+                req.authUser.handle = _.find(req.authUser, (value, key) => {
+                  return (key.indexOf('handle') !== -1)
+                })
+                req.authUser.roles = _.find(req.authUser, (value, key) => {
+                  return (key.indexOf('roles') !== -1)
+                })
+
+                next()
+              }
+            })
+          } else {
+            // if there is no token
+            // return an error
+            res.status(httpStatus.UNAUTHORIZED)
+              .json({ message: 'No token provided.' })
+            res.send()
+          }
+          {{/dependencies.secure.tc-core-library-js}}
+          {{/projectStyle.auth.needJwt}}
         })
         actions.push((req, res, next) => { // eslint-disable-line
           if (req.authUser.isMachine) {
