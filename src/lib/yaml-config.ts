@@ -4,7 +4,7 @@ import merge from 'merge-deep';
 import Debug from 'debug';
 import {nameMatchs} from './param-match';
 
-const debug = Debug('code:generator');
+const debug = Debug('code:config');
 
 function read(filename: fs.PathLike): any {
   const buffer = fs.readFileSync(filename);
@@ -26,7 +26,7 @@ function handleYamlConfig(config) {
       pathParams = path.path.match(/\:\w+/gi)
     }
     for ( const method of path.ops ) {
-      debug( `method: ${method.operationId}`);
+      debug( `-----------------method: ${method.operationId}`);
       if(method.tag && !tags.includes(method.tag)) {
         tags.push(method.tag)
       }
@@ -49,10 +49,6 @@ function handleYamlConfig(config) {
             break;
         }
       }
-      // if(method.operationId) {
-      //   method.summary = method.operationId.match(/[A-Z]*[^A-Z]+/g).map(word => word.toLowerCase().trim()).join(' ');
-      //   method.operationName = method.operationId[0].toUpperCase() + method.operationId.substr(1, method.operationId.length - 1);
-      // }
       if (pathParams) {
         method.needFound = true
         // 将路径中的参数加入列表
@@ -88,6 +84,7 @@ function handleYamlConfig(config) {
           resParam.ex = nameMatchs(resParam.name);
           resParam.name = resParam.ex.pureName;
         }
+        debug( `method.responseParams` );
         debug( method.responseParams );
       }
       if ( method.refReqEntity ){
@@ -95,6 +92,13 @@ function handleYamlConfig(config) {
         if (ext.isArray) {
           method.refReqEntity = ext.pureName
           method.isArrayRefReqEntity = true
+        }
+      }
+      if (method.needResponseRef && method.refResponseEntity) {
+        let ext = nameMatchs(method.refResponseEntity)
+        if (ext.isArray) {
+          method.refResponseEntity = ext.pureName
+          method.isArrayRefResponseEntity = true
         }
       }
 

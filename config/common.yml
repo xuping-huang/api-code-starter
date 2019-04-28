@@ -25,7 +25,11 @@ defaults: &defaults # default use json-db,express,javascript
       isMysql: false
       isSqlite: false
       isDynamoDB: false
-      isPostgre: false
+      isPostgres: false
+      isMariadb: false
+      isMssql: false
+    orm:
+      isSequelize: false
     log:
       needLog: true
     test:
@@ -76,18 +80,9 @@ defaults: &defaults # default use json-db,express,javascript
       eslint-plugin-promise: false
       eslint-plugin-standard: false
     test:
-      chai: false
       mocha: false
-      mocha-prepare: false
-      nock: false
-      sinon: false
-      sinon-chai: false
-      sinon-mongoose: false
-      supertest: false
       jest: false
-      aws-sdk-mock: false
-      chai-as-promised: false
-      chai-http: false
+      should: false
     coverage:
       nyc: false # Istanbul's state of the art command line interface
     other:
@@ -120,6 +115,7 @@ defaults: &defaults # default use json-db,express,javascript
       aws-sdk: false
       sequelize: false
       sqlite3: false
+      postgres: false
     express:
       express: true
       express-status-monitor: false # monitor express status
@@ -157,17 +153,8 @@ test:
       superagent: true
   devDependencies:
     test:
-      chai: true
       mocha: true
-      mocha-prepare: true
-      nock: true
-      sinon: true
-      sinon-chai: true
-      sinon-mongoose: true
-      supertest: true
-      aws-sdk-mock: true
-      chai-as-promised: true
-      chai-http: true
+      should: true
 cov:
   projectStyle:
     test:
@@ -343,11 +330,30 @@ mysql:
     db:
       name: Mysql
       isMysql: true
+    orm:
+      isSequelize: true
+  dependencies:
+    db:
+      sequelize: true
+      mysql2: true
+mariadb:
+  projectStyle:
+    db:
+      name: Mariadb
+      isMariadb: true
+    orm:
+      isSequelize: true
+  dependencies:
+    db:
+      sequelize: true
+      mariadb: true
 sqlite:
   projectStyle:
     db:
       name: SQLite
       isSqlite: true
+    orm:
+      isSequelize: true
   dependencies:
     db:
       sequelize: true
@@ -356,10 +362,25 @@ postgres:
   projectStyle:
     db:
       name: PostgreSQL
-      isPostgre: true
+      isPostgres: true
+    orm:
+      isSequelize: true
   dependencies:
     db:
       sequelize: true
+      pg: true
+      pg-hstore: true
+mssql:
+  projectStyle:
+    db:
+      name: Microsoft SQL Server
+      isMssql: true
+    orm:
+      isSequelize: true
+  dependencies:
+    db:
+      sequelize: true
+      tedious : true
 ## Language
 typescript:
   projectStyle:

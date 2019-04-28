@@ -6,74 +6,77 @@ defaults: &defaults
   api:
     security:
       isJwt: true
-  paths: 
-    - path: '/terms/:challengeId'
+  paths:
+    - path: '/terms/:termsOfUseId'
       ops:
       - method: get
+        operationId: getTerms
         summary: Retrieves the term using the provided id.
         tag: Term
         noSecurity: false
         needAuth: true
         needPermission: true
         needFound: true
-        pathParams:
-          - name: termsOfUseId
         queryParams:
           - name: role
         needResponseRef: true
         refResponseEntity: Term_ref_array
-    - path: '/terms/:termsOfUseId/agree'
-      ops:
-      - method: post
-        summary: Create a term in the system.
-        tag: Term
-        noSecurity: false
-        needAuth: true
-        needPermission: true
-        needFound: true
-        needConflict: false
-        pathParams:
-          - name: termsOfUseId
-        needReqBody: true
-        needReqBodyRef: true
-        responseParams:
-          - name: success_bool
-    - path: /terms/docusignViewURL
-      ops:
-      - method: post
-        summary: Create term in the system.
-        tag: Term
-        noSecurity: false
-        needAuth: true
-        needPermission: true
-        needFound: true
-        needConflict: true
-        needReqBody: true
-        reqBodyParams:
-          - name: templateId
-          - name: tabs
-          - name: returnUrl
-        responseParams:
-          - name: recipientViewUrl
-          - name: envelopeId
-    - path: /terms/docusignCallback
-      ops:
-      - method: post
-        summary: Create doc sign in the system.
-        tag: Term
-        noSecurity: false
-        needAuth: true
-        needPermission: true
-        needFound: true
-        needConflict: true
-        needReqBody: true
-        reqBodyParams:
-          - name: envelopeStatus
-          - name: envelopeId
-          - name: tabs
-          - name: connectKey
-        responseParams:
-          - name: message
+    # - path: '/terms/:termsOfUseId/agree'
+    #   ops:
+    #   - method: post
+    #     operationId: agreeTerms
+    #     summary: Create a term in the system.
+    #     tag: Term
+    #     noSecurity: false
+    #     needAuth: true
+    #     needPermission: true
+    #     needFound: true
+    #     needConflict: false
+    #     pathParams:
+    #       - name: termsOfUseId
+    #     needReqBody: true
+    #     isList: true
+    #     needReqBodyRef: true
+    #     responseParams:
+    #       - name: success_bool
+    # - path: /terms/docusignViewURL
+    #   ops:
+    #   - method: post
+    #     operationId: docusignViewURL
+    #     summary: Create term in the system.
+    #     tag: Term
+    #     noSecurity: false
+    #     needAuth: true
+    #     needPermission: true
+    #     needFound: true
+    #     needConflict: true
+    #     needReqBody: true
+    #     reqBodyParams:
+    #       - name: templateId
+    #       - name: tabs
+    #       - name: returnUrl
+    #     responseParams:
+    #       - name: recipientViewUrl
+    #       - name: envelopeId
+    # - path: /terms/docusignCallback
+    #   ops:
+    #   - method: post
+    #     operationId: docusignCallback
+    #     summary: Create doc sign in the system.
+    #     tag: Term
+    #     noSecurity: false
+    #     needAuth: true
+    #     needPermission: true
+    #     needFound: true
+    #     needConflict: true
+    #     needReqBody: true
+    #     reqBodyParams:
+    #       - name: envelopeStatus
+    #       - name: envelopeId
+    #       - name: tabs
+    #       - name: connectKey
+    #     responseParams:
+    #       - name: message
 
   schemas:
     - entity: Id

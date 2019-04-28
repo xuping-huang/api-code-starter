@@ -30,16 +30,34 @@ DATABASE_USERNAME: "database access account",
 DATABASE_PASSWORD: "database access account password",
 DATABASE_POOL_MAX: "database connection pool max",
 {{/projectStyle.db.isSqlite}}
-{{#projectStyle.db.isPostgre}}
+{{#projectStyle.db.isPostgres}}
 DATABASE_USERNAME: "database access account",
 DATABASE_PASSWORD: "database access account password",
 DATABASE_POOL_MAX: "database connection pool max",
-{{/projectStyle.db.isPostgre}}
+DATABASE_URL: "database link",
+DATABASE_NAME: "database name"
+{{/projectStyle.db.isPostgres}}
 {{#projectStyle.db.isMysql}}
 DATABASE_USERNAME: "database access account",
 DATABASE_PASSWORD: "database access account password",
 DATABASE_POOL_MAX: "database connection pool max",
+DATABASE_URL: "database link",
+DATABASE_NAME: "database name"
 {{/projectStyle.db.isMysql}}
+{{#projectStyle.db.isMariadb}}
+DATABASE_USERNAME: "database access account",
+DATABASE_PASSWORD: "database access account password",
+DATABASE_POOL_MAX: "database connection pool max",
+DATABASE_URL: "database link",
+DATABASE_NAME: "database name"
+{{/projectStyle.db.isMariadb}}
+{{#projectStyle.db.isMssql}}
+DATABASE_USERNAME: "database access account",
+DATABASE_PASSWORD: "database access account password",
+DATABASE_POOL_MAX: "database connection pool max",
+DATABASE_URL: "database link",
+DATABASE_NAME: "database name"
+{{/projectStyle.db.isMssql}}
 {{#projectStyle.db.isMongoDB}}
 DATABASE_USERNAME: "database access account",
 DATABASE_PASSWORD: "database access account password",
@@ -64,9 +82,18 @@ EMAIL_FROM: "email sender address",
 3. Modify the other configuration variables if necessary in `config/default.js`
 
 4. Database initialize
-  {{#projectStyle.db.isPostgre}}
+  {{#projectStyle.db.isMysql}}
   1. Create tables in the database by running the sql script `scripts\createTables.sql`
-  {{/projectStyle.db.isPostgre}}
+  {{/projectStyle.db.isMysql}}
+  {{#projectStyle.db.isMssql}}
+  1. Create tables in the database by running the sql script `scripts\createTables.sql`
+  {{/projectStyle.db.isMssql}}
+  {{#projectStyle.db.isMariadb}}
+  1. Create tables in the database by running the sql script `scripts\createTables.sql`
+  {{/projectStyle.db.isMariadb}}
+  {{#projectStyle.db.isPostgres}}
+  1. Create tables in the database by running the sql script `scripts\createTables.sql`
+  {{/projectStyle.db.isPostgres}}
   {{#projectStyle.db.isSqlite}}
   1. Create tables in the database by running the sql script `scripts\createTables.sql`
   {{/projectStyle.db.isSqlite}}

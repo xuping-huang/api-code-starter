@@ -10,9 +10,7 @@ const pagination = require('pagination')
 {{/dependencies.other.pagination}}
 const error = require('./app-error')
 const { Role } = require('../constants')
-{{#projectStyle.db.isSqlite}}
 const Model = require('../model/index')
-{{/projectStyle.db.isSqlite}}
 
 /**
  * Wrap all functions of object to express middleware
@@ -274,7 +272,7 @@ module.exports.validEmail = (emailAddress) => {
   }
   return true
 }
-{{#projectStyle.db.isSqlite}}
+{{#projectStyle.orm.isSequelize}}
 
 /**
  * Check to see if the user ID exists in the table.
@@ -288,4 +286,4 @@ module.exports.checkUserExist = async (userId) => {
   }
   return Promise.resolve(user)
 }
-{{/projectStyle.db.isSqlite}}
+{{/projectStyle.orm.isSequelize}}

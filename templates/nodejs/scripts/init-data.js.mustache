@@ -1,0 +1,14 @@
+/**
+* Insert test data to database.
+*/
+const logger = require('../src/lib/logger')
+const { cleanData, initData } = require('./tools')
+
+const run = async () => {
+  logger.info('Importing test data into database.')
+  await cleanData()
+  await initData()
+  logger.info('Database test data imported.')
+}
+
+run()

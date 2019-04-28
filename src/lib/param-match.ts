@@ -332,8 +332,6 @@ const refUnderMatch = matchWrap(REF_PARAM, (word: ParsedName, paramEx)=>{
 });
 
 const idEndMatch = matchWrap(ID_PARAM, (word: ParsedName, paramEx)=>{
-  debug('-----------idEndMatch----------------')
-  debug(word)
   return endMatch( word, ['id'], paramEx);
 });
 

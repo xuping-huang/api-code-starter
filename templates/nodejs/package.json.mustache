@@ -14,15 +14,15 @@
     "lint:fix": "standard --fix",
     "eslint": "eslint \"**/*.js\"",
     {{#projectStyle.test.unitTest}}
-    "test": "set DEBUG=test:*&&mocha test/**/*.spec.js",
+    "test": "set DEBUG=test:*&&mocha test/unit/test.js --timeout 20000 --exit",
     {{/projectStyle.test.unitTest}}
     {{#projectStyle.test.e2eTest}}
-    "e2e": "set DEBUG=test:*&&mocha test/**/*.e2e.js",
+    "e2e": "set DEBUG=test:*&&mocha test/e2e/test.js --timeout 20000 --exit",
     {{/projectStyle.test.e2eTest}}
     {{#projectStyle.test.needCoverage}}
-    "cov": "nyc --reporter=html --reporter=text mocha test/**/*.spec.js --exit",
+    "cov": "nyc --reporter=html --reporter=text mocha test/unit/test.js --timeout 20000 --exit",
     {{#projectStyle.test.e2eTest}}
-    "cov-e2e": "nyc --reporter=html --reporter=text mocha test/**/*.e2e.js --exit"
+    "cov-e2e": "nyc --reporter=html --reporter=text mocha test/e2e/test.js --timeout 20000 --exit"
     {{/projectStyle.test.e2eTest}}
     {{/projectStyle.test.needCoverage}}
     "initData": "node scripts/init-data.js",
@@ -154,6 +154,21 @@
     {{#dependencies.db.sqlite3}}
     "sqlite3": "^4.0.6",
     {{/dependencies.db.sqlite3}}
+    {{#dependencies.db.pg}}
+    "pg": "^7.10.0",
+    {{/dependencies.db.pg}}
+    {{#dependencies.db.pg-hstore}}
+    "pg-hstore": "^2.3.2",
+    {{/dependencies.db.pg-hstore}}
+    {{#dependencies.db.mysql2}}
+    "mysql2": "^1.6.5",
+    {{/dependencies.db.mysql2}}
+    {{#dependencies.db.mariadb}}
+    "mariadb": "^2.0.3",
+    {{/dependencies.db.mariadb}}
+    {{#dependencies.db.tedious}}
+    "tedious": "^6.1.1",
+    {{/dependencies.db.tedious}}
     {{#dependencies.other.superagent}}
     "superagent": "^5.0.2",
     {{/dependencies.other.superagent}}
@@ -166,21 +181,9 @@
     "request": "^2.88.0"
   },
   "devDependencies": {
-    {{#devDependencies.test.aws-sdk-mock}}
-    "aws-sdk-mock": "^4.3.1",
-    {{/devDependencies.test.aws-sdk-mock}}
     {{#devDependencies.codeStyle.babel-eslint}}
     "babel-eslint": "^10.0.1",
     {{/devDependencies.codeStyle.babel-eslint}}
-    {{#devDependencies.test.chai}}
-    "chai": "^4.1.2",
-    {{/devDependencies.test.chai}}
-    {{#devDependencies.test.chai-as-promised}}
-    "chai-as-promised": "^7.1.1",
-    {{/devDependencies.test.chai-as-promised}}
-    {{#devDependencies.test.chai-http}}
-    "chai-http": "^4.2.1",
-    {{/devDependencies.test.chai-http}}
     {{#devDependencies.codeStyle.eslint}}
     "eslint": "^5.6.0",
     {{/devDependencies.codeStyle.eslint}}
@@ -208,30 +211,15 @@
     {{#devDependencies.test.mocha}}
     "mocha": "^5.2.0",
     {{/devDependencies.test.mocha}}
-    {{#devDependencies.test.mocha-prepare}}
-    "mocha-prepare": "^0.1.0",
-    {{/devDependencies.test.mocha-prepare}}
-    {{#devDependencies.test.nock}}
-    "nock": "^10.0.6",
-    {{/devDependencies.test.nock}}
+    {{#devDependencies.test.should}}
+    "should": "^13.2.3",
+    {{/devDependencies.test.should}}
     {{#devDependencies.coverage.nyc}}
     "nyc": "^13.0.1",
     {{/devDependencies.coverage.nyc}}
-    {{#devDependencies.test.sinon}}
-    "sinon": "^6.3.3",
-    {{/devDependencies.test.sinon}}
-    {{#devDependencies.test.sinon-chai}}
-    "sinon-chai": "^3.3.0",
-    {{/devDependencies.test.sinon-chai}}
-    {{#devDependencies.test.sinon-mongoose}}
-    "sinon-mongoose": "^2.2.1",
-    {{/devDependencies.test.sinon-mongoose}}
     {{#devDependencies.codeStyle.standard}}
     "standard": "^12.0.1",
     {{/devDependencies.codeStyle.standard}}
-    {{#devDependencies.test.supertest}}
-    "supertest": "^3.3.0",
-    {{/devDependencies.test.supertest}}
     {{#devDependencies.other.nodemon}}
     "nodemon": "^1.18.9"
     {{/devDependencies.other.nodemon}}

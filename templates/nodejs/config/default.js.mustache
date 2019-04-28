@@ -25,19 +25,53 @@ module.exports = {
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || 'FAKE_ACCESS_KEY',
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || 'FAKE_SECRET_ACCESS_KEY',
     AWS_REGION: process.env.AWS_REGION || 'ap-southeast-1',
-    IS_LOCAL: process.env.IS_LOCAL || true,
+    IS_LOCAL: process.env.AWS_IS_LOCAL || true,
     AWS_DYNAMODB_ENDPOINT: process.env.AWS_DYNAMODB_ENDPOINT || 'http://localhost:8000'
   },
   {{/projectStyle.db.isDynamoDB}}
   {{#projectStyle.db.isSqlite}}
   DATABASE: {
-    USERNAME: process.env.DATABASE_USERNAME || 'postgres',
+    USERNAME: process.env.DATABASE_USERNAME || 'sqlite',
     PASSWORD: process.env.DATABASE_PASSWORD || '98096',
-    URL: process.env.DATABASE_URL || 'localhost:5432',
-    NAME: process.env.DATABASE_NAME || 'TopcoderTerm',
     POOL_MAX: process.env.DATABASE_POOL_MAX || 30
   },
   {{/projectStyle.db.isSqlite}}
+  {{#projectStyle.db.isPostgres}}
+  DATABASE: {
+    USERNAME: process.env.DATABASE_USERNAME || 'postgres',
+    PASSWORD: process.env.DATABASE_PASSWORD || '98096',
+    URL: process.env.DATABASE_URL || 'localhost:5432',
+    NAME: process.env.DATABASE_NAME || 'DBName',
+    POOL_MAX: process.env.DATABASE_POOL_MAX || 30
+  },
+  {{/projectStyle.db.isPostgres}}
+  {{#projectStyle.db.isMysql}}
+  DATABASE: {
+    USERNAME: process.env.DATABASE_USERNAME || 'mysql',
+    PASSWORD: process.env.DATABASE_PASSWORD || '98096',
+    URL: process.env.DATABASE_URL || 'localhost:3306',
+    NAME: process.env.DATABASE_NAME || 'DBName',
+    POOL_MAX: process.env.DATABASE_POOL_MAX || 30
+  },
+  {{/projectStyle.db.isMysql}}
+  {{#projectStyle.db.isMariadb}}
+  DATABASE: {
+    USERNAME: process.env.DATABASE_USERNAME || 'mariadb',
+    PASSWORD: process.env.DATABASE_PASSWORD || '98096',
+    URL: process.env.DATABASE_URL || 'localhost:3306',
+    NAME: process.env.DATABASE_NAME || 'DBName',
+    POOL_MAX: process.env.DATABASE_POOL_MAX || 30
+  },
+  {{/projectStyle.db.isMariadb}}
+  {{#projectStyle.db.isMssql}}
+  DATABASE: {
+    USERNAME: process.env.DATABASE_USERNAME || 'mssql',
+    PASSWORD: process.env.DATABASE_PASSWORD || '98096',
+    URL: process.env.DATABASE_URL || 'localhost:1433',
+    NAME: process.env.DATABASE_NAME || 'DBName',
+    POOL_MAX: process.env.DATABASE_POOL_MAX || 30
+  },
+  {{/projectStyle.db.isMssql}}
   {{#dependencies.other.pagination}}
   PAGE: {
     PERPAGE_DEFAULT: process.env.PERPAGE_DEFAULT || 20,
