@@ -25,6 +25,7 @@ defaults: &defaults # default use json-db,express,javascript
       isMysql: false
       isSqlite: false
       isDynamoDB: false
+      isPostgre: false
     log:
       needLog: true
     test:
@@ -55,6 +56,8 @@ defaults: &defaults # default use json-db,express,javascript
       needGootleText2Speech: false
       needErrorEmail: false
       needHttps: false
+      needKafka: false
+      needElasticSearch: false
     date:
       isThreeTenbp: false
       isJava8: false
@@ -241,7 +244,8 @@ m2m:
       jwks-rsa: true
 pwd:
   projectStyle:
-    needPassword: true
+    auth:
+      needPassword: true
 salt:
   projectStyle:
     auth:
@@ -263,10 +267,38 @@ twilio:
   dependencies:
     other:
       twilio: true
+kafka:
+  projectStyle:
+    other:
+      needKafka: true
+es:
+  projectStyle:
+    other:
+      needElasticSearch: true
 https:
   projectStyle:
     other:
       needHttps: true
+file:
+  dependencies:
+    express:
+      express-fileupload: true
+xlsx:
+  dependencies:
+    other:
+      xlsx: true
+email:
+  dependencies:
+    other:
+      nodemailer: true
+nopage:
+  dependencies:
+    other:
+      pagination: false
+mockapi:
+  projectStyle:
+    test:
+      needMockApi: true
 #### DB
 jsondb:
   projectStyle:
@@ -320,6 +352,14 @@ sqlite:
     db:
       sequelize: true
       sqlite3: true
+postgres:
+  projectStyle:
+    db:
+      name: PostgreSQL
+      isPostgre: true
+  dependencies:
+    db:
+      sequelize: true
 ## Language
 typescript:
   projectStyle:
@@ -342,27 +382,7 @@ spring:
       groupId: com.autocognita
     log:
       needLog: true
-## other
-file:
-  dependencies:
-    express:
-      express-fileupload: true
-xlsx:
-  dependencies:
-    other:
-      xlsx: true
-email:
-  dependencies:
-    other:
-      nodemailer: true
-nopage:
-  dependencies:
-    other:
-      pagination: false
-mockapi:
-  projectStyle:
-    test:
-      needMockApi: true
+
 ## Required
 name:
   project:

@@ -6,11 +6,10 @@ const _ = require('lodash')
 const Joi = require('joi')
 {{#dependencies.other.pagination}}
 const querystring = require('querystring')
-{{/dependencies.other.pagination}}
-const { Role } = require('../constants')
-{{#dependencies.other.pagination}}
 const pagination = require('pagination')
 {{/dependencies.other.pagination}}
+const error = require('./app-error')
+const { Role } = require('../constants')
 {{#projectStyle.db.isSqlite}}
 const Model = require('../model/index')
 {{/projectStyle.db.isSqlite}}
@@ -46,7 +45,7 @@ module.exports.wrapMiddleware = wrapMiddleware
  * @returns {Boolean} the check result
  */
 module.exports.checkIfExists = (source, term) => {
-    let terms
+  let terms
 
   if (!_.isArray(source)) {
     throw new Error('Source argument should be an array')
@@ -63,7 +62,7 @@ module.exports.checkIfExists = (source, term) => {
   }
 
   const intersection = source.filter(v => terms.includes(v))
-  if (intersection && intersection.length > 0){
+  if (intersection && intersection.length > 0) {
     return true
   }
 
@@ -77,7 +76,7 @@ module.exports.checkIfExists = (source, term) => {
  */
 module.exports.hasAdminRole = (authUser) => {
   for (let i = 0; i < authUser.roles.length; i++) {
-    if (authUser.roles[i].toLowerCase() ===Role.Admin.toLowerCase()) {
+    if (authUser.roles[i].toLowerCase() === Role.Admin.toLowerCase()) {
       return true
     }
   }
@@ -227,7 +226,6 @@ module.exports.formatPagingData = (req, data) => {
   }
 }
 {{/dependencies.other.pagination}}
-
 
 /**
  * Verify IP address validity

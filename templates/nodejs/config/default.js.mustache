@@ -30,9 +30,13 @@ module.exports = {
   },
   {{/projectStyle.db.isDynamoDB}}
   {{#projectStyle.db.isSqlite}}
-  DATABASE_USERNAME: process.env.DATABASE_USERNAME || 'jason',
-  DATABASE_PASSWORD: process.env.DATABASE_PASSWORD || '123456',
-  DATABASE_POOL_MAX: process.DATABASE_POOL_MAX || 10,
+  DATABASE: {
+    USERNAME: process.env.DATABASE_USERNAME || 'postgres',
+    PASSWORD: process.env.DATABASE_PASSWORD || '98096',
+    URL: process.env.DATABASE_URL || 'localhost:5432',
+    NAME: process.env.DATABASE_NAME || 'TopcoderTerm',
+    POOL_MAX: process.env.DATABASE_POOL_MAX || 30
+  },
   {{/projectStyle.db.isSqlite}}
   {{#dependencies.other.pagination}}
   PAGE: {
@@ -40,6 +44,15 @@ module.exports = {
     PER_PAGE_MAX: process.env.PERPAGE_MAX || 200
   },
   {{/dependencies.other.pagination}}
+  {{#dependencies.other.nodemailer}}
+  EMAIL: {
+    ACCOUNT: process.env.EMAIL_SERVER_ACCOUNT || 'hxpwork2',
+    PASSWORD: process.env.EMAIL_SERVER_PASSWORD || '980965',
+    FROM: process.env.EMAIL_FROM || 'hxpwork2@126.com',
+    HOST: process.env.EMAIL_SERVER_HOST || 'smtp.126.com',
+    HOST_PORT: process.env.EMAIL_SERVER_HOST_PORT || 465
+  },
+  {{/dependencies.other.nodemailer}}
   LOG: {
     LOGGER_DIR: process.env.LOGGER_DIR || 'log',
     LOGGER_FILE: process.env.LOGGER_FILE || 'access.log'

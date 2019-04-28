@@ -1,19 +1,158 @@
 # {{project.description}} Verification
 
-## Prepare Postman
+{{#projectStyle.auth.needPassword}}
+## Login Account
 
-## Postman tests
-- import Postman collection and environment in the docs folder to Postman
-- note that the Postman tests depend on the test data, so you must first run `npm run cleanData` and `npm run initData` to setup test data
-- Just run the whole test cases under provided environment.
+- username: `jason`
+- passowrd: `123456`
+{{/projectStyle.auth.needPassword}}
 
+## Setup
+
+1. Install NPM dependencies
+
+```
+npm i
+```
+
+2. Set up the environment variables or use defined default value
+
+```
 {{#projectStyle.db.isDynamoDB}}
-## DynamoDB Verification
-1. Open a new console and run the command `docker exec -ti dynamodb sh` to use `aws-cli`
-
-2. On the console you opened in step 1, run these following commands you can verify the data that inserted into database during the executing of postman tests
-```
-aws dynamodb scan --table-name Challenge --endpoint-url http://localhost:8000
-aws dynamodb scan --table-name ChallengeType --endpoint-url http://localhost:8000
-```
+export AWS_ACCESS_KEY_ID="AWS access key id"
+export AWS_SECRET_ACCESS_KEY="AWS secret access key"
+export AWS_REGION="AWS region"
+export IS_LOCAL="true/false"
+export AWS_DYNAMODB_ENDPOINT="dynamodb endpoint (required when is_local=true)"
 {{/projectStyle.db.isDynamoDB}}
+{{#projectStyle.db.isSqlite}}
+DATABASE_USERNAME: "database access account",
+DATABASE_PASSWORD: "database access account password",
+DATABASE_POOL_MAX: "database connection pool max",
+{{/projectStyle.db.isSqlite}}
+{{#projectStyle.db.isPostgre}}
+DATABASE_USERNAME: "database access account",
+DATABASE_PASSWORD: "database access account password",
+DATABASE_POOL_MAX: "database connection pool max",
+{{/projectStyle.db.isPostgre}}
+{{#projectStyle.db.isMysql}}
+DATABASE_USERNAME: "database access account",
+DATABASE_PASSWORD: "database access account password",
+DATABASE_POOL_MAX: "database connection pool max",
+{{/projectStyle.db.isMysql}}
+{{#projectStyle.db.isMongoDB}}
+DATABASE_USERNAME: "database access account",
+DATABASE_PASSWORD: "database access account password",
+DATABASE_POOL_MAX: "database connection pool max",
+{{/projectStyle.db.isMongoDB}}
+{{#projectStyle.db.isNeo4j}}
+DATABASE_USERNAME: "database access account",
+DATABASE_PASSWORD: "database access account password",
+DATABASE_POOL_MAX: "database connection pool max",
+DATABASE_URL: "database url",
+DATABASE_NAME: "database name",
+{{/projectStyle.db.isNeo4j}}
+{{#dependencies.other.nodemailer}}
+EMAIL_SERVER_ACCOUNT: "email server access account",
+EMAIL_SERVER_PASSWORD: "email server access account password",
+EMAIL_SERVER_HOST: "email server host address",
+EMAIL_SERVER_HOST_PORT: "email server port",
+EMAIL_FROM: "email sender address",
+{{/dependencies.other.nodemailer}}
+```
+
+3. Modify the other configuration variables if necessary in `config/default.js`
+
+4. Database initialize
+  {{#projectStyle.db.isPostgre}}
+  1. Create tables in the database by running the sql script `scripts\createTables.sql`
+  {{/projectStyle.db.isPostgre}}
+  {{#projectStyle.db.isSqlite}}
+  1. Create tables in the database by running the sql script `scripts\createTables.sql`
+  {{/projectStyle.db.isSqlite}}
+  {{#projectStyle.db.isDynamoDB}}
+  1. Open a new console and run the command `docker exec -ti dynamodb sh` to use `aws-cli`
+
+  2. On the console you opened in step 1, run these following commands you can verify the data that inserted into database during the executing of postman tests
+  ```
+  aws dynamodb scan --table-name Challenge --endpoint-url http://localhost:8000
+  aws dynamodb scan --table-name ChallengeType --endpoint-url http://localhost:8000
+  ```
+  {{/projectStyle.db.isDynamoDB}}
+
+  1. Initialize the data of database tables by running the script
+
+  ```
+  npm run initData
+  ```
+
+
+
+## Postman verification
+
+1. Open Postman
+
+2. Import Postman Environment and Collection from `docs` directory
+
+3. Reintialize the data if need
+
+  ```
+  npm run initData
+  ```
+
+4. Run the application
+
+  ```
+  npm run start
+  ```
+
+5. Running Test Case in Postman
+  **Note**: Some test case have order prefix, do not change the running order please.
+
+{{#projectStyle.test.unitTest}}
+## Unit tests and Integration tests
+{{#projectStyle.other.needElasticSearch}}
+
+Integration tests may use different index `member-test` which may not same as the usual index.
+
+Please ensure to create the index `member-test` or the index specified in the environment variable `ES_INDEX_TEST` before running the Integration tests. You could re-use the existing scripts to create index but you would need to set the below environment variable
+
+```
+export ES_INDEX=member-test
+```
+{{/projectStyle.other.needElasticSearch}}
+
+### Running unit tests{{#projectStyle.test.needCoverage}} and coverage{{/projectStyle.test.needCoverage}}
+
+To run unit tests
+
+```
+npm run test
+```
+{{#projectStyle.test.needCoverage}}
+
+To run unit tests with coverage report
+
+```
+npm run cov
+```
+{{/projectStyle.test.needCoverage}}
+{{/projectStyle.test.unitTest}}
+
+{{#projectStyle.test.e2eTest}}
+### Running integration tests{{#projectStyle.test.needCoverage}} and coverage{{/projectStyle.test.needCoverage}}
+
+To run integration tests alone
+
+```
+npm run e2e
+```
+{{#projectStyle.test.needCoverage}}
+
+To run integration tests with coverage report
+
+```
+npm run cov-e2e
+```
+{{/projectStyle.test.needCoverage}}
+{{/projectStyle.test.e2eTest}}
