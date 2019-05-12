@@ -86,6 +86,7 @@ defaults: &defaults # default use json-db,express,javascript
     coverage:
       nyc: false # Istanbul's state of the art command line interface
     other:
+      string-format: true
       nodemon: true # if false, becareful devDependencies has a extend comma
   dependencies:
     config:
@@ -143,7 +144,7 @@ defaults: &defaults # default use json-db,express,javascript
     spring:
       spring-fox: false
       otp-aerogera: false
-test:
+test: #(+)
   projectStyle:
     test:
       unitTest: true
@@ -155,14 +156,14 @@ test:
     test:
       mocha: true
       should: true
-cov:
+cov: #(+)
   projectStyle:
     test:
       needCoverage: true
   devDependencies:
     coverage:
       nyc: true
-eslint:
+eslint: #(+)
   projectStyle:
     lint:
       isESlingStandard: true
@@ -177,31 +178,30 @@ eslint:
       eslint-plugin-import: true
       eslint-plugin-promise: true
       eslint-plugin-standard: true
-tslint:
+tslint: #(+)
   devDependencies:
     codeStyle:
       tslint: true
       tslint-config-prettier: true
       tslint-immutable: true
-heroku:
+heroku: #(+)
   projectStyle:
     deploy:
       useDocker: false
-      useHeroku: true
-swgdoc:
+swgdoc: #(+)
   projectStyle:
     doc:
       isSwaggerDoc: true
   dependencies:
     other:
       swagger-jsdoc: true
-koa:
+koa: #(+)
   projectStyle:
     server:
       name: koa
       isExpress: false
       isKoa: true
-jwt:
+jwt: #(+)
   projectStyle:
     auth:
       needJwt: true
@@ -209,7 +209,7 @@ jwt:
     secure:
       express-jwt: true
       jsonwebtoken: true
-tcjwt:
+tcjwt: #(+)
   projectStyle:
     auth:
       needJwt: true
@@ -218,7 +218,7 @@ tcjwt:
       express-jwt: true
       jsonwebtoken: true
       tc-core-library-js: true
-m2m:
+m2m: #(+)
   projectStyle:
     auth:
       needM2M: true
@@ -229,64 +229,64 @@ m2m:
       auth0-js: true
       express-jwt-authz: true
       jwks-rsa: true
-pwd:
+pwd: #(+)
   projectStyle:
     auth:
       needPassword: true
-salt:
+salt: #(+)
   projectStyle:
     auth:
       needPassword: true
   dependencies:
     secure:
       bcryptjs: true
-aws:
+aws: #(+)
   projectStyle:
     other:
       needAws: true
   dependencies:
     db:
       aws-sdk: true
-twilio:
+twilio: #(+)
   projectStyle:
     other:
       needTwilio: true
   dependencies:
     other:
       twilio: true
-kafka:
+kafka: #(+)
   projectStyle:
     other:
       needKafka: true
-es:
+es: #(+)
   projectStyle:
     other:
       needElasticSearch: true
-https:
+https: #(+)
   projectStyle:
     other:
       needHttps: true
-file:
+file: #(+)
   dependencies:
     express:
       express-fileupload: true
-xlsx:
+xlsx: #(+)
   dependencies:
     other:
       xlsx: true
-email:
+email: #(+)
   dependencies:
     other:
       nodemailer: true
-nopage:
+nopage: #(+)
   dependencies:
     other:
       pagination: false
-mockapi:
+mockapi: #(+)
   projectStyle:
     test:
       needMockApi: true
-#### DB
+#### DB (+)
 jsondb:
   projectStyle:
     db:
@@ -381,7 +381,7 @@ mssql:
     db:
       sequelize: true
       tedious : true
-## Language
+## Language (+)
 typescript:
   projectStyle:
     language:
@@ -405,7 +405,7 @@ spring:
       needLog: true
 
 ## Required
-name:
+name: # (+)
   project:
     name: ddmt-api
     description: DDMT API

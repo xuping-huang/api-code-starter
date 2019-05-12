@@ -1,0 +1,13 @@
+/**
+* Insert test data to database.
+*/
+const logger = require('../src/lib/logger')
+const { createSheet } = require('./tools')
+
+const run = async () => {
+  logger.info('Create data xlsx.')
+  await createSheet()
+  logger.info('Data xlsx created.')
+}
+
+run()

@@ -84,12 +84,14 @@ EMAIL_FROM: "email sender address",
 4. Database initialize
   {{#projectStyle.db.isMysql}}
   1. Create tables in the database by running the sql script `scripts\createTables.sql`
+    - **Note**: If you want the table name to be created after it is displayed to be case-sensitive, set the `lower_case_table_names=2` and restart the Mysql engine. Not setting this parameter will only affect the display effect and does not affect the application running.
   {{/projectStyle.db.isMysql}}
   {{#projectStyle.db.isMssql}}
   1. Create tables in the database by running the sql script `scripts\createTables.sql`
   {{/projectStyle.db.isMssql}}
   {{#projectStyle.db.isMariadb}}
   1. Create tables in the database by running the sql script `scripts\createTables.sql`
+    - **Note**: If you want the table name to be created after it is displayed to be case-sensitive, set the `lower_case_table_names=2` and restart the Mysql engine. Not setting this parameter will only affect the display effect and does not affect the application running.
   {{/projectStyle.db.isMariadb}}
   {{#projectStyle.db.isPostgres}}
   1. Create tables in the database by running the sql script `scripts\createTables.sql`
