@@ -72,6 +72,9 @@ paths:
       {{/noSecurity}}
       produces:
         - application/json
+      {{^isHead}}
+      operationId: {{operationId}}
+      {{/isHead}}
       {{#hasMethodParameters}}parameters:{{/hasMethodParameters}}
       {{#needNavPage}}
         - $ref: '#/parameters/page'
@@ -113,8 +116,37 @@ paths:
       {{/needReqBody}}
       responses:
         {{#noResponseContent}}
+        {{#isDelete}}
         204:
-          description: Successfully {{operationName}}.
+        {{/isDelete}}
+        {{^isDelete}}
+        200:
+        {{/isDelete}}
+          description: The operation succeeded.
+          {{#needResponsePageHeader}}
+          headers:
+            X-Next-Page:
+              type: integer
+              description: The index of the next page
+            X-Page:
+              type: integer
+              description: The index of the current page (starting at 1)
+            X-Per-Page:
+              type: integer
+              description: The number of items to list per page
+            X-Prev-Page:
+              type: integer
+              description: The number of the previous page
+            X-Total:
+              type: integer
+              description: The total number of items
+            X-Total-Pages:
+              type: integer
+              description: The total number of pages
+            Link:
+              type: string
+              description: Pagination link header.
+          {{/needResponsePageHeader}}
         {{/noResponseContent}}
         {{^noResponseContent}}
         {{#isPost}}201{{/isPost}}{{^isPost}}200{{/isPost}}:
@@ -245,9 +277,6 @@ definitions:
     description: The id.
     example: 564935d6-16d5-4410-b415-55d369b90327
   {{/api.entity.needId}}
-  TrueFalseSign:
-    type: string
-    enum: ['Y', 'N']
   {{#api.entity.needRecord}}
   Record:
     type: object

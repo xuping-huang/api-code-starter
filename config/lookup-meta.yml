@@ -1,0 +1,236 @@
+defaults: &defaults
+  project:
+    name: lookup-api-v5
+    basePath: /v5/lookup
+    templateSwitch: swagger
+  api:
+    security:
+      isJwt: true
+    navigation:
+      page: page
+      perPage: perPage
+    entity:
+      needRecord: true
+      needId: true
+  paths:
+    - path: /countries
+      ops:
+      - method: get
+        operationId: findAllCountries
+        summary: Retrieves all countries.
+        tag: Country
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needFound: false
+        needResponsePageHeader: true
+        queryParams:
+          - name: page
+          - name: perPage
+          - name: name
+        needResponseRef: true
+        refResponseEntity: Country
+      - method: head
+        operationId: countAllCountries
+        summary: Retrieves the number of countries.
+        tag: Country
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needFound: false
+        needResponsePageHeader: true
+        queryParams:
+          - name: page
+          - name: perPage
+          - name: name
+        noResponseContent: true
+      - method: post
+        operationId: createCountries
+        summary: Create country in the system.
+        tag: Country
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needFound: false
+        needConflict: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: CountryData
+        needResponseRef: true
+        refResponseEntity: Country
+    - path: '/countries/:countryId'
+      ops:
+      - method: get
+        operationId: getCountryById
+        summary: Retrieves the country using the provided Id.
+        tag: Country
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needFound: true
+        needResponseRef: true
+        refResponseEntity: Country
+      - method: head
+        operationId: existCountryById
+        summary: Retrieves whether exist country using the provided Id.
+        tag: Country
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needFound: true
+        noResponseContent: true
+      - method: delete
+        operationId: removeCountryById
+        summary: Delete country based on Id
+        tag: Country
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        noResponseContent: true
+      - method: put
+        operationId: modifyCountryById
+        summary: Update country based on Id.
+        tag: Country
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needConflict: true
+        needFound: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: CountryData
+        needResponseRef: true
+        refResponseEntity: Country
+      - method: patch
+        operationId: partiallyModifyCountryById
+        summary: Partially update country based on Id.
+        tag: Country
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needConflict: true
+        needFound: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: CountryData
+        needResponseRef: true
+        refResponseEntity: Country
+    - path: /educationalInstitutions
+      ops:
+      - method: get
+        operationId: findAllEducationalInstitutions
+        summary: Retrieves all educational institutions.
+        tag: EducationalInstitution
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needFound: false
+        needResponsePageHeader: true
+        queryParams:
+          - name: page
+          - name: perPage
+          - name: name
+        needResponseRef: true
+        refResponseEntity: EducationalInstitution
+      - method: head
+        operationId: countAllEducationalInstitutions
+        summary: Get only response status and headers information but no response body for the endpoint.
+        tag: EducationalInstitution
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needFound: false
+        needResponsePageHeader: true
+        queryParams:
+          - name: page
+          - name: perPage
+          - name: name
+        noResponseContent: true
+      - method: post
+        operationId: createEducationalInstitutions
+        summary: Create educational institution in the system.
+        tag: EducationalInstitution
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needFound: false
+        needConflict: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: EducationalInstitutionData
+        needResponseRef: true
+        refResponseEntity: EducationalInstitution
+    - path: '/educationalInstitutions/:educationalInstitutionId'
+      ops:
+      - method: get
+        operationId: getEducationalInstitutionById
+        summary: Retrieves the educational institutions using the provided Id.
+        tag: EducationalInstitution
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needFound: true
+        needResponseRef: true
+        refResponseEntity: EducationalInstitution
+      - method: head
+        operationId: existEducationalInstitutionById
+        summary: Retrieves whether exist educational institution using the provided Id.
+        tag: EducationalInstitution
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needFound: true
+        noResponseContent: true
+      - method: delete
+        operationId: removeEducationalInstitutionById
+        summary: Delete educational institution based on Id
+        tag: EducationalInstitution
+        noSecurity: false
+        needAuth: true
+        needFound: true
+        needPermission: true
+        noResponseContent: true
+      - method: put
+        operationId: modifyEducationalInstitutionById
+        summary: Update educational institution based on Id.
+        tag: EducationalInstitution
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needConflict: true
+        needFound: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: EducationalInstitutionData
+        needResponseRef: true
+        refResponseEntity: EducationalInstitution
+      - method: patch
+        operationId: partiallyModifyEducationalInstitutionById
+        summary: Partially update educational institution based on Id.
+        tag: EducationalInstitution
+        noSecurity: false
+        needAuth: true
+        needPermission: true
+        needConflict: true
+        needFound: true
+        needReqBody: true
+        needReqBodyRef: true
+        refReqEntity: EducationalInstitutionData
+        needResponseRef: true
+        refResponseEntity: EducationalInstitution
+  schemas:
+    - entity: Country
+      isGetReturn: true
+      isRecord: true
+      returnRef: CountryData
+    - entity: CountryData
+      entityParams:
+        - name: name
+    - entity: EducationalInstitution
+      isGetReturn: true
+      isRecord: true
+      returnRef: EducationalInstitutionData
+    - entity: EducationalInstitutionData
+      entityParams:
+        - name: name

@@ -8,9 +8,8 @@ const Joi = require('joi')
 const querystring = require('querystring')
 const pagination = require('pagination')
 {{/dependencies.other.pagination}}
-const error = require('./app-error')
-const { Role } = require('../constants')
-const Model = require('../model/index')
+const errors = require('./app-error')
+const models = require('../model/index')
 
 /**
  * Wrap all functions of object to express middleware
@@ -67,30 +66,6 @@ module.exports.checkIfExists = (source, term) => {
   return false
 }
 
-/**
- * Check if the user has admin role
- * @param {Object} authUser the user
- * @returns {Boolean} check result
- */
-module.exports.hasAdminRole = (authUser) => {
-  for (let i = 0; i < authUser.roles.length; i++) {
-    if (authUser.roles[i].toLowerCase() === Role.Admin.toLowerCase()) {
-      return true
-    }
-  }
-  return false
-}
-
-/**
- * Determines whether the text form of two parameters is equal when the case and the first and last spaces are ignored.
- * @param {String} valueA the first value
- * @param {String} valueB the second value
- * @return {Boolean} Comparison result of whether two parameters are equal
- */
-module.exports.equalIgnoreCase = (valueA, valueB) => {
-  if (!valueA || !valueB) return false
-  return String(valueA).trim().toLowerCase() === String(valueB).trim().toLowerCase()
-}
 {{#dependencies.other.pagination}}
 
 /**
@@ -224,6 +199,154 @@ module.exports.formatPagingData = (req, data) => {
   }
 }
 {{/dependencies.other.pagination}}
+{{#projectStyle.db.isDynamoDB}}
+
+/**
+ * Get data by model id
+ * @param {Object} modelName The dynamoose model name
+ * @param {String} id The id value
+ * @return {Promise}
+ */
+module.exports.getById = async (modelName, id) => {
+  return new Promise((resolve, reject) => {
+    models[modelName].query('id').eq(id).exec((err, result) => {
+      if (err) {
+        reject(err)
+      }
+      if (result.length > 0) {
+        return resolve(result[0])
+      } else {
+        reject(new errors.NotFoundError(`${modelName} with id: ${id} does not exist`))
+      }
+    })
+  })
+}
+
+/**
+ * Delete data by model id
+ * @param {Object} modelName The dynamoose model name
+ * @param {String} id The id value
+ * @return {Promise<void>}
+ */
+module.exports.delete = async (modelName, id) => {
+  return new Promise((resolve, reject) => {
+    models[modelName].delete({ id }, (err) => {
+      if (err) {
+        reject(err)
+      }
+      return resolve()
+    })
+  })
+}
+
+/**
+ * Create item in database
+ * @param {Object} modelName The dynamoose model name
+ * @param {Object} data The create data object
+ * @return {Promise}
+ */
+module.exports.create = async (modelName, data) => {
+  return new Promise((resolve, reject) => {
+    const dbItem = new models[modelName](data)
+    dbItem.save((err) => {
+      if (err) {
+        reject(err)
+      }
+
+      return resolve(dbItem)
+    })
+  })
+}
+
+/**
+ * Update item in database
+ * @param {Object} dbItem The Dynamo database item
+ * @param {Object} data The updated data object
+ * @return {Promise}
+ */
+module.exports.update = async (dbItem, data) => {
+  Object.keys(data).forEach((key) => {
+    dbItem[key] = data[key]
+  })
+  return new Promise((resolve, reject) => {
+    dbItem.save((err) => {
+      if (err) {
+        reject(err)
+      }
+
+      return resolve(dbItem)
+    })
+  })
+}
+
+/**
+ * Get data collection by scan parameters
+ * @param {Object} modelName The dynamoose model name
+ * @param {Object} scanParams The scan parameters object
+ * @return {Promise}
+ */
+module.exports.scan = async (modelName, scanParams) => {
+  return new Promise((resolve, reject) => {
+    models[modelName].scan(scanParams).all().exec((err, result) => {
+      if (err) {
+        reject(err)
+      }
+
+      return resolve(result.count === 0 ? [] : result)
+    })
+  })
+}
+
+/**
+ * Get dynamodb filter expression for query params.
+ * @param {Object} params The query params.
+ * @return {Object} The filter expression.
+ */
+module.exports.filterExpression = (params) => {
+  const Scan = {
+    Filters: [],
+    Names: {},
+    Values: {}
+  }
+  _.each(params, (value, key) => {
+    if (!_.isUndefined(value)) {
+      if (_.isBoolean(value)) {
+        Scan.Filters.push(`#${key} = :${key}Value`)
+      } else if (_.isString(value)) {
+        Scan.Filters.push(`contains(#${key}, :${key}Value)`)
+      } else {
+        Scan.Filters.push(`#${key} = :${key}Value`)
+      }
+      Scan.Names[`#${key}`] = key
+      Scan.Values[`:${key}Value`] = value
+    }
+  })
+  let filter
+  if (Scan.Filters.length > 0) {
+    filter = {
+      FilterExpression: Scan.Filters.join(' and '),
+      ExpressionAttributeNames: Scan.Names,
+      ExpressionAttributeValues: Scan.Values
+    }
+  }
+  return filter
+}
+{{/projectStyle.db.isDynamoDB}}
+{{#projectStyle.orm.isSequelize}}
+
+/**
+ * Check to see if the user ID exists in the table.
+ * @param {Uuid} userId the user id
+ * @return {Object} When the user ID exists, it returns the user data for it, otherwise null is returned.
+ */
+module.exports.checkUserExist = async (userId) => {
+  const user = await models.UserModel.findByPk(userId, { raw: true })
+  if (!user) {
+    return Promise.reject(new error.NotFoundError(`User id '${userId}' not found.`))
+  }
+  return Promise.resolve(user)
+}
+{{/projectStyle.orm.isSequelize}}
 
 /**
  * Verify IP address validity
@@ -272,18 +395,3 @@ module.exports.validEmail = (emailAddress) => {
   }
   return true
 }
-{{#projectStyle.orm.isSequelize}}
-
-/**
- * Check to see if the user ID exists in the table.
- * @param {Uuid} userId the user id
- * @return {Object} When the user ID exists, it returns the user data for it, otherwise null is returned.
- */
-module.exports.checkUserExist = async (userId) => {
-  const user = await Model.UserModel.findByPk(userId, { raw: true })
-  if (!user) {
-    return Promise.reject(new error.NotFoundError(`User id '${userId}' not found.`))
-  }
-  return Promise.resolve(user)
-}
-{{/projectStyle.orm.isSequelize}}

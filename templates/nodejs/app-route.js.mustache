@@ -114,10 +114,31 @@ module.exports = (app) => {
       }]
 
       // add authenticator check if route has auth
-      if (params.auth) {
+      if (params.auth === 'jwt') {
+        {{#dependencies.secure.tc-core-library-js}}
+        let originalStatus
+        let originalJson
+        {{/dependencies.secure.tc-core-library-js}}
         actions.push((req, res, next) => {
           {{#projectStyle.auth.needJwt}}
           {{#dependencies.secure.tc-core-library-js}}
+          // intercept and change the response status body from jwtAuthenticator to match v5 standard
+          originalStatus = res.status
+          originalJson = res.json
+          res.status = (code) => {
+            if (code === httpStatus.FORBIDDEN) {
+              return originalStatus.apply(res, [httpStatus.UNAUTHORIZED])
+            } else {
+              return originalStatus.apply(res, [code])
+            }
+          }
+          res.json = (value) => {
+            if (_.get(value, 'result.content.message')) {
+              return originalJson.apply(res, [{ message: _.get(value, 'result.content.message') }])
+            } else {
+              return originalJson.apply(res, [value])
+            }
+          }
           authenticator(_.pick(config, ['AUTH_SECRET', 'VALID_ISSUERS']))(req, res, next)
           {{/dependencies.secure.tc-core-library-js}}
           {{^dependencies.secure.tc-core-library-js}}
@@ -164,8 +185,8 @@ module.exports = (app) => {
           {{/dependencies.secure.tc-core-library-js}}
           {{/projectStyle.auth.needJwt}}
         })
-        actions.push((req, res, next) => { // eslint-disable-line
-          if (req.authUser.isMachine) {
+        actions.push((req, _res, next) => { // eslint-disable-line
+          if (req.authUser.scopes) {
             // M2M Token
             if (!helper.checkIfExists(params.scopes, req.authUser.scopes)) {
               next(new error.ForbiddenError())
@@ -188,7 +209,7 @@ module.exports = (app) => {
       }
 
       actions.push(method)
-      app[verb](path, helper.wrapMiddleware(actions))
+      app[verb](`${config.API_VERSION}${path}`, helper.wrapMiddleware(actions))
     })
   })
   {{#dependencies.other.swagger-jsdoc}}

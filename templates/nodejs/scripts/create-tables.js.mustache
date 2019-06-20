@@ -1,0 +1,40 @@
+/**
+ * Create tables
+ */
+
+require('../src/bootstrap')
+const config = require('config')
+const logger = require('../src/lib/logger')
+const helper = require('../src/lib/helper')
+const constants = require('../src/constants')
+
+logger.info('Create tables.')
+
+const createTables = async () => {
+  for (const name of constants.Tables) {
+    logger.info(`Create table: ${name}`)
+    {{#projectStyle.db.isMongoDB}}
+    await helper.createTable({
+      TableName: name,
+      KeySchema: [
+        { AttributeName: 'id', KeyType: 'HASH' } // Partition key
+      ],
+      AttributeDefinitions: [
+        { AttributeName: 'id', AttributeType: 'S' } // S -> String
+      ],
+      ProvisionedThroughput: {
+        ReadCapacityUnits: Number(config.DYNAMODB.AWS_READ_UNITS),
+        WriteCapacityUnits: Number(config.DYNAMODB.AWS_WRITE_UNITS)
+      }
+    })
+    {{/projectStyle.db.isMongoDB}}
+  }
+}
+
+createTables().then(() => {
+  logger.info('Done!')
+  process.exit()
+}).catch((e) => {
+  logger.logFullError(e)
+  process.exit()
+})

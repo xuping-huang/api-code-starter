@@ -13,7 +13,9 @@ const main = () => {
   const configEnv = process.env.CONFIG_ENV || 'common.yml'
   const configFile = path.resolve(__dirname, `../config/${configEnv}`);
   const config = nodeConfig.load(configFile, codeEnv);
-  config.project.name = nameEnv;
+  if (!config.project.name) {
+    config.project.name = nameEnv;
+  }
   config.project.description = _.startCase(nameEnv);
   debug(config);
 

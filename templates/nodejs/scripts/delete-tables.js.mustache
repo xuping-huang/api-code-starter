@@ -1,0 +1,25 @@
+/**
+ * Delete tables
+ */
+
+require('../src/bootstrap')
+const logger = require('../src/lib/logger')
+const helper = require('../src/lib/helper')
+const constants = require('../src/constants')
+
+logger.info('Delete DynamoDB tables.')
+
+const deleteTables = async () => {
+  for (const name of constants.Tables) {
+    logger.info(`Delete table: ${name}`)
+    await helper.deleteTable(name)
+  }
+}
+
+deleteTables().then(() => {
+  logger.info('Done!')
+  process.exit()
+}).catch((e) => {
+  logger.logFullError(e)
+  process.exit()
+})

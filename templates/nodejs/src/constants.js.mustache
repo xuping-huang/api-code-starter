@@ -18,6 +18,12 @@ module.exports.Response = {
   InternalServerError: 'Something went wrong while processing your request. We’re sorry for the trouble. We’ve been notified of the error and will correct it as soon as possible. Please try your request again in a moment.'
 }
 
+const Table = {
+  scoreSystems: 'scoreSystems',
+  scorecards: 'scorecards'
+}
+module.exports.Table = Table
+module.exports.Tables = [Table.scoreSystems, Table.scorecards]
 
 /**
  * Database Schema

@@ -65,17 +65,17 @@ app.disable('x-powered-by')
 app.use(morgan('combined', { stream: logger.stream }))
 {{/dependencies.logger.morgan}}
 
-// eslint-disable-next-line
-const router = require('./app-route')(app)
-
 // intercept the response body from jwtAuthenticator
-app.use(interceptor((req, res) => {
+app.use(interceptor((_req, res) => {
   return {
     isInterceptable: () => {
       return res.statusCode === httpStatus.FORBIDDEN
     },
 
     intercept: (body, send) => {
+      if (!res.forbidden) {
+        res.statusCode = httpStatus.UNAUTHORIZED
+      }
       let obj
       try {
         obj = JSON.parse(body)
@@ -92,9 +92,12 @@ app.use(interceptor((req, res) => {
   }
 }))
 
+// Register routes
+require('./app-route')(app)
+
 // The error handler
 // eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   logger.logFullError(err, req.signature || `${req.method} ${req.url}`)
   const errorResponse = {}
   const status = err.isJoi ? httpStatus.BAD_REQUEST : (err.httpStatus || httpStatus.INTERNAL_SERVER_ERROR)

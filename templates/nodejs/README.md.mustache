@@ -7,11 +7,10 @@
 {{#projectStyle.other.needTwilio}}
 - Twilio Account
 {{/projectStyle.other.needTwilio}}
-{{#projectStyle.other.needAws}}
-- AWS Account
-{{/projectStyle.other.needAws}}
 {{#projectStyle.db.isDynamoDB}}
-- DynamoDB
+- AWS DynamoDB
+- Java 6+ (used if using runnable jar of local DynamoDB)
+- Docker, Docker Compose (used if using docker of local DynamoDB)
 {{/projectStyle.db.isDynamoDB}}
 {{#projectStyle.db.isPostgres}}
 - PostgresSQL 10+
@@ -34,108 +33,116 @@
 
 ## Configuration
 
-Configuration for the application is at `config/default.js`.
+Configuration for the application is at `config/default.js` and `config/production.js`.
 The following parameters can be set in config files or in env variables:
 
 - LOG_LEVEL: the log level, default is 'debug'
-- LOGGER_DIR: the directory stored in logs
-- LOGGER_FILE: the log file name
+- LOG.LOGGER_DIR: the directory stored in logs
+- LOG.LOGGER_FILE: the log file name
 - PORT: the server port, default is 3000
+- API_VERSION: the base path of api version
   {{#projectStyle.other.needHttps}}
 - SECURE_PORT: The secure server port, default is 443.
   {{/projectStyle.other.needHttps}}
   {{#projectStyle.auth.needJwt}}
 - AUTH_SECRET: The authorization secret used during token verification.
-- JWT_KEY_CACHE_TIME: The token expired time.
   {{#dependencies.secure.tc-core-library-js}}
 - VALID_ISSUERS: The valid issuer of tokens.
   {{/dependencies.secure.tc-core-library-js}}
   {{/projectStyle.auth.needJwt}}
   {{#projectStyle.auth.needM2M}}
+- SCOPES.SCORESYSTEM: The machine token scope name for score system.
   {{/projectStyle.auth.needM2M}}
   {{#projectStyle.db.isDynamoDB}}
-- AWS_ACCESS_KEY_ID: The Amazon certificate key to use when connecting. Use local dynamodb you can set fake value
-- AWS_SECRET_ACCESS_KEY: The Amazon certificate access key to use when connecting. Use local dynamodb you can set fake value
-- AWS_REGION: The Amazon certificate region to use when connecting. Use local dynamodb you can set fake value
-- AWS_IS_LOCAL: Use Amazon DynamoDB Local or server.
-- AWS_DYNAMODB_ENDPOINT: The local url if using Amazon DynamoDB Local
+- DYNAMODB.AWS_ACCESS_KEY_ID: The Amazon certificate key to use when connecting. Use local dynamodb you can set fake value
+- DYNAMODB.AWS_SECRET_ACCESS_KEY: The Amazon certificate access key to use when connecting. Use local dynamodb you can set fake value
+- DYNAMODB.AWS_REGION: The Amazon certificate region to use when connecting. Use local dynamodb you can set fake value
+- DYNAMODB.AWS_IS_LOCAL: Use Amazon DynamoDB Local or server.
+- DYNAMODB.AWS_DYNAMODB_ENDPOINT: The local url if using Amazon DynamoDB Local
+- DYNAMODB.AWS_READ_UNITS: The AWS DynamoDB read capacity units
+- DYNAMODB.AWS_WRITE_UNITS: The AWS DynamoDB write capacity units
   {{/projectStyle.db.isDynamoDB}}
   {{#projectStyle.db.isSqlite}}
-- DATABASE_USERNAME: The Sqlite3 database username.
-- DATABASE_PASSWORD: The Sqlite3 database password.
-- DATABASE_POOL_MAX: The database connection pool max size.
+- DATABASE.USERNAME: The Sqlite3 database username.
+- DATABASE.PASSWORD: The Sqlite3 database password.
+- DATABASE.POOL_MAX: The database connection pool max size.
   {{/projectStyle.db.isSqlite}}
   {{#projectStyle.db.isPostgres}}
-- DATABASE_USERNAME: The PostgresSQL database username.
-- DATABASE_PASSWORD: The PostgresSQL database password.
-- DATABASE_POOL_MAX: The database connection pool max size.
-- DATABASE_URL: The database link.
-- DATABASE_NAME: The database name.
+- DATABASE.USERNAME: The PostgresSQL database username.
+- DATABASE.PASSWORD: The PostgresSQL database password.
+- DATABASE.POOL_MAX: The database connection pool max size.
+- DATABASE.URL: The database link.
+- DATABASE.NAME: The database name.
   {{/projectStyle.db.isPostgres}}
   {{#projectStyle.db.isMysql}}
-- DATABASE_USERNAME: The mysql database username.
-- DATABASE_PASSWORD: The mysql database password.
-- DATABASE_POOL_MAX: The database connection pool max size.
-- DATABASE_URL: The database link.
-- DATABASE_NAME: The database name.
+- DATABASE.USERNAME: The mysql database username.
+- DATABASE.PASSWORD: The mysql database password.
+- DATABASE.POOL_MAX: The database connection pool max size.
+- DATABASE.URL: The database link.
+- DATABASE.NAME: The database name.
   {{/projectStyle.db.isMysql}}
   {{#projectStyle.db.isMariadb}}
-- DATABASE_USERNAME: The Mariadb database username.
-- DATABASE_PASSWORD: The Mariadb database password.
-- DATABASE_POOL_MAX: The database connection pool max size.
-- DATABASE_URL: The database link.
-- DATABASE_NAME: The database name.
+- DATABASE.USERNAME: The Mariadb database username.
+- DATABASE.PASSWORD: The Mariadb database password.
+- DATABASE.POOL_MAX: The database connection pool max size.
+- DATABASE.URL: The database link.
+- DATABASE.NAME: The database name.
   {{/projectStyle.db.isMariadb}}
   {{#projectStyle.db.isMssql}}
-- DATABASE_USERNAME: The SqlServer database username.
-- DATABASE_PASSWORD: The SqlServer database password.
-- DATABASE_POOL_MAX: The database connection pool max size.
-- DATABASE_URL: The database link.
-- DATABASE_NAME: The database name.
+- DATABASE.USERNAME: The SqlServer database username.
+- DATABASE.PASSWORD: The SqlServer database password.
+- DATABASE.POOL_MAX: The database connection pool max size.
+- DATABASE.URL: The database link.
+- DATABASE.NAME: The database name.
   {{/projectStyle.db.isMssql}}
   {{#dependencies.other.nodemailer}}
-- EMAIL_SERVER_ACCOUNT: The email server account.
-- EMAIL_SERVER_PASSWORD: The email server password.
-- EMAIL_SERVER_HOST: The email server address.
-- EMAIL_SERVER_HOST_PORT: The email server port.
-- EMAIL_FROM: The email sender address.
+- EMAIL.ACCOUNT: The email server account.
+- EMAIL.PASSWORD: The email server password.
+- EMAIL.HOST: The email server address.
+- EMAIL.WHOST_PORT: The email server port.
+- EMAIL.FROM: The email sender address.
   {{/dependencies.other.nodemailer}}
   {{#dependencies.other.pagination}}
-- PERPAGE_DEFAULT: The default page size
-- PER_PAGE_MAX: The max page size
+- PAGE.PERPAGE_DEFAULT: The default page size
+- PAGE.PER_PAGE_MAX: The max page size
   {{/dependencies.other.pagination}}
   {{#projectStyle.auth.needPassword}}
-- PRIVATE_KEY: Private key certificate for decrypting passwords.
   {{/projectStyle.auth.needPassword}}
+{{#projectStyle.test.e2eTest}}
 
+Test configuration is at `config/test.js`. You don't need to change them.
+The following test parameters can be set in config file or in env variables:
+
+- WAIT_TIME: the wait time before test running
+{{/projectStyle.test.e2eTest}}
 {{#projectStyle.db.isDynamoDB}}
-## DynamoDB Setup with Docker
-We will use DynamoDB setup on Docker.
 
-Just run `docker-compose up` in docker folder. When Docker startup is complete, the table has been created in the database.
+## Local DynamoDB setup (Optional)
 
-If you have already installed aws-cli in your local machine, you can use following command to verify. If not you can still verify table created following `Verify Table via awscli in Docker`.
-```
-aws dynamodb list-tables --endpoint-url http://localhost:8000
-```
+This page `https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html` provides several ways to deploy local DynamoDB.
 
-## Verify Table via awscli in Docker
-1. Make sure DynamoDB are running as per instructions above.
+If you want to use runnable jar of local DynamoDB:
 
-2. Run the following commands
-```
-docker exec -ti dynamodb-cli sh
-```
-Next
-```
-aws dynamodb list-tables --endpoint-url http://dynamodb:8000
-```
-**Note:** The `endpoint-url` should be `http://dynamodb:8000`.
+- see `https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html` for details
+- download the local DynamoDB of your region
+- extract out the downloaded archive
+- ensure Java 6+ is installed
+- in the extracted folder, run `java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb`
+- local DynamoDB is running at `http://localhost:8000`
 
+If you want to use docker of local DynamoDB:
+
+- see `https://hub.docker.com/r/amazon/dynamodb-local` for details
+- you may go to `docker` folder, and run `docker-compose up` to start local DynamoDB
+- local DynamoDB is running at `http://localhost:8000`
+
+## AWS DynamoDB setup
+
+Properly configure DYNAMODB.AWS_ACCESS_KEY_ID, DYNAMODB.AWS_SECRET_ACCESS_KEY, DYNAMODB.AWS_REGION, DYNAMODB.AWS_IS_LOCAL
+in config file or via environment variables. You may create tables using below `npm run create-tables` command.
 {{/projectStyle.db.isDynamoDB}}
-
-
 {{#projectStyle.other.needKafka}}
+
 ## Local Kafka setup
 
 - `http://kafka.apache.org/quickstart` contains details to setup and manage Kafka server,
@@ -162,9 +169,8 @@ aws dynamodb list-tables --endpoint-url http://dynamodb:8000
   `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic member.action.profile.create --from-beginning`
 - writing/reading messages to/from other topics are similar
 {{/projectStyle.other.needKafka}}
-
-
 {{#projectStyle.other.needElasticSearch}}
+
 ## ElasticSearch setup
 
 You may download ElasticSearch v6, install and run it locally.
@@ -181,8 +187,10 @@ go to docker-es folder, run `docker-compose up`
 - Start app `npm start`
   - App is running at `http://localhost:3000`
 - Start app in debug mode `npm run debug`
-- Clear and init db `npm run cleanData`
-- Insert test data `npm run initData`
+- To delete DynamoDB table if needed `npm run delete-tables`
+- To create DynamoDB table if needed `npm run create-tables`
+- Clear and init db `npm run clean-data`
+- Insert test data `npm run init-data`
   {{#projectStyle.test.unitTest}}
 - Run unit test `npm run test`
   {{/projectStyle.test.unitTest}}
@@ -198,13 +206,15 @@ go to docker-es folder, run `docker-compose up`
 
   {{#projectStyle.test.unitTest}}
 ## Testing
+
+Tables should be created before running tests.
+
 - Run `npm run test` to execute unit tests.
 - RUN `npm run e2e` to execute e2e tests.
   {{/projectStyle.test.unitTest}}
+{{#projectStyle.other.needElasticSearch}}
 
 ## Local Deployment with Docker
-
-{{#projectStyle.other.needElasticSearch}}
 To run the Member ES Processor using docker, follow the below steps
 
 1. Navigate to the directory `docker`
@@ -219,6 +229,12 @@ To run the Member ES Processor using docker, follow the below steps
 docker-compose up
 ```
 {{/projectStyle.other.needElasticSearch}}
+
+## Notes
+
+- swagger is at `doc/swagger.yaml`, you may check it using `http://editor.swagger.io/`
+- all JWT tokens provided in tests are created in `https://jwt.io` with secret `mysecret`
+- the local db setup, db tables management are provided to make review easier
 
 ## Verification
 Refer to the verification document `Verification.md`

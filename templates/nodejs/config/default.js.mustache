@@ -5,28 +5,35 @@
 module.exports = {
   LOG_LEVEL: process.env.LOG_LEVEL || 'debug',
   PORT: process.env.PORT || 3000,
+  API_VERSION: process.env.API_VERSION || '{{project.basePath}}',
   {{#projectStyle.other.needHttps}}
   SECURE_PORT: process.env.SECURE_PORT || 443,
   {{/projectStyle.other.needHttps}}
   {{#projectStyle.auth.needJwt}}
-  AUTH_SECRET: process.env.AUTH_SECRET || 'This_value_should_be_changed_in_product_environment',
+  AUTH_SECRET: process.env.AUTH_SECRET || 'mysecret',
+  {{^dependencies.secure.tc-core-library-js}}
   JWT_KEY_CACHE_TIME: process.env.JWT_KEY_CACHE_TIME || '5d',
+  {{/dependencies.secure.tc-core-library-js}}
   {{#dependencies.secure.tc-core-library-js}}
-  VALID_ISSUERS: process.env.VALID_ISSUERS || '["https://api.topcoder-dev.com", "https://api.topcoder.com", "https://topcoder-dev.auth0.com/"]',
+  VALID_ISSUERS: process.env.VALID_ISSUERS ? process.env.VALID_ISSUERS.replace(/\\"/g, '') : '["https://api.topcoder.com"]',
   {{/dependencies.secure.tc-core-library-js}}
   {{/projectStyle.auth.needJwt}}
   {{#projectStyle.auth.needM2M}}
+  SCOPES: {
+    SCORESYSTEM: process.env.SCOPE_SCORESYSTEM || 'review'
+  },
   {{/projectStyle.auth.needM2M}}
   {{#projectStyle.auth.needPassword}}
-  PRIVATE_KEY: process.env.PRIVATE_KEY || '-----BEGIN PRIVATE KEY-----\nMIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAxme0vBpT/+KuLJM0estudsMeFbTELaAM7/WkVEEeTi4LKJ6NNdDBkEQaitHhbVixd69lI+/XWu/ZCmZ37zmu6QIDAQABAkEAsP1MdkzKSEeP9sWumCgnt5whl111b/oJ8HniCSM6BKRuSN0ehPEthEPENDlZzUDQmLLhHDM7P9q83Mo74LFQgQIhAOJZRfJRywbADHULqc2lFqrvMhtY/Mks4XGw11XYUU4ZAiEA4GVUC4S+nGwaTmN2XK2yk1CfQpbYGgdWsNioqco84VECIQC29nCq2mDhmPW42u+sEilLjMQVBQ5403V8f/TgKFY4aQIgN5aCcnQI8CELhz22dZEF+t5vBYTutcv5msehSKZz3HECICIdtmo0sQCDj1+8xVlH2DXpWL+Cb3vj3A10Cjc3hf4P\n-----END PRIVATE KEY-----',
   {{/projectStyle.auth.needPassword}}
   {{#projectStyle.db.isDynamoDB}}
   DYNAMODB: {
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || 'FAKE_ACCESS_KEY',
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || 'FAKE_SECRET_ACCESS_KEY',
     AWS_REGION: process.env.AWS_REGION || 'ap-southeast-1',
-    IS_LOCAL: process.env.AWS_IS_LOCAL || true,
-    AWS_DYNAMODB_ENDPOINT: process.env.AWS_DYNAMODB_ENDPOINT || 'http://localhost:8000'
+    AWS_IS_LOCAL: process.env.AWS_IS_LOCAL || true,
+    AWS_DYNAMODB_ENDPOINT: process.env.AWS_DYNAMODB_ENDPOINT || 'http://localhost:8000',
+    AWS_READ_UNITS: process.env.AWS_READ_UNITS || 15,
+    AWS_WRITE_UNITS: process.env.AWS_WRITE_UNITS || 15
   },
   {{/projectStyle.db.isDynamoDB}}
   {{#projectStyle.db.isSqlite}}

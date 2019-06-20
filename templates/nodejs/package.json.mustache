@@ -2,6 +2,7 @@
   "name": "{{project.name}}",
   "version": "{{project.version}}",
   "description": "{{project.description}}",
+  "main": "app.js",
   "author": {
     "name": "TOPCODER"
   },
@@ -12,21 +13,22 @@
     "start": "node app.js",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "eslint": "eslint \"**/*.js\"",
     {{#projectStyle.test.unitTest}}
-    "test": "set DEBUG=test:*&&mocha test/unit/test.js --timeout 20000 --exit",
+    "test": "set DEBUG=api:*&&mocha test/unit/test.js --timeout 20000 --exit",
     {{/projectStyle.test.unitTest}}
     {{#projectStyle.test.e2eTest}}
-    "e2e": "set DEBUG=test:*&&mocha test/e2e/test.js --timeout 20000 --exit",
+    "e2e": "set DEBUG=api:*&&mocha test/e2e/test.js --timeout 20000 --exit",
     {{/projectStyle.test.e2eTest}}
     {{#projectStyle.test.needCoverage}}
     "cov": "nyc --reporter=html --reporter=text mocha test/unit/test.js --timeout 20000 --exit",
     {{#projectStyle.test.e2eTest}}
-    "cov-e2e": "nyc --reporter=html --reporter=text mocha test/e2e/test.js --timeout 20000 --exit"
+    "cov-e2e": "nyc --reporter=html --reporter=text mocha test/e2e/test.js --timeout 20000 --exit",
     {{/projectStyle.test.e2eTest}}
     {{/projectStyle.test.needCoverage}}
-    "initData": "node scripts/init-data.js",
-    "cleanData": "node scripts/clean-data.js"
+    "create-tables": "node scripts/create-tables.js",
+    "delete-tables": "node scripts/delete-tables.js",
+    "init-data": "node scripts/init-data.js",
+    "clean-data": "node scripts/clean-data.js"
     {{/projectStyle.language.isJavaScript}}
     {{#projectStyle.language.isTypeScript}}
     "start": "ts-node app.ts“,
@@ -67,12 +69,12 @@
     {{#dependencies.express.cors}}
     "cors": "^2.8.5",
     {{/dependencies.express.cors}}
+    {{#dependencies.db.dynamoose}}
+    "dynamoose": "^1.7.3",
+    {{/dependencies.db.dynamoose}}
     {{#dependencies.other.debug}}
     "debug": "^4.1.0",
     {{/dependencies.other.debug}}
-    {{#dependencies.other.moment}}
-    "moment": "^2.24.0",
-    {{/dependencies.other.moment}}
     {{#dependencies.express.express}}
     "express": "^4.16.3",
     {{/dependencies.express.express}}
@@ -118,6 +120,9 @@
     {{#dependencies.other.merge-deep}}
     "merge-deep": "^3.0.2",
     {{/dependencies.other.merge-deep}}
+    {{#dependencies.other.moment}}
+    "moment": "^2.24.0",
+    {{/dependencies.other.moment}}
     {{#dependencies.logger.morgan}}
     "morgan": "^1.9.1",
     {{/dependencies.logger.morgan}}
@@ -130,12 +135,6 @@
     {{#dependencies.other.pagination}}
     "pagination": "^0.4.6",
     {{/dependencies.other.pagination}}
-    {{#dependencies.secure.tc-core-library-js}}
-    "tc-core-library-js": "git+https://github.com/appirio-tech/tc-core-library-js.git#v2.4.1",
-    {{/dependencies.secure.tc-core-library-js}}
-    {{#dependencies.other.uuid}}
-    "uuid": "^3.3.2",
-    {{/dependencies.other.uuid}}
     {{#dependencies.logger.winston}}
     "winston": "^3.2.1",
     {{/dependencies.logger.winston}}
@@ -169,16 +168,16 @@
     {{#dependencies.db.tedious}}
     "tedious": "^6.1.1",
     {{/dependencies.db.tedious}}
-    {{#dependencies.other.superagent}}
-    "superagent": "^5.0.2",
-    {{/dependencies.other.superagent}}
     {{#dependencies.other.swagger-jsdoc}}
     "swagger-jsdoc": "^3.2.6",
     {{/dependencies.other.swagger-jsdoc}}
     {{#dependencies.other.xlsx}}
     "xlsx": "^0.14.2",
     {{/dependencies.other.xlsx}}
-    "request": "^2.88.0"
+    {{#dependencies.secure.tc-core-library-js}}
+    "tc-core-library-js": "appirio-tech/tc-core-library-js.git#v2.6.2",
+    {{/dependencies.secure.tc-core-library-js}}
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     {{#devDependencies.codeStyle.babel-eslint}}
@@ -214,8 +213,11 @@
     {{#devDependencies.test.should}}
     "should": "^13.2.3",
     {{/devDependencies.test.should}}
+    {{#devDependencies.test.chai}}
+    "chai": "^4.2.0",
+    {{/devDependencies.test.chai}}
     {{#devDependencies.coverage.nyc}}
-    "nyc": "^13.0.1",
+    "nyc": "^14.1.1",
     {{/devDependencies.coverage.nyc}}
     {{#devDependencies.codeStyle.standard}}
     "standard": "^12.0.1",
@@ -223,6 +225,9 @@
     {{#devDependencies.other.string-format}}
     "string-format": "^2.0.0",
     {{/devDependencies.other.string-format}}
+    {{#devDependencies.other.superagent}}
+    "superagent": "^5.1.0",
+    {{/devDependencies.other.superagent}}
     {{#devDependencies.other.nodemon}}
     "nodemon": "^1.18.9"
     {{/devDependencies.other.nodemon}}
@@ -231,6 +236,16 @@
     "node": ">=10.14.0",
     "npm": ">=5.6.0"
   },
+  {{#projectStyle.test.needCoverage}}
+  "nyc": {
+    "exclude": [
+      "test/**/*",
+      "coverage/*.js",
+      "scripts/*.js",
+      "src/lib/logger.js"
+    ]
+  },
+  {{/projectStyle.test.needCoverage}}
   "standard": {
     "env": [
       "mocha"

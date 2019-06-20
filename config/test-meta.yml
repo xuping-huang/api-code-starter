@@ -1,0 +1,120 @@
+defaults: &defaults
+  project:
+    name: terms-api-v5
+    basePath: v5/api
+    templateSwitch: swagger
+  api:
+    security:
+      isJwt: true
+    entity:
+      needId: true
+      needRecord: true
+  paths:
+  - path: '/countries'
+    ops:
+    - method: get
+      operationId: search
+      summary: Retrieves all Country by default.
+      tag: Country
+      noSecurity: false
+      needAuth: true
+      needPermission: false
+      queryParams:
+        - name: query
+      isList: true
+      needNavPage: true
+      needResponseRef: true
+      refResponseEntity: Country
+      needResponsePageHeader: true
+    - method: head
+      summary: Get only response status and headers information but no response body for the endpoint.
+      tag: Country
+      noSecurity: false
+      needAuth: true
+      needPermission: false
+      queryParams:
+        - name: query
+      isList: true
+      needNavPage: true
+      noResponseContent: true
+      needResponsePageHeader: true
+    - method: post
+      operationId: create
+      summary: Create Country in the system.
+      tag: Country
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needFound: false
+      needConflict: true
+      needReqBody: true
+      needReqBodyRef: true
+      refReqEntity: CountryData
+      needResponseRef: true
+      refResponseEntity: Country
+  - path: '/countries/:countryId'
+    ops:
+    - method: get
+      operationId: get
+      summary: Retrieves the Country using the provided id.
+      tag: Country
+      noSecurity: false
+      needAuth: true
+      needPermission: false
+      needFound: true
+      needResponseRef: true
+      refResponseEntity: Country
+    - method: head
+      summary: Get only response status and headers information but no response body for the endpoint.
+      tag: Country
+      noSecurity: false
+      needAuth: true
+      needPermission: false
+      needFound: true
+      noResponseContent: true
+    - method: put
+      operationId: update
+      summary: Update Country based on id
+      tag: Country
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needConflict: true
+      needFound: true
+      needReqBody: true
+      needReqBodyRef: true
+      refReqEntity: CountryData
+      needResponseRef: true
+      refResponseEntity: Country
+    - method: patch
+      operationId: partiallyUpdate
+      summary: Partially update Country based on id
+      tag: Country
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needFound: true
+      needConflict: true
+      needReqBody: true
+      needReqBodyRef: true
+      refReqEntity: CountryData
+      needResponseRef: true
+      refResponseEntity: Country
+    - method: delete
+      operationId: remove
+      summary: Delete Country based on id
+      tag: Country
+      noSecurity: false
+      needAuth: true
+      needFound: true
+      needPermission: true
+      noResponseContent: true
+  schemas:
+    - entity: CountryData
+      entityParams:
+        - name: name
+    - entity: Country
+      isRecord: true
+      returnRef: CountryData
+      entityParams:
+        - name: age

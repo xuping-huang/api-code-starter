@@ -1,0 +1,217 @@
+defaults: &defaults
+  project:
+    name: scorecard-api-v5
+    basePath: /v5
+    templateSwitch: swagger
+  api:
+    security:
+      isJwt: true
+    entity:
+      needId: true
+      needRecord: true
+  paths:
+  - path: '/scoreSystems'
+    ops:
+    - method: get
+      operationId: searchScoreSystem
+      summary: Retrieves all ScoreSystem by default.
+      tag: ScoreSystem
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      queryParams:
+        - name: query
+      isList: true
+      needResponseRef: true
+      refResponseEntity: ScoreSystem
+    - method: head
+      summary: Get only response status and headers information but no response body for the endpoint.
+      tag: ScoreSystem
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      queryParams:
+        - name: query
+      isList: true
+      noResponseContent: true
+    - method: post
+      operationId: createScoreSystem
+      summary: Create ScoreSystem in the system.
+      tag: ScoreSystem
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needFound: false
+      needConflict: true
+      needReqBody: true
+      needReqBodyRef: true
+      refReqEntity: ScoreSystemData
+      needResponseRef: true
+      refResponseEntity: ScoreSystem
+  - path: '/scoreSystems/:scoreSystemId'
+    ops:
+    - method: get
+      operationId: getScoreSystem
+      summary: Retrieves the ScoreSystem using the provided id.
+      tag: ScoreSystem
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needFound: true
+      needResponseRef: true
+      refResponseEntity: ScoreSystem
+    - method: head
+      summary: Get only response status and headers information but no response body for the endpoint.
+      tag: ScoreSystem
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needFound: true
+      noResponseContent: true
+    - method: put
+      operationId: updateScoreSystem
+      summary: Update ScoreSystem based on id
+      tag: ScoreSystem
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needConflict: true
+      needFound: true
+      needReqBody: true
+      needReqBodyRef: true
+      refReqEntity: ScoreSystemData
+      needResponseRef: true
+      refResponseEntity: ScoreSystem
+    - method: patch
+      operationId: partiallyUpdateScoreSystem
+      summary: Partially update ScoreSystem based on id
+      tag: ScoreSystem
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needFound: true
+      needConflict: true
+      needReqBody: true
+      needReqBodyRef: true
+      refReqEntity: ScoreSystemData
+      needResponseRef: true
+      refResponseEntity: ScoreSystem
+    - method: delete
+      operationId: removeScoreSystem
+      summary: Delete ScoreSystem based on id
+      tag: ScoreSystem
+      noSecurity: false
+      needAuth: true
+      needFound: true
+      needPermission: true
+      noResponseContent: true
+  - path: '/scorecards'
+    ops:
+    - method: get
+      operationId: searchScorecard
+      summary: Retrieves all Scorecard by default.
+      tag: Scorecard
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      isList: true
+      needResponseRef: true
+      refResponseEntity: Scorecard
+    - method: head
+      summary: Get only response status and headers information but no response body for the endpoint.
+      tag: Scorecard
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      isList: true
+      noResponseContent: true
+    - method: post
+      operationId: createScorecard
+      summary: Create Scorecard in the system.
+      tag: Scorecard
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needFound: false
+      needConflict: true
+      needReqBody: true
+      needReqBodyRef: true
+      refReqEntity: ScorecardData
+      needResponseRef: true
+      refResponseEntity: Scorecard
+  - path: '/scorecards/:scorecardId'
+    ops:
+    - method: get
+      operationId: getScorecard
+      summary: Retrieves the Scorecard using the provided id.
+      tag: Scorecard
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needFound: true
+      needResponseRef: true
+      refResponseEntity: Scorecard
+    - method: head
+      summary: Get only response status and headers information but no response body for the endpoint.
+      tag: Scorecard
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needFound: true
+      noResponseContent: true
+    - method: put
+      operationId: updateScorecard
+      summary: Update Scorecard based on id
+      tag: Scorecard
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needConflict: true
+      needFound: true
+      needReqBody: true
+      needReqBodyRef: true
+      refReqEntity: ScorecardData
+      needResponseRef: true
+      refResponseEntity: Scorecard
+    - method: patch
+      operationId: partiallyUpdateScorecard
+      summary: Partially update Scorecard based on id
+      tag: Scorecard
+      noSecurity: false
+      needAuth: true
+      needPermission: true
+      needFound: true
+      needConflict: true
+      needReqBody: true
+      needReqBodyRef: true
+      refReqEntity: ScorecardData
+      needResponseRef: true
+      refResponseEntity: Scorecard
+    - method: delete
+      operationId: removeScorecard
+      summary: Delete Scorecard based on id
+      tag: Scorecard
+      noSecurity: false
+      needAuth: true
+      needFound: true
+      needPermission: true
+      noResponseContent: true
+  schemas:
+    - entity: ScoreSystemData
+      isRecord: false
+      entityParams:
+        - name: name
+        - name: phase
+        - name: isActive
+        - name: topic
+    - entity: ScoreSystem
+      isRecord: true
+      returnRef: ScoreSystemData
+    - entity: ScorecardData
+      isRecord: false
+      entityParams:
+        - name: name
+        - name: scorecardDetails
+    - entity: Scorecard
+      isRecord: true
+      returnRef: ScorecardData

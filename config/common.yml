@@ -83,11 +83,13 @@ defaults: &defaults # default use json-db,express,javascript
       mocha: false
       jest: false
       should: false
+      chai: false
     coverage:
       nyc: false # Istanbul's state of the art command line interface
     other:
       string-format: true
       nodemon: true # if false, becareful devDependencies has a extend comma
+      superagent: false
   dependencies:
     config:
       config: true # load .env
@@ -125,22 +127,21 @@ defaults: &defaults # default use json-db,express,javascript
       express-validator: false
       cors: true # enable CORS with various options.
       helmet: true # secure Express/Connect apps with various HTTP headers
-      multer: true # Middleware for handling `multipart/form-data
+      multer: false # Middleware for handling `multipart/form-data
       express-fileupload: false
       express-interceptor: true
     other:
       http-status: true
       uuid: true
       swagger-jsdoc: false
-      debug: true
+      debug: false
       bluebird: true
-      merge-deep: true
+      merge-deep: false
       pagination: true
       lodash: true
       config: true
       nodemailer: false
       moment: true
-      superagent: false
     spring:
       spring-fox: false
       otp-aerogera: false
@@ -149,13 +150,12 @@ test: #(+)
     test:
       unitTest: true
       e2eTest: true
-  dependencies:
+  devDependencies:
     other:
       superagent: true
-  devDependencies:
     test:
       mocha: true
-      should: true
+      chai: true
 cov: #(+)
   projectStyle:
     test:
@@ -213,10 +213,14 @@ tcjwt: #(+)
   projectStyle:
     auth:
       needJwt: true
+      needM2M: true
   dependencies:
+    express:
+      express-jwt: false
     secure:
-      express-jwt: true
-      jsonwebtoken: true
+      auth0-js: false
+      express-jwt-authz: false
+      jwks-rsa: false
       tc-core-library-js: true
 m2m: #(+)
   projectStyle:
@@ -321,10 +325,7 @@ dynamo:
       isDynamoDB: true
   dependencies:
     db:
-      aws-sdk: true
-    other:
-      bluebird: true
-      merge-deep: true
+      dynamoose: true
 mysql:
   projectStyle:
     db:

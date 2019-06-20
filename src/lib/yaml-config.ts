@@ -47,6 +47,9 @@ function handleYamlConfig(config) {
           case "delete":
             method.isDelete = true;
             break;
+          case "head":
+            method.isHead = true;
+            break;
         }
       }
       if (pathParams) {
@@ -103,7 +106,7 @@ function handleYamlConfig(config) {
       }
 
       // 判断方法是否有任何参数定义
-      if (method.needNavPage || method.queryParams || method.pathParams || method.reqBodyParams ) {
+      if (method.needNavPage || method.queryParams || method.pathParams || method.reqBodyParams || method.needReqBodyRef) {
         method.hasMethodParameters = true
       }
       // OPEN API 3.0 reqBodyParams参数不再位于parameters中

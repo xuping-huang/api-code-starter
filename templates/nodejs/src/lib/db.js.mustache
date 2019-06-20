@@ -4,6 +4,9 @@ const Sequelize = require('sequelize')
 {{#projectStyle.db.isMysql}}
 const dbLink = `mysql://${config.get('DATABASE.USERNAME')}:${config.get('DATABASE.PASSWORD')}@${config.get('DATABASE.URL')}/${config.get('DATABASE.NAME')}`
 const sequelize = new Sequelize(dbLink, {
+  logging: false,
+  operatorsAliases: false,
+  dialectOptions: { encrypt: true },
   pool: {
     max: config.get('DATABASE.POOL_MAX'),
     min: 0,
@@ -17,6 +20,9 @@ module.exports.sequelize = sequelize
 {{#projectStyle.db.isMariadb}}
 const dbLink = `mariadb://${config.get('DATABASE.USERNAME')}:${config.get('DATABASE.PASSWORD')}@${config.get('DATABASE.URL')}/${config.get('DATABASE.NAME')}`
 const sequelize = new Sequelize(dbLink, {
+  logging: false,
+  operatorsAliases: false,
+  dialectOptions: { encrypt: true },
   pool: {
     max: config.get('DATABASE.POOL_MAX'),
     min: 0,
@@ -30,6 +36,9 @@ module.exports.sequelize = sequelize
 {{#projectStyle.db.isPostgres}}
 const dbLink = `postgres://${config.get('DATABASE.USERNAME')}:${config.get('DATABASE.PASSWORD')}@${config.get('DATABASE.URL')}/${config.get('DATABASE.NAME')}`
 const sequelize = new Sequelize(dbLink, {
+  logging: false,
+  operatorsAliases: false,
+  dialectOptions: { encrypt: true },
   pool: {
     max: config.get('DATABASE.POOL_MAX'),
     min: 0,
@@ -43,6 +52,9 @@ module.exports.sequelize = sequelize
 {{#projectStyle.db.isMssql}}
 const dbLink = `mssql://${config.get('DATABASE.USERNAME')}:${config.get('DATABASE.PASSWORD')}@${config.get('DATABASE.URL')}/${config.get('DATABASE.NAME')}`
 const sequelize = new Sequelize(dbLink, {
+  logging: false,
+  operatorsAliases: false,
+  dialectOptions: { encrypt: true },
   pool: {
     max: config.get('DATABASE.POOL_MAX'),
     min: 0,
@@ -64,6 +76,9 @@ const sequelize = new Sequelize('database', config.get('DATABASE_USERNAME'), con
   // the storage engine for sqlite
   // - default ':memory:'
   storage: './db/database.db',
+  logging: false,
+  operatorsAliases: false,
+  dialectOptions: { encrypt: true },
   pool: {
     max: config.get('DATABASE_POOL_MAX'),
     min: 0,

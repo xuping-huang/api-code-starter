@@ -1,6 +1,6 @@
 # {{project.description}} Verification
-
 {{#projectStyle.auth.needPassword}}
+
 ## Login Account
 
 - username: `jason`
@@ -22,7 +22,7 @@ npm i
 export AWS_ACCESS_KEY_ID="AWS access key id"
 export AWS_SECRET_ACCESS_KEY="AWS secret access key"
 export AWS_REGION="AWS region"
-export IS_LOCAL="true/false"
+export AWS_IS_LOCAL="true/false"
 export AWS_DYNAMODB_ENDPOINT="dynamodb endpoint (required when is_local=true)"
 {{/projectStyle.db.isDynamoDB}}
 {{#projectStyle.db.isSqlite}}
@@ -83,50 +83,39 @@ EMAIL_FROM: "email sender address",
 
 4. Database initialize
   {{#projectStyle.db.isMysql}}
-  1. Create tables in the database by running the sql script `scripts\createTables.sql`
-    - **Note**: If you want the table name to be created after it is displayed to be case-sensitive, set the `lower_case_table_names=2` and restart the Mysql engine. Not setting this parameter will only affect the display effect and does not affect the application running.
+
+**Note**: If you want the table name to be created after it is displayed to be case-sensitive, set the `lower_case_table_names=2` and restart the Mysql engine. Not setting this parameter will only affect the display effect and does not affect the application running.
   {{/projectStyle.db.isMysql}}
   {{#projectStyle.db.isMssql}}
-  1. Create tables in the database by running the sql script `scripts\createTables.sql`
   {{/projectStyle.db.isMssql}}
   {{#projectStyle.db.isMariadb}}
-  1. Create tables in the database by running the sql script `scripts\createTables.sql`
-    - **Note**: If you want the table name to be created after it is displayed to be case-sensitive, set the `lower_case_table_names=2` and restart the Mysql engine. Not setting this parameter will only affect the display effect and does not affect the application running.
+
+**Note**: If you want the table name to be created after it is displayed to be case-sensitive, set the `lower_case_table_names=2` and restart the Mysql engine. Not setting this parameter will only affect the display effect and does not affect the application running.
   {{/projectStyle.db.isMariadb}}
   {{#projectStyle.db.isPostgres}}
-  1. Create tables in the database by running the sql script `scripts\createTables.sql`
   {{/projectStyle.db.isPostgres}}
   {{#projectStyle.db.isSqlite}}
-  1. Create tables in the database by running the sql script `scripts\createTables.sql`
   {{/projectStyle.db.isSqlite}}
   {{#projectStyle.db.isDynamoDB}}
-  1. Open a new console and run the command `docker exec -ti dynamodb sh` to use `aws-cli`
-
-  2. On the console you opened in step 1, run these following commands you can verify the data that inserted into database during the executing of postman tests
-  ```
-  aws dynamodb scan --table-name Challenge --endpoint-url http://localhost:8000
-  aws dynamodb scan --table-name ChallengeType --endpoint-url http://localhost:8000
-  ```
   {{/projectStyle.db.isDynamoDB}}
 
-  1. Initialize the data of database tables by running the script
+Initialize the data of database tables by running the script
 
-  ```
-  npm run initData
-  ```
-
-
+```
+npm run create-tables
+npm run init-data
+```
 
 ## Postman verification
 
 1. Open Postman
 
-2. Import Postman Environment and Collection from `docs` directory
+2. Import Postman Environment and Collection from `doc` directory
 
 3. Reintialize the data if need
 
   ```
-  npm run initData
+  npm run init-data
   ```
 
 4. Run the application
@@ -185,3 +174,24 @@ npm run cov-e2e
 ```
 {{/projectStyle.test.needCoverage}}
 {{/projectStyle.test.e2eTest}}
+{{#projectStyle.test.needCoverage}}
+
+## Test Reports
+
+### E2E Test
+
+  298 passing (55s)
+
+File                     |  % Stmts | % Branch |  % Funcs |  % Lines | Uncovered Line #s |
+-------------------------|----------|----------|----------|----------|-------------------|
+All files                |    91.24 |    81.11 |    88.37 |    92.48 |                   |
+
+
+### Unit Test
+
+  188 passing (7s)
+
+File                     |  % Stmts | % Branch |  % Funcs |  % Lines | Uncovered Line #s |
+-------------------------|----------|----------|----------|----------|-------------------|
+All files                |    85.11 |    79.29 |    80.65 |       88 |                   |
+{{/projectStyle.test.needCoverage}}
