@@ -305,7 +305,7 @@ definitions:
         description: The error message.
   {{#schemas}}
   {{entity}}:
-    {{^isRecord}}
+    {{#isPatch}}
     {{#isEnum}}
     type: string
     {{#description}}description: {{description}}{{/description}}
@@ -313,27 +313,31 @@ definitions:
     {{/isEnum}}
     {{^isEnum}}
     type: object
+    properties:
+      {{#entityParams}}{{> prop}}{{/entityParams}}
+    {{/isEnum}}
+    {{/isPatch}}
+    {{^isPatch}}
+    type: object
+    {{#needRequired}}
     required:
       {{#entityParams}}
       {{^notRequired}}
       - {{name}}
       {{/notRequired}}
       {{/entityParams}}
-    properties:
-      {{#entityParams}}{{> prop}}{{/entityParams}}
-    {{/isEnum}}
-    {{/isRecord}}
-    {{#isRecord}}
-    type: object
+    {{/needRequired}}
     allOf:
+    {{#isRecord}}
       - type: object
         properties:
                                   id:
-                                    $ref: '#/definitions/Id'
-          {{#entityParams}}{{> prop}}{{/entityParams}}
+                                    type: string
+                                    description: The id.
       {{#api.entity.needRecord}}
       - $ref: '#/definitions/Record'
       {{/api.entity.needRecord}}
-      - $ref: '#/definitions/{{returnRef}}'
     {{/isRecord}}
+      - $ref: '#/definitions/{{returnRef}}'
+    {{/isPatch}}
   {{/schemas}}

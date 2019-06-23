@@ -31,8 +31,9 @@
                                       {{/ex.isRef}}
                                       {{#ex.isObject}}
                                       properties:
-                                        name:
-                                          type: string
+                                        {{name}}:
+                                          type: {{ex.type}}
+                                          description: {{ex.description}}
                                       {{/ex.isObject}}
                                       {{#ex.isRefArray}}
                                       items:
@@ -42,6 +43,7 @@
                                       items:
                                         type: object
                                         properties:
-                                          name:
-                                            type: string
+                                          {{name}}:
+                                            type: {{ex.type}}
+                                            description: {{ex.description}}
                                       {{/ex.isObjectArray}}

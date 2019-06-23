@@ -93,7 +93,7 @@ defaults: &defaults
       needConflict: true
       needReqBody: true
       needReqBodyRef: true
-      refReqEntity: ScoreSystemData
+      refReqEntity: ScoreSystemPatchData
       needResponseRef: true
       refResponseEntity: ScoreSystem
     - method: delete
@@ -184,7 +184,7 @@ defaults: &defaults
       needConflict: true
       needReqBody: true
       needReqBodyRef: true
-      refReqEntity: ScorecardData
+      refReqEntity: ScorecardPatchData
       needResponseRef: true
       refResponseEntity: Scorecard
     - method: delete
@@ -197,16 +197,24 @@ defaults: &defaults
       needPermission: true
       noResponseContent: true
   schemas:
+    - entity: ScoreSystem
+      isRecord: true
+      returnRef: ScoreSystemData
     - entity: ScoreSystemData
-      isRecord: false
+      needRequired: true
+      returnRef: ScoreSystemPatchData
       entityParams:
         - name: name
         - name: phase
         - name: isActive
         - name: topic
-    - entity: ScoreSystem
-      isRecord: true
-      returnRef: ScoreSystemData
+    - entity: ScoreSystemPatchData
+      isPatch: true
+      entityParams:
+        - name: name
+        - name: phase
+        - name: isActive
+        - name: topic
     - entity: ScorecardData
       isRecord: false
       entityParams:
