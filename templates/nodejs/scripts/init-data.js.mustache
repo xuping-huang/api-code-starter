@@ -1,14 +1,32 @@
 /**
-* Insert test data to database.
-*/
-const logger = require('../src/lib/logger')
-const { cleanData, initData } = require('./tools')
+ * Insert seed data to tables in database
+ */
+// TODO FIRST: adjust ref dir
 
-const run = async () => {
-  logger.info('Importing test data into database.')
-  await cleanData()
-  await initData()
-  logger.info('Database test data imported.')
-}
+const { get } = require('lodash')
+const models = require('../src/models')
+const logger = require('../src/common/logger')
 
-run()
+logger.info('Requesting to insert seed data to the tables...')
+
+const promises = []
+
+Object.keys(models).forEach(modelName => {
+  try {
+    const data = require(`./data/${modelName}.json`)
+    logger.info(`Inserting ${get(data, 'length')} records in table ${modelName}`)
+    promises.push(models[modelName].batchPut(data))
+  } catch (e) {
+    logger.warn(`No records will be inserted in table ${modelName}`)
+  }
+})
+
+Promise.all(promises)
+  .then(() => {
+    logger.info('All tables have been inserted with the data. The processes is run asynchronously')
+    process.exit()
+  })
+  .catch((err) => {
+    logger.logFullError(err)
+    process.exit(1)
+  })

@@ -62,6 +62,7 @@ defaults: &defaults # default use json-db,express,javascript
       needHttps: false
       needKafka: false
       needElasticSearch: false
+      needS3: false
     date:
       isThreeTenbp: false
       isJava8: false
@@ -262,10 +263,24 @@ kafka: #(+)
   projectStyle:
     other:
       needKafka: true
+  dependencies:
+    other:
+      topcoder-bus-api-wrapper: true
 es: #(+)
   projectStyle:
     other:
       needElasticSearch: true
+  dependencies:
+    other:
+      elasticsearch: true
+      http-aws-es: true
+s3:
+  projectStyle:
+    other:
+      needS3: true
+  dependencies:
+    db:
+      aws-sdk: true
 https: #(+)
   projectStyle:
     other:
@@ -326,6 +341,7 @@ dynamo:
   dependencies:
     db:
       dynamoose: true
+      aws-sdk: true
 mysql:
   projectStyle:
     db:

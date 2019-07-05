@@ -49,19 +49,34 @@ The following parameters can be set in config files or in env variables:
   {{#dependencies.secure.tc-core-library-js}}
 - VALID_ISSUERS: The valid issuer of tokens.
   {{/dependencies.secure.tc-core-library-js}}
+  {{#projectStyle.other.needKafka}}
+  {{#dependencies.secure.tc-core-library-js}}
+- BUSAPI_URL: Bus API URL
+- KAFKA_ERROR_TOPIC: Kafka error topic used by bus API wrapper
+- KAFKA_TOPIC: the Kafka topic used by bus API wrapper, refer `config/default.js` for more details
+  {{/dependencies.secure.tc-core-library-js}}
+  {{/projectStyle.other.needKafka}}
   {{/projectStyle.auth.needJwt}}
   {{#projectStyle.auth.needM2M}}
-- SCOPES.SCORESYSTEM: The machine token scope name for score system.
+- AUTH0_URL: AUTH0 URL, used to get M2M token
+- AUTH0_PROXY_SERVER_URL: AUTH0 proxy server URL, used to get M2M token
+- AUTH0_AUDIENCE: AUTH0 audience, used to get M2M token
+- TOKEN_CACHE_TIME: AUTH0 token cache time, used to get M2M token
+- AUTH0_CLIENT_ID: AUTH0 client id, used to get M2M token
+- AUTH0_CLIENT_SECRET: AUTH0 client secret, used to get M2M token
+- SCOPES: the configurable M2M token scopes, refer `config/default.js` for more details
   {{/projectStyle.auth.needM2M}}
+  {{#dependencies.db.aws-sdk}}
+- AMAZON.AWS_ACCESS_KEY_ID: The Amazon certificate key to use when connecting. Use local dynamodb you can set fake value
+- AMAZON.AWS_SECRET_ACCESS_KEY: The Amazon certificate access key to use when connecting. Use local dynamodb you can set fake value
+- AMAZON.AWS_REGION: The Amazon certificate region to use when connecting. Use local dynamodb you can set fake value
+- AMAZON.AWS_IS_LOCAL: Use Amazon DynamoDB Local or server.
   {{#projectStyle.db.isDynamoDB}}
-- DYNAMODB.AWS_ACCESS_KEY_ID: The Amazon certificate key to use when connecting. Use local dynamodb you can set fake value
-- DYNAMODB.AWS_SECRET_ACCESS_KEY: The Amazon certificate access key to use when connecting. Use local dynamodb you can set fake value
-- DYNAMODB.AWS_REGION: The Amazon certificate region to use when connecting. Use local dynamodb you can set fake value
-- DYNAMODB.AWS_IS_LOCAL: Use Amazon DynamoDB Local or server.
-- DYNAMODB.AWS_DYNAMODB_ENDPOINT: The local url if using Amazon DynamoDB Local
-- DYNAMODB.AWS_READ_UNITS: The AWS DynamoDB read capacity units
-- DYNAMODB.AWS_WRITE_UNITS: The AWS DynamoDB write capacity units
+- AMAZON.AWS_DYNAMODB_ENDPOINT: The local url if using Amazon DynamoDB Local
+- AMAZON.DYNAMODB_THROUGHPUT_READ: The AWS DynamoDB read capacity units
+- AMAZON.DYNAMODB_THROUGHPUT_WRITE: The AWS DynamoDB write capacity units
   {{/projectStyle.db.isDynamoDB}}
+  {{/dependencies.db.aws-sdk}}
   {{#projectStyle.db.isSqlite}}
 - DATABASE.USERNAME: The Sqlite3 database username.
 - DATABASE.PASSWORD: The Sqlite3 database password.
@@ -95,6 +110,16 @@ The following parameters can be set in config files or in env variables:
 - DATABASE.URL: The database link.
 - DATABASE.NAME: The database name.
   {{/projectStyle.db.isMssql}}
+  {{#projectStyle.other.needS3}}
+- AMAZON.S3_API_VERSION: the AWS S3 api version
+- AMAZON.ATTACHMENT_S3_BUCKET: the AWS S3 bucket to store attachments
+  {{/projectStyle.other.needS3}}
+  {{#projectStyle.other.needElasticSearch}}
+- ES.HOST: Elasticsearch host
+- ES.API_VERSION: Elasticsearch API version
+- ES.ES_INDEX: Elasticsearch index name
+- ES.ES_TYPE: Elasticsearch index type
+  {{/projectStyle.other.needElasticSearch}}
   {{#dependencies.other.nodemailer}}
 - EMAIL.ACCOUNT: The email server account.
 - EMAIL.PASSWORD: The email server password.
@@ -138,7 +163,7 @@ If you want to use docker of local DynamoDB:
 
 ## AWS DynamoDB setup
 
-Properly configure DYNAMODB.AWS_ACCESS_KEY_ID, DYNAMODB.AWS_SECRET_ACCESS_KEY, DYNAMODB.AWS_REGION, DYNAMODB.AWS_IS_LOCAL
+Properly configure AMAZON.AWS_ACCESS_KEY_ID, AMAZON.AWS_SECRET_ACCESS_KEY, AMAZON.AWS_REGION, AMAZON.AWS_IS_LOCAL
 in config file or via environment variables. You may create tables using below `npm run create-tables` command.
 {{/projectStyle.db.isDynamoDB}}
 {{#projectStyle.other.needKafka}}

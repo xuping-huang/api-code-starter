@@ -1,0 +1,92 @@
+/**
+ * Helper functions to load data in ES
+ */
+
+const logger = require('../common/logger')
+const helper = require('../common/helper')
+const config = require('config')
+
+const esClient = helper.getESClient()
+
+/*
+ * Init index into ES
+ */
+const initIndex = async () => {
+  // TODO FIRST: adjust es indexes
+  const indexes = [
+    config.ES.INDEXES.ES_ENTITY_INDEX
+  ]
+  if (process.argv.length === 3 && process.argv[2] === 'force') {
+    _.each(indexes, index => {
+      logger.info(`Delete index ${index} if any.`)
+      try {
+        await client.indices.delete({ index })
+      } catch (err) {
+        // ignore
+      }
+    })
+  }
+
+  _.each(indexes, index => {
+    const exists = await client.indices.exists({ index })
+    if (exists) {
+      logger.info(`The index ${index} exists.`)
+    } else {
+      logger.info(`The index ${index} will be created.`)
+      await client.indices.create({ index })
+    }
+  })
+}
+
+/**
+ * Load entity into ES
+ */
+const createModelIndex = async (indexName, indexType, entity) => {
+  esClient.create({
+    index: indexName,
+    type: indexType,
+    id: entity.id,
+    body: entity
+  })
+}
+
+/**
+ * Update entity into ES
+ */
+const updateModelIndex = async (indexName, indexType, entity) => {
+  esClient.update({
+    index: indexName,
+    type: indexType,
+    id: entity.id,
+    body: {
+      doc: entity
+    }
+  })
+}
+
+/**
+ * Delete entity from ES
+ */
+const deleteModelIndex = async (indexName, indexType, entityId) => {
+  esClient.delete({
+    index: indexName,
+    type: indexType,
+    id: entity.id
+  })
+}
+
+/*
+ * Load data into ES after removing existing data
+ */
+const loadES = async () => {
+  logger.info('ES Index create started!')
+  await initIndex()
+  logger.info('ES Index create succeeded!')
+}
+
+module.exports = {
+  createModelIndex,
+  updateModelIndex,
+  deleteModelIndex,
+  loadES
+}

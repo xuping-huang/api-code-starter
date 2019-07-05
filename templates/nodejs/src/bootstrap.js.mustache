@@ -5,19 +5,20 @@
 global.Promise = require('bluebird')
 const fs = require('fs')
 {{#dependencies.other.pagination}}
-const Joi = require('joi')
+const Joi = require('@hapi/joi')
 {{/dependencies.other.pagination}}
 const path = require('path')
-const logger = require('./lib/logger')
+const logger = require('./common/logger')
 {{#dependencies.other.pagination}}
 
 /**
  * Define multiple Joi validation common methods
  */
 
+Joi.optionalId = () => Joi.string().uuid()
+Joi.id = () => Joi.optionalId().required()
 Joi.page = () => Joi.number().integer().min(1).default(1)
-Joi.perPage = () => Joi.number().integer().min(1).max(config.PAGE.PER_PAGE_MAX)
-Joi.sortOrder = () => Joi.string().valid('asc', 'desc', 'ASC', 'DESC').default('asc')
+Joi.perPage = () => Joi.number().integer().min(1).max(100).default(20)
 {{/dependencies.other.pagination}}
 
 /**
@@ -40,4 +41,4 @@ function buildServices (dir) {
   })
 }
 
-buildServices(path.join(__dirname, 'service'))
+buildServices(path.join(__dirname, 'services'))

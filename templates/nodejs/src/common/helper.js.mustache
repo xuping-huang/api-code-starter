@@ -1,15 +1,55 @@
 /**
  * This file defines helper methods
  */
-
+// TODO LAST: remove no use function
 const _ = require('lodash')
-const Joi = require('joi')
+const Joi = require('@hapi/joi')
+{{#dependencies.db.aws-sdk}}
+const AWS = require('aws-sdk')
+{{/dependencies.db.aws-sdk}}
+{{#projectStyle.other.needKafka}}
+const busApi = require('topcoder-bus-api-wrapper')
+const constants = require('../constants')
+{{/projectStyle.other.needKafka}}
+{{#projectStyle.other.needElasticSearch}}
+const elasticsearch = require('elasticsearch')
+{{/projectStyle.other.needElasticSearch}}
 {{#dependencies.other.pagination}}
 const querystring = require('querystring')
 const pagination = require('pagination')
 {{/dependencies.other.pagination}}
 const errors = require('./app-error')
-const models = require('../model/index')
+const models = require('../models/index')
+{{#projectStyle.auth.needM2M}}
+const config = require('config')
+const m2mAuth = require('tc-core-library-js').auth.m2m
+const m2m = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME']))
+{{/projectStyle.auth.needM2M}}
+
+{{#projectStyle.other.needKafka}}
+// Bus API Client
+let busApiClient
+{{/projectStyle.other.needKafka}}
+
+{{#projectStyle.other.needElasticSearch}}
+// Elasticsearch client
+let esClient
+{{/projectStyle.other.needElasticSearch}}
+
+{{#dependencies.db.aws-sdk}}
+AWS.config.update({
+  {{#projectStyle.other.needS3}}
+  s3: config.AMAZON.S3_API_VERSION,
+  {{/projectStyle.other.needS3}}
+  accessKeyId: config.AMAZON.AWS_ACCESS_KEY_ID,
+  secretAccessKey: config.AMAZON.AWS_SECRET_ACCESS_KEY,
+  region: config.AMAZON.AWS_REGION
+})
+{{/dependencies.db.aws-sdk}}
+
+{{#projectStyle.other.needS3}}
+const s3 = new AWS.S3()
+{{/projectStyle.other.needS3}}
 
 /**
  * Wrap all functions of object to express middleware
@@ -347,6 +387,70 @@ module.exports.checkUserExist = async (userId) => {
   return Promise.resolve(user)
 }
 {{/projectStyle.orm.isSequelize}}
+{{#projectStyle.other.needS3}}
+
+/**
+ * Upload file to S3
+ * @param {String} attachmentId the attachment id
+ * @param {Buffer} data the file data
+ * @param {String} mimetype the MIME type
+ * @param {String} fileName the original file name
+ * @return {Promise} promise to upload file to S3
+ */
+module.exports.uploadToS3 = async (attachmentId, data, mimetype, fileName) => {
+  const params = {
+    Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET,
+    Key: attachmentId,
+    Body: data,
+    ContentType: mimetype,
+    Metadata: {
+      fileName
+    }
+  }
+  // Upload to S3
+  return s3.upload(params).promise()
+}
+
+/**
+ * Download file from S3
+ * @param {String} attachmentId the attachment id
+ * @return {Promise} promise resolved to downloaded data
+ */
+module.exports.downloadFromS3 = async (attachmentId) => {
+  const file = await s3.getObject({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET, Key: attachmentId }).promise()
+  return {
+    data: file.Body,
+    mimetype: file.ContentType
+  }
+}
+
+/**
+ * Delete file from S3
+ * @param {String} attachmentId the attachment id
+ * @return {Promise} promise resolved to deleted data
+ */
+module.exports.deleteFromS3 = async (attachmentId) => {
+  return s3.deleteObject({ Bucket: config.AMAZON.ATTACHMENT_S3_BUCKET, Key: attachmentId }).promise()
+}
+{{/projectStyle.other.needS3}}
+
+/**
+ * Test whether the given value is partially match the filter.
+ * @param {String} filter the filter
+ * @param {String} value the value to test
+ * @returns {Boolean} the match result
+ */
+module.exports.partialMatch = (filter, value) => {
+  if (filter) {
+    if (value) {
+      return RegExp(filter, 'i').test(value)
+    } else {
+      return false
+    }
+  } else {
+    return true
+  }
+}
 
 /**
  * Verify IP address validity
@@ -395,3 +499,81 @@ module.exports.validEmail = (emailAddress) => {
   }
   return true
 }
+
+{{#projectStyle.auth.needM2M}}
+/**
+ * Get M2M token.
+ * @returns {Promise<String>} the M2M token
+ */
+module.exports.getM2MToken = async () => {
+  return m2m.getMachineToken(config.AUTH0_CLIENT_ID, config.AUTH0_CLIENT_SECRET)
+}
+{{/projectStyle.auth.needM2M}}
+{{#projectStyle.other.needKafka}}
+
+/**
+ * Get Bus API Client
+ * @return {Object} Bus API Client Instance
+ */
+const getBusApiClient = () => {
+  // if there is no bus API client instance, then create a new instance
+  if (!busApiClient) {
+    busApiClient = busApi(_.pick(config,
+      ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME',
+        'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'BUSAPI_URL',
+        'KAFKA_ERROR_TOPIC', 'AUTH0_PROXY_SERVER_URL']))
+  }
+
+  return busApiClient
+}
+
+/**
+ * Post bus event.
+ * @param {String} topic the event topic
+ * @param {Object} payload the event payload
+ */
+module.exports.postBusEvent = async (topic, payload) => {
+  if (!topic) {
+    throw new errors.InternalServerError('Kafka topic undefined!')
+  }
+  const client = getBusApiClient()
+  await client.postEvent({
+    topic,
+    originator: constants.EVENT_ORIGINATOR,
+    timestamp: new Date().toISOString(),
+    'mime-type': constants.EVENT_MIME_TYPE,
+    payload
+  })
+}
+{{/projectStyle.other.needKafka}}
+{{#projectStyle.other.needElasticSearch}}
+
+/**
+ * Get ES Client
+ * @return {Object} Elasticsearch Client Instance
+ */
+module.exports.getESClient = async () => {
+  if (esClient) {
+    return esClient
+  }
+  const esHost = config.get('ES.HOST')
+  // AWS ES configuration is different from other providers
+  if (/.*amazonaws.*/.test(esHost)) {
+    esClient = elasticsearch.Client({
+      apiVersion: config.get('ES.API_VERSION'),
+      hosts: esHost,
+      connectionClass: require('http-aws-es'), // eslint-disable-line global-require
+      amazonES: {
+        region: config.get('AMAZON.AWS_REGION'),
+        credentials: new AWS.EnvironmentCredentials('AWS')
+      }
+    })
+  } else {
+    esClient = new elasticsearch.Client({
+      apiVersion: config.get('ES.API_VERSION'),
+      hosts: esHost
+    })
+  }
+  return esClient
+}
+{{/projectStyle.other.needElasticSearch}}

@@ -1,22 +1,22 @@
 /**
- * Create table schemes in database
+ * Drop tables in database. All data will be cleared.
  */
 // TODO FIRST: adjust ref dir
 
 const models = require('../src/models')
 const logger = require('../src/common/logger')
 
-logger.info('Requesting to create tables...')
+logger.info('Requesting to delete tables...')
 
 const promises = []
 
 Object.keys(models).forEach(modelName => {
-  promises.push(models[modelName].$__.table.create())
+  promises.push(models[modelName].$__.table.delete())
 })
 
 Promise.all(promises)
   .then(() => {
-    logger.info('All tables have been requested to be created. Creating processes is run asynchronously')
+    logger.info('All tables have been requested to be deleted. Deleting processes is run asynchronously')
     process.exit()
   })
   .catch((err) => {

@@ -19,8 +19,8 @@ const authenticator = require('tc-core-library-js').middleware.jwtAuthenticator
 const jwt = require('jsonwebtoken')
 {{/dependencies.secure.tc-core-library-js}}
 {{/projectStyle.auth.needJwt}}
-const helper = require('./src/lib/helper')
-const error = require('./src/lib/app-error')
+const helper = require('./src/common/helper')
+const error = require('./src/common/app-error')
 const routes = require('./src/routes')
 {{#dependencies.other.swagger-jsdoc}}
 
@@ -103,7 +103,7 @@ const authVerifier = (jwtKeyCacheTime) => {
 module.exports = (app) => {
   _.each(routes, (verbs, path) => {
     _.each(verbs, (params, verb) => {
-      const method = require(`./src/controller/${params.controller}`)[params.operation]; // eslint-disable-line
+      const method = require(`./src/controllers/${params.controller}`)[params.operation]; // eslint-disable-line
       if (!method) {
         throw new error.InternalServerError(`${params.operation} is undefined, for controller ${params.controller}`)
       }
